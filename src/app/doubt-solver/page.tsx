@@ -9,8 +9,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Sparkles, Image as ImageIcon, X } from 'lucide-react';
+import { Loader2, Sparkles, X } from 'lucide-react';
 import { solveDoubt } from './actions';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -115,8 +117,8 @@ export default function DoubtSolverPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap font-body">
-                        {state.explanation}
+                    <div className="prose prose-sm max-w-none text-foreground font-body">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.explanation}</ReactMarkdown>
                     </div>
                 </CardContent>
             </Card>
