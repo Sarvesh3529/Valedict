@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +32,7 @@ function SubmitButton() {
 }
 
 export default function DoubtSolverPage() {
-  const [state, formAction] = useFormState(solveDoubt, { explanation: '', error: null });
+  const [state, formAction] = useActionState(solveDoubt, { explanation: '', error: null });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState<string>('');
 
