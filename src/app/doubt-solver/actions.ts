@@ -13,7 +13,7 @@ const schema = z.object({
     .optional()
     .refine(file => !file || file.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
     .refine(
-        file => !file || ALLOWED_IMAGE_TYPES.includes(file.type),
+        file => !file || file.size === 0 || ALLOWED_IMAGE_TYPES.includes(file.type),
         'Only .jpg, .jpeg, .png, and .webp formats are supported.'
     ),
 });
