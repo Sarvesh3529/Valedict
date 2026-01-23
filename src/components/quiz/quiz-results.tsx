@@ -24,6 +24,7 @@ import {
   ChartConfig,
 } from '@/components/ui/chart';
 import { PieChart, Pie, Cell } from 'recharts';
+import { cn } from '@/lib/utils';
 
 interface QuizResultsProps {
   results: QuizResult[];
@@ -33,7 +34,7 @@ interface QuizResultsProps {
 const chartConfig: ChartConfig = {
   correct: {
     label: "Correct",
-    color: "hsl(var(--primary))",
+    color: "hsl(var(--accent))",
   },
   incorrect: {
     label: "Incorrect",
@@ -90,35 +91,42 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
         <Accordion type="single" collapsible className="w-full space-y-2">
           {results.map((result, index) => (
             <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
-              <AccordionTrigger className={`flex p-3 rounded-lg ${result.isCorrect ? 'bg-green-100 hover:bg-green-200' : 'bg-red-100 hover:bg-red-200'}`}>
-                <div className="flex items-center space-x-3 text-left">
+              <AccordionTrigger 
+                className={cn(
+                  'flex p-3 rounded-lg hover:no-underline',
+                  result.isCorrect 
+                    ? 'bg-accent/10 hover:bg-accent/20' 
+                    : 'bg-destructive/10 hover:bg-destructive/20'
+                )}
+              >
+                <div className="flex flex-1 items-center space-x-3 text-left">
                   {result.isCorrect ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0" />
                   ) : (
-                    <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                    <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
                   )}
-                  <span className="flex-1">Question {index + 1}</span>
+                  <span className="flex-1 text-foreground">Question {index + 1}</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 border border-t-0 rounded-b-lg">
+              <AccordionContent className="p-4 border border-border border-t-0 rounded-b-lg bg-card">
                 <p className="font-semibold mb-2">{result.question.question}</p>
                 <div className="space-y-2 text-sm">
                   <p>
                     Your answer:{' '}
-                    <span className={result.isCorrect ? 'text-green-700' : 'text-red-700'}>
+                    <span className={result.isCorrect ? 'text-accent' : 'text-destructive'}>
                       {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                     </span>
                   </p>
                   <p>
                     Correct answer:{' '}
-                    <span className="font-medium">
+                    <span className="font-medium text-muted-foreground">
                       {result.question.options[result.question.correctAnswer]}
                     </span>
                   </p>
                 </div>
-                <Alert className="mt-4 bg-blue-50 border-blue-200">
-                  <AlertTitle className="text-blue-800">Explanation</AlertTitle>
-                  <AlertDescription className="text-blue-700">
+                <Alert className="mt-4 bg-secondary border-none">
+                  <AlertTitle>Explanation</AlertTitle>
+                  <AlertDescription className="text-secondary-foreground/80">
                     {result.question.explanation}
                   </AlertDescription>
                 </Alert>
