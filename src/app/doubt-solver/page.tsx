@@ -58,7 +58,7 @@ export default function DoubtSolverPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
+    <div className="container mx-auto max-w-3xl px-4 py-12">
       <Card>
         <CardHeader>
           <CardTitle className="text-center font-headline text-2xl text-primary">
@@ -117,7 +117,7 @@ export default function DoubtSolverPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="prose prose-sm max-w-none text-foreground font-body">
+                    <div className="prose prose-sm max-w-none text-foreground font-body dark:prose-invert">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.explanation}</ReactMarkdown>
                     </div>
                 </CardContent>

@@ -49,7 +49,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className="container mx-auto max-w-4xl px-4 py-12">
        <Card className="overflow-hidden">
         <CardHeader className="bg-primary/5">
           <CardTitle className="font-headline text-2xl text-primary text-center">
