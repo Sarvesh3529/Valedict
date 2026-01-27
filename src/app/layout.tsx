@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import { FirebaseClientProvider } from '@/firebase';
 import ConditionalHeader from '@/components/ConditionalHeader';
 
 export const metadata: Metadata = {
@@ -29,11 +30,13 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
+        <FirebaseClientProvider>
           <div className="relative flex min-h-screen flex-col">
             <ConditionalHeader />
             <main className="flex-1">{children}</main>
           </div>
           <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );
