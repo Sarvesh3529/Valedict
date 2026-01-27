@@ -2,6 +2,7 @@ import { subjects } from '@/lib/data';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -14,6 +15,7 @@ const iconComponents: { [key: string]: React.ElementType } = {
   Zap: Icons.Zap,
   FlaskConical: Icons.FlaskConical,
   Leaf: Icons.Leaf,
+  GraduationCap: Icons.GraduationCap
 };
 
 export default function DashboardPage() {
@@ -29,6 +31,23 @@ export default function DashboardPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <Card className="flex flex-col md:col-span-2 lg:col-span-3 bg-primary/10 border-primary">
+            <CardHeader>
+                <div className='flex items-center gap-4'>
+                    <Icons.GraduationCap className="h-8 w-8 text-primary" />
+                    <CardTitle className="font-headline text-white">New here? Get started!</CardTitle>
+                </div>
+                <CardDescription>
+                    Answer a few questions to personalize your study plan. It only takes a minute.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Link href="/onboarding">Personalize Your Plan</Link>
+                </Button>
+            </CardContent>
+        </Card>
+
         {subjects.map((subject) => {
           const Icon = iconComponents[subject.iconName];
           return (

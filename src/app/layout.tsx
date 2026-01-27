@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import Header from '@/components/header';
 import { cn } from '@/lib/utils';
+import ConditionalHeader from '@/components/ConditionalHeader';
 
 export const metadata: Metadata = {
   title: 'ExamPrep AI',
@@ -29,11 +29,11 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-        </div>
-        <Toaster />
+          <div className="relative flex min-h-screen flex-col">
+            <ConditionalHeader />
+            <main className="flex-1">{children}</main>
+          </div>
+          <Toaster />
       </body>
     </html>
   );

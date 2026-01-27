@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Collection Rules
+    match /onboardingResponses/{anonId} {
+      // READ: Only the owner can read their own response document.
+      allow get: if isOwner(anonId);
+      allow list: if false;
+
+      // WRITE: Owner can create and update, but not delete.
+      allow create: if isOwner(anonId);
+      allow update: if isOwner(anonId);
+      allow delete: if false;
+    }
+  }
+}

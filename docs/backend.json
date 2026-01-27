@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "onboardingResponse": {
+      "title": "Onboarding Response",
+      "description": "Stores responses from the pre-login onboarding flow.",
+      "type": "object",
+      "properties": {
+        "anonId": {
+          "type": "string",
+          "description": "The anonymous user ID from Firebase Auth."
+        },
+        "class": {
+          "type": "string",
+          "description": "The user's selected class."
+        },
+        "exam": {
+          "type": "string",
+          "description": "The exam the user is preparing for."
+        },
+        "weakAreas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Subjects or topics the user struggles with."
+        },
+        "confidenceLevel": {
+          "type": "number",
+          "description": "User's self-reported confidence level (e.g., 1-5)."
+        },
+        "dailyStudyTime": {
+          "type": "string",
+          "description": "How much time the user can study daily."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the record was created."
+        }
+      },
+      "required": ["anonId", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": ["anonymous"]
+  },
+  "firestore": {
+    "/onboardingResponses/{anonId}": {
+      "schema": {
+        "$ref": "#/backend/entities/onboardingResponse"
+      },
+      "description": "Stores individual user responses from the onboarding flow."
+    }
+  }
+}
