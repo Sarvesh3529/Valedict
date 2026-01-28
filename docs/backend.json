@@ -13,9 +13,12 @@
           "type": "string",
           "description": "The user's selected grade."
         },
-        "troublingSubject": {
-          "type": "string",
-          "description": "The subject the user finds most troubling."
+        "troublingSubjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The subjects the user finds most troubling."
         },
         "studyTime": {
           "type": "string",
@@ -28,9 +31,12 @@
           },
           "description": "The times of day the user usually studies."
         },
-        "difficulty": {
-          "type": "number",
-          "description": "User's self-reported difficulty level (e.g., 1-5)."
+        "biggestProblems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The biggest problems the user is facing."
         },
         "nextExamDate": {
           "type": "string",

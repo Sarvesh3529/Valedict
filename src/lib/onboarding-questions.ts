@@ -22,8 +22,8 @@ export type OnboardingQuestion = {
     {
         id: 2,
         text: "Which subject troubles you the most?",
-        type: 'single-choice',
-        firestoreField: 'troublingSubject',
+        type: 'multi-select',
+        firestoreField: 'troublingSubjects',
         options: [
           { label: "Mathematics", value: "math" },
           { label: "Physics", value: "phy" },
@@ -57,9 +57,15 @@ export type OnboardingQuestion = {
     },
     {
         id: 5,
-        text: "How difficult is your biggest problem right now?",
-        type: 'slider',
-        firestoreField: 'difficulty',
+        text: "What’s your biggest problem right now?",
+        type: 'multi-select',
+        firestoreField: 'biggestProblems',
+        options: [
+            { label: "I forget what I study", value: "forget" },
+            { label: "I don’t understand concepts", value: "concepts" },
+            { label: "I don’t revise regularly", value: "revision" },
+            { label: "I panic before exams", value: "panic" },
+        ],
     },
     {
       id: 6,
