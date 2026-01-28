@@ -15,17 +15,18 @@ export const chapters: Chapter[] = [
   { id: 'eco', name: 'Ecology', subjectId: 'bio' },
 ];
 
-export const subjects: Omit<Subject, 'chapters'>[] = [
+const baseSubjects: Omit<Subject, 'chapters'>[] = [
   { id: 'math', name: 'Mathematics', iconName: 'Calculator' },
   { id: 'phy', name: 'Physics', iconName: 'Zap' },
   { id: 'chem', name: 'Chemistry', iconName: 'FlaskConical' },
   { id: 'bio', name: 'Biology', iconName: 'Leaf' },
 ];
 
-export const fullSubjects: Subject[] = subjects.map((subject) => ({
+export const subjects: Subject[] = baseSubjects.map((subject) => ({
   ...subject,
   chapters: chapters.filter((c) => c.subjectId === subject.id),
 }));
+
 
 export const quizQuestions: QuizQuestion[] = [
   // Math
@@ -129,5 +130,3 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'Photosynthesis is the process used by plants, algae and certain bacteria to harness energy from sunlight into chemical energy.'
   }
 ];
-
-export { fullSubjects as subjects };
