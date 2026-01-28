@@ -2,17 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, BrainCircuit, Menu, NotebookText } from 'lucide-react';
+import { BookOpen, BrainCircuit, Menu, NotebookText, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from './theme-toggle';
 
 const navLinks = [
-  { href: '/dashboard', label: 'Dashboard', icon: BookOpen },
-  { href: '/quiz', label: 'Quiz Mode', icon: NotebookText },
+  { href: '/dashboard', label: 'Home', icon: BookOpen },
+  { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function Header() {
@@ -53,21 +55,25 @@ export default function Header() {
         </Link>
 
         {isMobile ? (
-          <Sheet open={isMobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <div className="flex flex-col space-y-2 p-4">
-                <NavContent />
-              </div>
-            </SheetContent>
-          </Sheet>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Sheet open={isMobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left">
+                <div className="flex flex-col space-y-2 p-4">
+                  <NavContent />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         ) : (
           <nav className="flex items-center space-x-2">
             <NavContent />
+            <ThemeToggle />
           </nav>
         )}
       </div>
