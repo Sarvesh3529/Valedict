@@ -10,7 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { href: '/', label: 'Dashboard', icon: BookOpen },
+  { href: '/dashboard', label: 'Dashboard', icon: BookOpen },
   { href: '/quiz', label: 'Quiz Mode', icon: NotebookText },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
 ];
@@ -47,7 +47,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold">
+        <Link href="/dashboard" className="flex items-center gap-2 font-bold">
           <BrainCircuit className="h-6 w-6 text-primary" />
           <span className="font-headline text-lg">ExamPrep AI</span>
         </Link>

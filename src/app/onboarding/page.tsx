@@ -79,8 +79,8 @@ export default function OnboardingPage() {
           </div>
           <h1 className="text-2xl font-bold mb-2">You're all set!</h1>
           <p className="text-slate-400 mb-6">We’ll personalize your study plan based on this 🎯</p>
-          <Button onClick={() => router.push('/')} size="lg" className="w-full">
-            Create Your Free Account
+          <Button onClick={() => router.push('/dashboard')} size="lg" className="w-full">
+            Go to Dashboard
           </Button>
         </motion.div>
       </div>
