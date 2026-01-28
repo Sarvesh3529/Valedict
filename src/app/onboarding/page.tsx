@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CalendarIcon, Check, ChevronRight, GraduationCap } from 'lucide-react';
+import { CalendarIcon, Check, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged, signInAnonymously, type User } from 'firebase/auth';
 import { useFirebaseApp } from '@/firebase';
@@ -68,8 +68,44 @@ export default function OnboardingPage() {
     }, 400); // Animation duration
   }, [isAnimating, anonUser, responses, currentQuestionIndex]);
 
+  useEffect(() => {
+    if (currentQuestionIndex >= onboardingQuestions.length) {
+        localStorage.setItem('onboardingComplete', 'true');
+
+        const determineNextStep = () => {
+            const grade = responses.grade;
+            const troublingSubjects = responses.troublingSubjects || [];
+
+            let revisionSubject: string | null = null;
+            let revisionType: string | null = null;
+
+            if (troublingSubjects.includes('math')) {
+                revisionSubject = 'math';
+                revisionType = 'formula';
+            } else if (troublingSubjects.includes('phy')) {
+                revisionSubject = 'phy';
+                revisionType = 'formula';
+            } else if (troublingSubjects.includes('chem')) {
+                revisionSubject = 'chem';
+                revisionType = 'concept';
+            } else if (troublingSubjects.includes('bio')) {
+                revisionSubject = 'bio';
+                revisionType = 'term';
+            }
+
+            if (revisionSubject && revisionType && grade) {
+                router.push(`/revision/start?subject=${revisionSubject}&type=${revisionType}&grade=${grade}`);
+            } else {
+                router.push('/dashboard');
+            }
+        };
+
+        const timer = setTimeout(determineNextStep, 2000);
+        return () => clearTimeout(timer);
+    }
+  }, [currentQuestionIndex, responses, router]);
+
   if (currentQuestionIndex >= onboardingQuestions.length) {
-    localStorage.setItem('onboardingComplete', 'true');
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
         <motion.div
@@ -79,13 +115,10 @@ export default function OnboardingPage() {
           className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
         >
           <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <GraduationCap className="w-8 h-8 text-white" />
+            <Check className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold mb-2">You're all set!</h1>
-          <p className="text-slate-400 mb-6">We’ll personalize your study plan based on this 🎯</p>
-          <Button onClick={() => router.push('/dashboard')} size="lg" className="w-full">
-            Go to Dashboard
-          </Button>
+          <p className="text-slate-400 mb-6">We’re personalizing your study plan... 🎯</p>
         </motion.div>
       </div>
     );

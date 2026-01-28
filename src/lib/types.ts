@@ -25,3 +25,16 @@ export type QuizResult = {
   userAnswer: number | null;
   isCorrect: boolean;
 };
+
+export type RevisionItem = {
+  id: string;
+  subjectId: 'math' | 'phy' | 'chem' | 'bio';
+  chapterId: string;
+  grade: string;
+  type: 'formula' | 'concept' | 'term';
+  topic: string;
+  content: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+};
