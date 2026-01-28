@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { FirebaseClientProvider } from '@/firebase';
 import ConditionalHeader from '@/components/ConditionalHeader';
 import { ThemeProvider } from '@/components/theme-provider';
+import ConditionalFooter from '@/components/ConditionalFooter';
 
 export const metadata: Metadata = {
   title: 'ExamPrep AI',
@@ -40,7 +41,8 @@ export default function RootLayout({
           <FirebaseClientProvider>
             <div className="relative flex min-h-screen flex-col">
               <ConditionalHeader />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 pb-20 md:pb-0">{children}</main>
+              <ConditionalFooter />
             </div>
             <Toaster />
           </FirebaseClientProvider>
