@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, ChevronRight, GraduationCap } from 'lucide-react';
+import { CalendarIcon, Check, ChevronRight, GraduationCap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getAuth, onAuthStateChanged, signInAnonymously, type User } from 'firebase/auth';
 import { useFirebaseApp } from '@/firebase';
@@ -11,6 +11,9 @@ import { saveOnboardingResponse } from '@/firebase/onboarding';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
   const progress = (current / total) * 100;
@@ -31,6 +34,7 @@ export default function OnboardingPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isAnimating, setIsAnimating] = useState(false);
+  const [date, setDate] = useState<Date>();
   
   useEffect(() => {
     const auth = getAuth(app);
@@ -116,7 +120,7 @@ export default function OnboardingPage() {
         };
         return (
           <>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {question.options?.map((option) => {
                 const isSelected = selectedOptions.includes(option.value);
                 return (
@@ -156,9 +160,44 @@ export default function OnboardingPage() {
                 onValueCommit={(value) => handleAnswer(question, value[0])}
             />
             <div className="flex justify-between text-sm text-slate-400 mt-2">
-                <span>Not confident</span>
-                <span>Very confident</span>
+                <span>Not difficult</span>
+                <span>Very difficult</span>
             </div>
+          </div>
+        );
+      case 'date':
+        return (
+            <div className="flex flex-col items-center gap-4 pt-4">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[280px] justify-start text-left font-normal bg-slate-800 border-slate-700 hover:bg-slate-700 hover:text-white",
+                    !date && "text-slate-400"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-slate-900 border-slate-700 text-white">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(selectedDate) => {
+                      if (selectedDate) {
+                        setDate(selectedDate)
+                        handleAnswer(question, format(selectedDate, "PPP"))
+                      }
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+             <Button variant="link" onClick={() => handleAnswer(question, 'Not Sure Yet')} className="text-primary hover:text-primary/80">
+                Not Sure Yet
+            </Button>
           </div>
         )
       default:

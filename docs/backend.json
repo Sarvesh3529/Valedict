@@ -9,28 +9,32 @@
           "type": "string",
           "description": "The anonymous user ID from Firebase Auth."
         },
-        "class": {
+        "grade": {
           "type": "string",
-          "description": "The user's selected class."
+          "description": "The user's selected grade."
         },
-        "exam": {
+        "troublingSubject": {
           "type": "string",
-          "description": "The exam the user is preparing for."
+          "description": "The subject the user finds most troubling."
         },
-        "weakAreas": {
+        "studyTime": {
+          "type": "string",
+          "description": "How much time the user can study daily."
+        },
+        "studySchedule": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Subjects or topics the user struggles with."
+          "description": "The times of day the user usually studies."
         },
-        "confidenceLevel": {
+        "difficulty": {
           "type": "number",
-          "description": "User's self-reported confidence level (e.g., 1-5)."
+          "description": "User's self-reported difficulty level (e.g., 1-5)."
         },
-        "dailyStudyTime": {
+        "nextExamDate": {
           "type": "string",
-          "description": "How much time the user can study daily."
+          "description": "The date of the user's next exam, or 'Not Sure Yet'."
         },
         "createdAt": {
           "type": "string",
