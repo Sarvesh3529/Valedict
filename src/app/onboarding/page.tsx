@@ -74,27 +74,11 @@ export default function OnboardingPage() {
 
         const determineNextStep = () => {
             const grade = responses.grade;
-            const troublingSubjects = responses.troublingSubjects || [];
+            const troublingSubjects = (responses.troublingSubjects || []) as string[];
 
-            let revisionSubject: string | null = null;
-            let revisionType: string | null = null;
-
-            if (troublingSubjects.includes('math')) {
-                revisionSubject = 'math';
-                revisionType = 'formula';
-            } else if (troublingSubjects.includes('phy')) {
-                revisionSubject = 'phy';
-                revisionType = 'formula';
-            } else if (troublingSubjects.includes('chem')) {
-                revisionSubject = 'chem';
-                revisionType = 'concept';
-            } else if (troublingSubjects.includes('bio')) {
-                revisionSubject = 'bio';
-                revisionType = 'term';
-            }
-
-            if (revisionSubject && revisionType && grade) {
-                router.push(`/revision/start?subject=${revisionSubject}&type=${revisionType}&grade=${grade}`);
+            if (troublingSubjects.length > 0 && grade) {
+                const subjectsParam = troublingSubjects.join(',');
+                router.push(`/revision/start?subjects=${subjectsParam}&grade=${grade}`);
             } else {
                 router.push('/dashboard');
             }

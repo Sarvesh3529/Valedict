@@ -9,8 +9,7 @@ import { Suspense } from 'react';
 
 function RevisionStartContent() {
   const searchParams = useSearchParams();
-  const subject = searchParams.get('subject');
-  const type = searchParams.get('type');
+  const subjects = searchParams.get('subjects');
   const grade = searchParams.get('grade');
 
   return (
@@ -29,7 +28,7 @@ function RevisionStartContent() {
           Based on your answers, we've prepared a quick revision session to get you started on the right foot.
         </p>
         <Button asChild size="lg" className="w-full">
-          <Link href={`/revision/session?subject=${subject}&type=${type}&grade=${grade}`}>
+          <Link href={`/revision/session?subjects=${subjects}&grade=${grade}`}>
             Let's Start
             <ArrowRight className="w-5 h-5 ml-2" />
           </Link>

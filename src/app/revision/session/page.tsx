@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { subjects } from '@/lib/data';
-import { revisionContent } from '@/lib/revision-data';
+import { generateRevisionSet } from '@/lib/revision-logic';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -15,37 +14,46 @@ import { Progress } from '@/components/ui/progress';
 function RevisionSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const subjectId = searchParams.get('subject');
-  const revisionType = searchParams.get('type');
+  const subjectIdsParam = searchParams.get('subjects');
   const grade = searchParams.get('grade');
 
-  const firstChapterId = useMemo(() => {
-    if (!subjectId) return null;
-    const subject = subjects.find(s => s.id === subjectId);
-    return subject?.chapters[0]?.id ?? null;
-  }, [subjectId]);
-
   const revisionItems = useMemo(() => {
-    if (!subjectId || !revisionType || !grade || !firstChapterId) return [];
-    return revisionContent.filter(item => 
-      item.subjectId === subjectId &&
-      item.grade === grade &&
-      item.chapterId === firstChapterId
-    );
-  }, [subjectId, revisionType, grade, firstChapterId]);
+    if (!subjectIdsParam || !grade) return [];
+    const subjectIds = subjectIdsParam.split(',');
+    return generateRevisionSet(subjectIds, grade, 7);
+  }, [subjectIdsParam, grade]);
 
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [userAnswers, setUserAnswers] = useState<(number | null)[]>([]);
+  const [startTime, setStartTime] = useState<number>(0);
+  const [endTime, setEndTime] = useState<number>(0);
+
+  useEffect(() => {
+    if (revisionItems.length > 0) {
+      setStartTime(Date.now());
+      setUserAnswers(Array(revisionItems.length).fill(null));
+    }
+  }, [revisionItems.length]);
+  
+  const commitAnswer = () => {
+    const newAnswers = [...userAnswers];
+    newAnswers[currentItemIndex] = selectedOption;
+    setUserAnswers(newAnswers);
+  };
 
   const handleNext = () => {
-    if (currentItemIndex < revisionItems.length) {
+    commitAnswer();
+    if (currentItemIndex < revisionItems.length - 1) {
       setCurrentItemIndex(currentItemIndex + 1);
-      setSelectedOption(null);
+      setSelectedOption(userAnswers[currentItemIndex + 1] ?? null);
     }
   };
 
   const handleFinish = () => {
-    router.push('/dashboard');
+    commitAnswer();
+    setEndTime(Date.now());
+    setCurrentItemIndex(revisionItems.length);
   }
 
   if (revisionItems.length === 0) {
@@ -65,19 +73,40 @@ function RevisionSessionContent() {
   }
 
   if (currentItemIndex >= revisionItems.length) {
+    const correctAnswersCount = userAnswers.filter((answer, index) => answer !== null && answer === revisionItems[index].correctAnswer).length;
+    const totalQuestions = revisionItems.length;
+    const accuracy = totalQuestions > 0 ? (correctAnswersCount / totalQuestions) * 100 : 0;
+    const timeTaken = endTime > 0 && startTime > 0 ? Math.round((endTime - startTime) / 1000) : 0;
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
             <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
+            className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-lg w-full"
             >
                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
                     <PartyPopper className="w-8 h-8 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold mb-2">Great start!</h1>
-                <p className="text-slate-400 mb-6">You've completed your first revision session. Let's head to your dashboard.</p>
-                <Button onClick={handleFinish} size="lg" className="w-full">
+                <h1 className="text-2xl font-bold mb-2">Revision Complete!</h1>
+                <p className="text-slate-400 mb-6">Here's how you did in your first session.</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center my-8">
+                    <div>
+                        <p className="text-3xl font-bold text-primary">{accuracy.toFixed(0)}%</p>
+                        <p className="text-sm text-slate-400">Accuracy</p>
+                    </div>
+                    <div>
+                        <p className="text-3xl font-bold text-primary">{correctAnswersCount}/{totalQuestions}</p>
+                        <p className="text-sm text-slate-400">Score</p>
+                    </div>
+                    <div>
+                        <p className="text-3xl font-bold text-primary">{timeTaken}<span className="text-lg">s</span></p>
+                        <p className="text-sm text-slate-400">Time Taken</p>
+                    </div>
+                </div>
+
+                <Button onClick={() => router.push('/dashboard')} size="lg" className="w-full">
                     Go to Dashboard
                     <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
