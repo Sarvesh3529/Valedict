@@ -3,36 +3,27 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { BrainCircuit, ArrowRight } from 'lucide-react';
+import { ArrowRight, FileQuestion } from 'lucide-react';
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4 text-center">
       <motion.div
-        initial={{ opacity: 0, y: -50 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="flex flex-col items-center gap-4"
+        transition={{ duration: 0.5 }}
+        className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
       >
-        <BrainCircuit className="h-20 w-20 text-primary" />
-        <h1 className="text-5xl md:text-6xl font-bold font-headline text-white">
-          ExamPrep AI
-        </h1>
-        <p className="text-lg md:text-xl text-slate-400 max-w-xl">
-          Your personal AI-powered study partner. Let's get you ready for your exams.
+        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+          <FileQuestion className="w-8 h-8 text-white" />
+        </div>
+        <h1 className="text-2xl font-bold mb-2">First, a few questions</h1>
+        <p className="text-slate-400 mb-6">
+          To personalize your learning path, we need to know a little bit about you. It'll be quick!
         </p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut', delay: 0.5 }}
-        className="mt-12"
-      >
-        <Button asChild size="lg" className="rounded-full px-10 py-6 text-lg">
-          <Link href="/onboarding/start">
-            Get Started
-            <ArrowRight className="ml-2 h-5 w-5" />
+        <Button asChild size="lg" className="w-full">
+          <Link href="/onboarding">
+            Continue <ArrowRight className="w-5 h-5 ml-1"/>
           </Link>
         </Button>
       </motion.div>
