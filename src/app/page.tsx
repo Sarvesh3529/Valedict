@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, FileQuestion } from 'lucide-react';
+import { ArrowRight, BrainCircuit } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -15,15 +15,15 @@ export default function LandingPage() {
         className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
       >
         <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-          <FileQuestion className="w-8 h-8 text-white" />
+          <BrainCircuit className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-2xl font-bold mb-2">First, a few questions</h1>
+        <h1 className="text-3xl font-bold mb-2">Welcome to ExamPrep AI</h1>
         <p className="text-slate-400 mb-6">
-          To personalize your learning path, we need to know a little bit about you. It'll be quick!
+          Your personalized AI-powered study partner. Let's get you started on the path to success.
         </p>
         <Button asChild size="lg" className="w-full">
-          <Link href="/onboarding">
-            Continue <ArrowRight className="w-5 h-5 ml-1"/>
+          <Link href="/onboarding/start">
+            Get Started <ArrowRight className="w-5 h-5 ml-1"/>
           </Link>
         </Button>
       </motion.div>
