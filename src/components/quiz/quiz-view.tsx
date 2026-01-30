@@ -18,15 +18,16 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
   const [userAnswers, setUserAnswers] = useState<(number | null)[]>(
     Array(questions.length).fill(null)
   );
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
+  // The currently selected option is derived directly from the answers array for this question
+  const selectedOption = userAnswers[currentQuestionIndex];
+
   const handleOptionChange = (value: string) => {
     const answerIndex = parseInt(value, 10);
-    setSelectedOption(answerIndex);
     const newAnswers = [...userAnswers];
     newAnswers[currentQuestionIndex] = answerIndex;
     setUserAnswers(newAnswers);
@@ -35,14 +36,12 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(userAnswers[currentQuestionIndex + 1]);
     }
   };
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setSelectedOption(userAnswers[currentQuestionIndex - 1]);
     }
   };
 
@@ -71,6 +70,8 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
           {currentQuestion.question}
         </h3>
         <RadioGroup
+          // The key ensures the component re-mounts when the question changes, clearing state
+          key={currentQuestionIndex}
           value={selectedOption?.toString()}
           onValueChange={handleOptionChange}
           className="space-y-3"
@@ -95,7 +96,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
             Back
         </Button>
         {isLastQuestion ? (
-          <Button onClick={handleSubmit} className="bg-accent hover:bg-accent/90">
+          <Button onClick={handleSubmit} disabled={selectedOption === null} className="bg-accent hover:bg-accent/90">
             Submit Quiz
             <CheckCircle className="ml-2 h-4 w-4" />
           </Button>
