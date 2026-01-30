@@ -49,7 +49,8 @@ export const subjects: Subject[] = baseSubjects.map((subject) => ({
 
 
 export const quizQuestions: QuizQuestion[] = [
-  // Math - Number Systems
+  // == Mathematics ==
+  // Chapter: Number Systems
   {
     id: 101,
     chapterId: 'g9-math-numsys',
@@ -66,7 +67,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'Rational numbers have decimal expansions that either terminate or repeat in a pattern.',
   },
-  // Math - Polynomials
+  {
+    id: 117,
+    chapterId: 'g9-math-numsys',
+    question: 'What is the result of (3 + √3)(2 + √2)?',
+    options: ['6 + 3√2 + 2√3 + √6', '6 + 5√5', '11 + √6', '5 + √6'],
+    correctAnswer: 0,
+    explanation: 'Use the distributive property (FOIL method): 3*2 + 3*√2 + √3*2 + √3*√2.',
+  },
+  {
+    id: 118,
+    chapterId: 'g9-math-numsys',
+    question: 'Every rational number is a real number. True or False?',
+    options: ['True', 'False'],
+    correctAnswer: 0,
+    explanation: 'The set of real numbers is composed of all rational and irrational numbers.',
+  },
+   {
+    id: 119,
+    chapterId: 'g9-math-numsys',
+    question: 'Which of the following numbers has a terminating decimal expansion?',
+    options: ['1/3', '1/7', '1/8', '1/6'],
+    correctAnswer: 2,
+    explanation: 'A rational number has a terminating decimal expansion if the prime factorization of the denominator contains only powers of 2 and/or 5. 8 = 2³.',
+  },
+
+  // Chapter: Polynomials
   {
     id: 103,
     chapterId: 'g9-math-poly',
@@ -78,12 +104,29 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 104,
     chapterId: 'g9-math-poly',
-    question: 'What is (x+y)²?',
-    options: ['x² + y²', 'x² + 2xy + y²', 'x² - 2xy + y²', '2x + 2y'],
-    correctAnswer: 1,
-    explanation: 'The formula for the square of a binomial (a+b)² is a² + 2ab + b².',
+    question: 'If p(x) = x + 3, what is the value of p(x) + p(-x)?',
+    options: ['6', '2x', '0', '3'],
+    correctAnswer: 0,
+    explanation: 'p(x) = x + 3 and p(-x) = -x + 3. So, (x + 3) + (-x + 3) = 6.',
   },
-  // Math - Coordinate Geometry
+  {
+    id: 120,
+    chapterId: 'g9-math-poly',
+    question: 'Which of the following is a zero of the polynomial x² - 5x + 6?',
+    options: ['1', '4', '5', '2'],
+    correctAnswer: 3,
+    explanation: 'A zero is a value of x that makes the polynomial equal to 0. (2)² - 5(2) + 6 = 4 - 10 + 6 = 0.',
+  },
+  {
+    id: 121,
+    chapterId: 'g9-math-poly',
+    question: 'What is the remainder when x³ + 1 is divided by x + 1?',
+    options: ['0', '1', '2', '-1'],
+    correctAnswer: 0,
+    explanation: 'According to the Remainder Theorem, the remainder is f(-1). (-1)³ + 1 = -1 + 1 = 0.',
+  },
+
+  // Chapter: Coordinate Geometry
   {
     id: 105,
     chapterId: 'g9-math-coord',
@@ -100,14 +143,23 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'In the third quadrant, both the x-coordinate and y-coordinate are negative.',
   },
-  // Math - Linear Equations
+  {
+    id: 122,
+    chapterId: 'g9-math-coord',
+    question: 'What is the name of the horizontal line in the cartesian plane?',
+    options: ['y-axis', 'origin', 'x-axis', 'quadrant'],
+    correctAnswer: 2,
+    explanation: 'The horizontal line is the x-axis, and the vertical line is the y-axis.',
+  },
+
+  // Chapter: Linear Equations in Two Variables
   {
     id: 107,
     chapterId: 'g9-math-lineq',
-    question: 'What is the value of x in the equation 2x + 3 = 7?',
-    options: ['1', '2', '3', '4'],
-    correctAnswer: 1,
-    explanation: 'Subtract 3 from both sides to get 2x = 4. Then divide by 2 to get x = 2.',
+    question: 'How many solutions does the equation y = 3x + 5 have?',
+    options: ['One solution', 'Two solutions', 'Infinitely many solutions', 'No solution'],
+    correctAnswer: 2,
+    explanation: 'For every value of x, you can find a corresponding value of y, resulting in an infinite number of (x, y) pairs.',
   },
   {
     id: 108,
@@ -117,7 +169,8 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'The equation ax + by + c = 0 always represents a straight line on a graph.',
   },
-  // Math - Euclid’s Geometry
+
+  // Chapter: Introduction to Euclid’s Geometry
   {
     id: 109,
     chapterId: 'g9-math-euclid',
@@ -126,7 +179,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'This is Euclid\'s fourth postulate, a fundamental assumption in Euclidean geometry.',
   },
-  // Math - Lines and Angles
+  {
+    id: 123,
+    chapterId: 'g9-math-euclid',
+    question: '"Things which are equal to the same thing are equal to one another." This is one of Euclid\'s:',
+    options: ['Postulates', 'Definitions', 'Axioms', 'Theorems'],
+    correctAnswer: 2,
+    explanation: 'This is Euclid\'s first axiom. Axioms are common notions used throughout mathematics, whereas postulates are specific to geometry.',
+  },
+
+  // Chapter: Lines and Angles
   {
     id: 110,
     chapterId: 'g9-math-linesangles',
@@ -135,7 +197,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'When two lines intersect, the angles opposite each other at the vertex are always equal.',
   },
-  // Math - Triangles
+  {
+    id: 124,
+    chapterId: 'g9-math-linesangles',
+    question: 'Two angles are complementary. If one angle is 40°, what is the other angle?',
+    options: ['50°', '140°', '90°', '40°'],
+    correctAnswer: 0,
+    explanation: 'Complementary angles add up to 90°. So, 90° - 40° = 50°.',
+  },
+
+  // Chapter: Triangles
   {
     id: 111,
     chapterId: 'g9-math-tri',
@@ -144,7 +215,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'The sum of the interior angles of any triangle is always 180 degrees.',
   },
-  // Math - Quadrilaterals
+  {
+    id: 125,
+    chapterId: 'g9-math-tri',
+    question: 'Which congruence rule applies if two sides and the included angle of one triangle are equal to two sides and the included angle of another triangle?',
+    options: ['SSS', 'ASA', 'SAS', 'RHS'],
+    correctAnswer: 2,
+    explanation: 'This is the Side-Angle-Side (SAS) congruence criterion.',
+  },
+  
+  // Chapter: Quadrilaterals
   {
     id: 112,
     chapterId: 'g9-math-quad',
@@ -153,7 +233,8 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'A square has four equal sides and four 90-degree angles.',
   },
-  // Math - Circles
+
+  // Chapter: Circles
   {
     id: 113,
     chapterId: 'g9-math-circles',
@@ -162,7 +243,8 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 3,
     explanation: 'The diameter is a chord that passes through the center of the circle, making it the longest possible chord.',
   },
-  // Math - Heron’s Formula
+
+  // Chapter: Heron’s Formula
   {
     id: 114,
     chapterId: 'g9-math-heron',
@@ -171,16 +253,18 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Heron\'s formula calculates the area of a triangle when the lengths of all three sides are known.',
   },
-  // Math - Surface Areas and Volumes
+
+  // Chapter: Surface Areas and Volumes
   {
     id: 115,
     chapterId: 'g9-math-surface',
-    question: 'What is the formula for the volume of a cylinder?',
-    options: ['πr²h', '2πrh', 'l*b*h', '4/3 πr³'],
-    correctAnswer: 0,
-    explanation: 'The volume of a cylinder is the area of the base (πr²) multiplied by the height (h).',
+    question: 'What is the formula for the volume of a sphere?',
+    options: ['πr²h', '2πrh', '4πr²', '(4/3)πr³'],
+    correctAnswer: 3,
+    explanation: 'The volume of a sphere with radius r is given by the formula V = (4/3)πr³.',
   },
-  // Math - Statistics
+
+  // Chapter: Statistics
   {
     id: 116,
     chapterId: 'g9-math-stats',
@@ -190,7 +274,8 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'The mode is the number that appears most frequently in a data set. In this case, 3 appears three times.',
   },
 
-  // Physics - Motion
+  // == Physics ==
+  // Chapter: Motion
   {
     id: 201,
     chapterId: 'g9-phy-motion',
@@ -207,7 +292,24 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Acceleration is defined as the rate at which an object changes its velocity.',
   },
-  // Physics - Force and Laws of Motion
+   {
+    id: 208,
+    chapterId: 'g9-phy-motion',
+    question: 'A car accelerates uniformly from 18 km/h to 36 km/h in 5 seconds. What is its acceleration?',
+    options: ['1 m/s²', '2 m/s²', '3.6 m/s²', '5 m/s²'],
+    correctAnswer: 0,
+    explanation: 'First, convert speeds to m/s: 18 km/h = 5 m/s, 36 km/h = 10 m/s. Then use a = (v-u)/t. a = (10-5)/5 = 1 m/s².',
+  },
+  {
+    id: 209,
+    chapterId: 'g9-phy-motion',
+    question: 'The area under a velocity-time graph represents:',
+    options: ['Speed', 'Acceleration', 'Displacement', 'Force'],
+    correctAnswer: 2,
+    explanation: 'The area under a v-t graph gives the displacement of the object.',
+  },
+
+  // Chapter: Force and Laws of Motion
   {
     id: 203,
     chapterId: 'g9-phy-force',
@@ -222,9 +324,18 @@ export const quizQuestions: QuizQuestion[] = [
     question: 'Inertia is the property of a body to resist a change in its state of:',
     options: ['Rest only', 'Motion only', 'Rest or uniform motion', 'Acceleration'],
     correctAnswer: 2,
-    explanation: 'Inertia is the resistance of any physical object to any change in its velocity. This includes changes to its speed, direction, or state of rest.',
+    explanation: 'Inertia is the resistance of any physical object to any change in its velocity.',
   },
-  // Physics - Gravitation
+  {
+    id: 210,
+    chapterId: 'g9-phy-force',
+    question: 'Momentum is the product of mass and __________.',
+    options: ['Acceleration', 'Velocity', 'Force', 'Distance'],
+    correctAnswer: 1,
+    explanation: 'Momentum (p) is defined as mass (m) times velocity (v), p = mv.',
+  },
+
+  // Chapter: Gravitation
   {
     id: 205,
     chapterId: 'g9-phy-grav',
@@ -233,7 +344,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'The Earth is not a perfect sphere; it is slightly flattened at the poles. Since g is inversely proportional to the square of the distance from the center, it is highest at the poles.',
   },
-  // Physics - Work and Energy
+  {
+    id: 211,
+    chapterId: 'g9-phy-grav',
+    question: 'The weight of an object on the moon is about ____ of its weight on Earth.',
+    options: ['1/2', '1/4', '1/6', 'The same as'],
+    correctAnswer: 2,
+    explanation: 'The moon\'s gravity is much weaker than Earth\'s, approximately one-sixth.',
+  },
+
+  // Chapter: Work and Energy
   {
     id: 206,
     chapterId: 'g9-phy-work',
@@ -242,7 +362,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'The SI unit of work and energy is the Joule (J).',
   },
-  // Physics - Sound
+  {
+    id: 212,
+    chapterId: 'g9-phy-work',
+    question: 'An object of mass 10 kg is moving with a velocity of 5 m/s. What is its kinetic energy?',
+    options: ['25 J', '50 J', '125 J', '250 J'],
+    correctAnswer: 2,
+    explanation: 'Kinetic Energy (KE) = 1/2 * m * v². KE = 0.5 * 10 * (5)² = 0.5 * 10 * 25 = 125 J.',
+  },
+
+  // Chapter: Sound
   {
     id: 207,
     chapterId: 'g9-phy-sound',
@@ -251,8 +380,17 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 3,
     explanation: 'Sound is a mechanical wave, which means it requires a medium (particles) to propagate. A vacuum is empty of matter.',
   },
+  {
+    id: 213,
+    chapterId: 'g9-phy-sound',
+    question: 'The persistence of sound due to repeated reflection is called:',
+    options: ['Echo', 'Reverberation', 'Pitch', 'Loudness'],
+    correctAnswer: 1,
+    explanation: 'Reverberation is the collection of reflected sounds from the surfaces in an enclosure.',
+  },
   
-  // Chemistry - Matter in Our Surroundings
+  // == Chemistry ==
+  // Chapter: Matter in Our Surroundings
   {
     id: 301,
     chapterId: 'g9-chem-matter',
@@ -269,14 +407,31 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'Liquids take the shape of their container but have a fixed volume.',
   },
-  // Chemistry - Is Matter Around Us Pure?
+  {
+    id: 307,
+    chapterId: 'g9-chem-matter',
+    question: 'What is the boiling point of water in Kelvin?',
+    options: ['273 K', '373 K', '100 K', '0 K'],
+    correctAnswer: 1,
+    explanation: 'The boiling point of water is 100°C. To convert Celsius to Kelvin, you add 273.15. So, 100 + 273.15 = 373.15 K.',
+  },
+  {
+    id: 308,
+    chapterId: 'g9-chem-matter',
+    question: 'Evaporation causes:',
+    options: ['Heating', 'Cooling', 'No change in temperature', 'An increase in pressure'],
+    correctAnswer: 1,
+    explanation: 'The particles of a liquid absorb energy from the surroundings to evaporate, which leads to a cooling effect.',
+  },
+
+  // Chapter: Is Matter Around Us Pure?
   {
     id: 303,
     chapterId: 'g9-chem-pure',
     question: 'Which of the following is a mixture?',
     options: ['Salt', 'Water', 'Air', 'Sugar'],
     correctAnswer: 2,
-    explanation: 'Air is a mixture of various gases like nitrogen, oxygen, argon, and carbon dioxide. Salt, water, and sugar are pure substances (compounds).',
+    explanation: 'Air is a mixture of various gases like nitrogen, oxygen, argon, and carbon dioxide.',
   },
   {
     id: 304,
@@ -286,7 +441,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'A saturated solution contains the maximum amount of solute that will dissolve in a solvent at that temperature.',
   },
-  // Chemistry - Atoms and Molecules
+  {
+    id: 309,
+    chapterId: 'g9-chem-pure',
+    question: 'Which of these is a chemical change?',
+    options: ['Melting of ice', 'Dissolving salt in water', 'Burning of wood', 'Boiling of water'],
+    correctAnswer: 2,
+    explanation: 'Burning wood (combustion) is a chemical change because it results in new substances (ash, smoke, CO2).',
+  },
+
+  // Chapter: Atoms and Molecules
   {
     id: 305,
     chapterId: 'g9-chem-atoms',
@@ -295,7 +459,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 3,
     explanation: 'A molecule of water is composed of two hydrogen atoms and one oxygen atom.',
   },
-  // Chemistry - Structure of the Atom
+  {
+    id: 310,
+    chapterId: 'g9-chem-atoms',
+    question: 'What is Avogadro\'s number?',
+    options: ['6.022 x 10²³', '3.14 x 10¹⁵', '9.8 x 10⁸', '1.602 x 10⁻¹⁹'],
+    correctAnswer: 0,
+    explanation: 'Avogadro\'s number is the number of constituent particles (usually atoms or molecules) that are contained in one mole of a substance.',
+  },
+  
+  // Chapter: Structure of the Atom
   {
     id: 306,
     chapterId: 'g9-chem-structure',
@@ -304,15 +477,24 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Electrons are negatively charged particles that orbit the nucleus of an atom.',
   },
+  {
+    id: 311,
+    chapterId: 'g9-chem-structure',
+    question: 'Isotopes are atoms of the same element with a different number of:',
+    options: ['Protons', 'Electrons', 'Neutrons', 'Ions'],
+    correctAnswer: 2,
+    explanation: 'Isotopes have the same number of protons (same atomic number) but different numbers of neutrons (different mass number).',
+  },
 
-  // Biology - The Fundamental Unit of Life (Cell)
+  // == Biology ==
+  // Chapter: The Fundamental Unit of Life (Cell)
   {
     id: 401,
     chapterId: 'g9-bio-cell',
     question: 'What is the powerhouse of the cell?',
     options: ['Nucleus', 'Ribosome', 'Mitochondrion', 'Chloroplast'],
     correctAnswer: 2,
-    explanation: 'Mitochondria are responsible for generating most of the cell\'s supply of adenosine triphosphate (ATP), used as a source of chemical energy.',
+    explanation: 'Mitochondria are responsible for generating most of the cell\'s supply of adenosine triphosphate (ATP).',
   },
   {
     id: 402,
@@ -322,14 +504,31 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'Lysosomes contain digestive enzymes. If the cell is damaged, they can burst and digest the entire cell.',
   },
-  // Biology - Tissues
+  {
+    id: 406,
+    chapterId: 'g9-bio-cell',
+    question: 'Which of the following is found in plant cells but not in animal cells?',
+    options: ['Cell membrane', 'Nucleus', 'Mitochondria', 'Cell wall'],
+    correctAnswer: 3,
+    explanation: 'Plant cells have a rigid cell wall outside the cell membrane for structural support. Animal cells do not.',
+  },
+   {
+    id: 407,
+    chapterId: 'g9-bio-cell',
+    question: 'Where is DNA located in a eukaryotic cell?',
+    options: ['Cytoplasm', 'Ribosome', 'Nucleus', 'Vacuole'],
+    correctAnswer: 2,
+    explanation: 'In eukaryotic cells, the vast majority of the genetic material (DNA) is contained within the nucleus.',
+  },
+
+  // Chapter: Tissues
   {
     id: 403,
     chapterId: 'g9-bio-tissues',
     question: 'Which type of tissue is responsible for movement in our body?',
     options: ['Epithelial tissue', 'Connective tissue', 'Muscular tissue', 'Nervous tissue'],
     correctAnswer: 2,
-    explanation: 'Muscular tissue is composed of cells that have the special ability to shorten or contract in order to produce movement of the body parts.',
+    explanation: 'Muscular tissue is composed of cells that have the special ability to shorten or contract in order to produce movement.',
   },
   {
     id: 404,
@@ -337,15 +536,32 @@ export const quizQuestions: QuizQuestion[] = [
     question: 'Blood is an example of which type of tissue?',
     options: ['Epithelial tissue', 'Connective tissue', 'Muscular tissue', 'Nervous tissue'],
     correctAnswer: 1,
-    explanation: 'Blood is considered a specialized form of connective tissue because it has a matrix (plasma) and originates from bone marrow.',
+    explanation: 'Blood is considered a specialized form of connective tissue because it has a matrix (plasma).',
   },
-  // Biology - Improvement in Food Resources
+  {
+    id: 408,
+    chapterId: 'g9-bio-tissues',
+    question: 'Which plant tissue is responsible for transporting water and minerals from the roots to the rest of the plant?',
+    options: ['Phloem', 'Xylem', 'Parenchyma', 'Sclerenchyma'],
+    correctAnswer: 1,
+    explanation: 'Xylem is the vascular tissue in plants that conducts water and dissolved nutrients upward from the root.',
+  },
+
+  // Chapter: Improvement in Food Resources
   {
     id: 405,
     chapterId: 'g9-bio-food',
     question: 'Which of the following is a Kharif crop?',
     options: ['Wheat', 'Pea', 'Paddy (Rice)', 'Mustard'],
     correctAnswer: 2,
-    explanation: 'Kharif crops are grown with the onset of monsoon and harvested in September-October. Examples include paddy, maize, and cotton.',
+    explanation: 'Kharif crops are grown with the onset of monsoon. Examples include paddy, maize, and cotton.',
+  },
+  {
+    id: 409,
+    chapterId: 'g9-bio-food',
+    question: 'The practice of growing two or more crops in a definite row pattern is known as:',
+    options: ['Crop rotation', 'Mixed cropping', 'Intercropping', 'Fallowing'],
+    correctAnswer: 2,
+    explanation: 'Intercropping involves growing two or more crops simultaneously in the same field in a definite pattern.',
   },
 ];

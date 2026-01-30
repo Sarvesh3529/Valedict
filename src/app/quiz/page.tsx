@@ -18,6 +18,9 @@ export default function QuizPage() {
   const handleStartQuiz = (chapterIds: string[], count: number) => {
     const generatedQuestions = generateQuiz(chapterIds, count);
     if (generatedQuestions.length > 0) {
+      if (generatedQuestions.length < count) {
+        alert(`Only ${generatedQuestions.length} questions were available for the selected chapters. The quiz has been adjusted.`);
+      }
       setQuestions(generatedQuestions);
       setQuizState('active');
     } else {
@@ -51,7 +54,7 @@ export default function QuizPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
        <Card className="overflow-hidden">
-        <CardHeader className="bg-primary/5">
+        <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary text-center">
             {getTitle()}
           </CardTitle>
