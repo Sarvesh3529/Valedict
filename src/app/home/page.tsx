@@ -102,14 +102,9 @@ export default function HomePage() {
                   <CardTitle className="font-headline">{subject.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <h4 className="font-semibold mb-2 text-muted-foreground">Top Chapters</h4>
-                  <ul className="space-y-2">
-                    {subject.chapters.slice(0, 3).map((chapter) => (
-                      <li key={chapter.id} className="text-sm">
-                        {chapter.name}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-sm text-muted-foreground">
+                    Practice questions from all chapters in {subject.name} to master the concepts.
+                  </p>
                 </CardContent>
                 <div className="p-6 pt-0">
                   <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
