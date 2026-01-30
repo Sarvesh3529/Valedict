@@ -65,7 +65,7 @@ function RevisionSessionContent() {
                 <CardDescription>We're preparing your lesson. If this takes too long, please go to the dashboard.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Button onClick={() => router.push('/dashboard')}>Go to Dashboard</Button>
+                <Button onClick={() => router.push('/home')}>Go to Dashboard</Button>
             </CardContent>
         </Card>
       </div>
@@ -106,7 +106,7 @@ function RevisionSessionContent() {
                     </div>
                 </div>
 
-                <Button onClick={() => router.push('/dashboard')} size="lg" className="w-full">
+                <Button onClick={() => router.push('/home')} size="lg" className="w-full">
                     Go to Dashboard
                     <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>

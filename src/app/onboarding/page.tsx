@@ -80,7 +80,7 @@ export default function OnboardingPage() {
                 const subjectsParam = troublingSubjects.join(',');
                 router.push(`/revision/start?subjects=${subjectsParam}&grade=${grade}`);
             } else {
-                router.push('/dashboard');
+                router.push('/home');
             }
         };
 

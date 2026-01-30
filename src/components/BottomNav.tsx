@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, BrainCircuit, NotebookText, User } from 'lucide-react';
+import { Home, NotebookText, BrainCircuit, User } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { href: '/dashboard', label: 'Home', icon: BookOpen },
+  { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
   { href: '/profile', label: 'Profile', icon: User },
