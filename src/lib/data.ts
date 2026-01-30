@@ -50,7 +50,7 @@ export const subjects: Subject[] = baseSubjects.map((subject) => ({
 
 export const quizQuestions: QuizQuestion[] = [
   // == Mathematics ==
-  // Chapter: Number Systems
+  // Chapter: Number Systems (g9-math-numsys)
   {
     id: 101,
     chapterId: 'g9-math-numsys',
@@ -92,7 +92,7 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'A rational number has a terminating decimal expansion if the prime factorization of the denominator contains only powers of 2 and/or 5. 8 = 2³.',
   },
 
-  // Chapter: Polynomials
+  // Chapter: Polynomials (g9-math-poly)
   {
     id: 103,
     chapterId: 'g9-math-poly',
@@ -125,8 +125,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'According to the Remainder Theorem, the remainder is f(-1). (-1)³ + 1 = -1 + 1 = 0.',
   },
+  {
+    id: 126,
+    chapterId: 'g9-math-poly',
+    question: 'The polynomial p(x) = 2x + 5 has a zero at:',
+    options: ['5/2', '-5/2', '2/5', '-2/5'],
+    correctAnswer: 1,
+    explanation: 'To find the zero, set p(x) = 0. 2x + 5 = 0 => 2x = -5 => x = -5/2.',
+  },
 
-  // Chapter: Coordinate Geometry
+  // Chapter: Coordinate Geometry (g9-math-coord)
   {
     id: 105,
     chapterId: 'g9-math-coord',
@@ -151,8 +159,24 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'The horizontal line is the x-axis, and the vertical line is the y-axis.',
   },
+  {
+    id: 127,
+    chapterId: 'g9-math-coord',
+    question: 'A point with a positive x-coordinate and a negative y-coordinate lies in which quadrant?',
+    options: ['First quadrant', 'Second quadrant', 'Third quadrant', 'Fourth quadrant'],
+    correctAnswer: 3,
+    explanation: 'The fourth quadrant is defined by x > 0 and y < 0.',
+  },
+  {
+    id: 128,
+    chapterId: 'g9-math-coord',
+    question: 'What is the abscissa of the point (4, -7)?',
+    options: ['4', '-7', '0', '3'],
+    correctAnswer: 0,
+    explanation: 'The abscissa is another name for the x-coordinate of a point.',
+  },
 
-  // Chapter: Linear Equations in Two Variables
+  // Chapter: Linear Equations in Two Variables (g9-math-lineq)
   {
     id: 107,
     chapterId: 'g9-math-lineq',
@@ -169,8 +193,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'The equation ax + by + c = 0 always represents a straight line on a graph.',
   },
+  {
+    id: 129,
+    chapterId: 'g9-math-lineq',
+    question: 'Which of the following points is a solution to the equation 2x + 3y = 12?',
+    options: ['(3, 2)', '(2, 3)', '(4, 1)', '(0, 3)'],
+    correctAnswer: 0,
+    explanation: 'Substitute the coordinates into the equation: 2(3) + 3(2) = 6 + 6 = 12.',
+  },
+  {
+    id: 130,
+    chapterId: 'g9-math-lineq',
+    question: 'The equation x = 7 in two variables can be written as:',
+    options: ['x + y = 7', '1.x + 0.y = 7', '0.x + 1.y = 7', 'x - y = 7'],
+    correctAnswer: 1,
+    explanation: 'To express it in two variables, we can add a y term with a coefficient of 0, as it does not change the value of x.',
+  },
+  {
+    id: 131,
+    chapterId: 'g9-math-lineq',
+    question: 'The graph of the equation y = a is a line parallel to the:',
+    options: ['y-axis', 'x-axis', 'Both axes', 'Origin'],
+    correctAnswer: 1,
+    explanation: 'For any value of x, the y-coordinate is always \'a\', creating a horizontal line parallel to the x-axis.',
+  },
 
-  // Chapter: Introduction to Euclid’s Geometry
+  // Chapter: Introduction to Euclid’s Geometry (g9-math-euclid)
   {
     id: 109,
     chapterId: 'g9-math-euclid',
@@ -187,8 +235,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'This is Euclid\'s first axiom. Axioms are common notions used throughout mathematics, whereas postulates are specific to geometry.',
   },
+  {
+    id: 132,
+    chapterId: 'g9-math-euclid',
+    question: 'How many dimensions does a solid have?',
+    options: ['One', 'Two', 'Three', 'Zero'],
+    correctAnswer: 2,
+    explanation: 'Solids have three dimensions: length, breadth, and height.',
+  },
+  {
+    id: 133,
+    chapterId: 'g9-math-euclid',
+    question: 'A surface has length and breadth only. How many dimensions does it have?',
+    options: ['One', 'Two', 'Three', 'Zero'],
+    correctAnswer: 1,
+    explanation: 'A surface is a two-dimensional figure with length and breadth.',
+  },
+  {
+    id: 134,
+    chapterId: 'g9-math-euclid',
+    question: 'Euclid stated that "a terminated line can be produced indefinitely". This is a(n):',
+    options: ['Axiom', 'Definition', 'Postulate', 'Theorem'],
+    correctAnswer: 2,
+    explanation: 'This is Euclid\'s second postulate, which deals with the properties of lines.',
+  },
 
-  // Chapter: Lines and Angles
+  // Chapter: Lines and Angles (g9-math-linesangles)
   {
     id: 110,
     chapterId: 'g9-math-linesangles',
@@ -205,8 +277,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'Complementary angles add up to 90°. So, 90° - 40° = 50°.',
   },
+  {
+    id: 135,
+    chapterId: 'g9-math-linesangles',
+    question: 'Two angles forming a linear pair are always:',
+    options: ['Equal', 'Complementary', 'Supplementary', 'Vertically opposite'],
+    correctAnswer: 2,
+    explanation: 'A linear pair of angles are adjacent angles whose non-common sides are opposite rays. They always add up to 180° (supplementary).',
+  },
+  {
+    id: 136,
+    chapterId: 'g9-math-linesangles',
+    question: 'If a transversal intersects two parallel lines, then each pair of corresponding angles is:',
+    options: ['Equal', 'Complementary', 'Supplementary', 'Unequal'],
+    correctAnswer: 0,
+    explanation: 'This is a fundamental property of parallel lines and transversals.',
+  },
+  {
+    id: 137,
+    chapterId: 'g9-math-linesangles',
+    question: 'An angle which is greater than 180° but less than 360° is called a(n):',
+    options: ['Acute angle', 'Obtuse angle', 'Straight angle', 'Reflex angle'],
+    correctAnswer: 3,
+    explanation: 'A reflex angle is an angle that is more than 180 degrees and less than 360 degrees.',
+  },
 
-  // Chapter: Triangles
+  // Chapter: Triangles (g9-math-tri)
   {
     id: 111,
     chapterId: 'g9-math-tri',
@@ -223,8 +319,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'This is the Side-Angle-Side (SAS) congruence criterion.',
   },
-  
-  // Chapter: Quadrilaterals
+  {
+    id: 138,
+    chapterId: 'g9-math-tri',
+    question: 'In an isosceles triangle, angles opposite to equal sides are:',
+    options: ['Unequal', 'Right angles', 'Equal', 'Supplementary'],
+    correctAnswer: 2,
+    explanation: 'This is a property of isosceles triangles. The base angles are equal.',
+  },
+  {
+    id: 139,
+    chapterId: 'g9-math-tri',
+    question: 'Which of the following cannot be the sides of a right-angled triangle?',
+    options: ['3, 4, 5', '5, 12, 13', '8, 15, 17', '7, 8, 9'],
+    correctAnswer: 3,
+    explanation: 'A right-angled triangle must satisfy the Pythagorean theorem (a² + b² = c²). 7² + 8² = 49 + 64 = 113, which is not equal to 9² (81).',
+  },
+  {
+    id: 140,
+    chapterId: 'g9-math-tri',
+    question: 'The sum of the lengths of any two sides of a triangle is always _____ the third side.',
+    options: ['Less than', 'Equal to', 'Greater than', 'Half of'],
+    correctAnswer: 2,
+    explanation: 'This is the Triangle Inequality Theorem, a fundamental property of all triangles.',
+  },
+
+  // Chapter: Quadrilaterals (g9-math-quad)
   {
     id: 112,
     chapterId: 'g9-math-quad',
@@ -233,8 +353,40 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'A square has four equal sides and four 90-degree angles.',
   },
+  {
+    id: 141,
+    chapterId: 'g9-math-quad',
+    question: 'The sum of all angles in a quadrilateral is:',
+    options: ['180°', '270°', '360°', '540°'],
+    correctAnswer: 2,
+    explanation: 'A quadrilateral can be divided into two triangles, so the sum of its angles is 2 * 180° = 360°.',
+  },
+  {
+    id: 142,
+    chapterId: 'g9-math-quad',
+    question: 'A quadrilateral with one pair of opposite sides parallel is called a:',
+    options: ['Parallelogram', 'Rhombus', 'Trapezium', 'Kite'],
+    correctAnswer: 2,
+    explanation: 'This is the definition of a trapezium (or trapezoid).',
+  },
+  {
+    id: 143,
+    chapterId: 'g9-math-quad',
+    question: 'The diagonals of a parallelogram:',
+    options: ['Are equal', 'Are perpendicular', 'Bisect each other', 'Bisect the angles'],
+    correctAnswer: 2,
+    explanation: 'A key property of a parallelogram is that its diagonals cut each other into two equal halves.',
+  },
+  {
+    id: 144,
+    chapterId: 'g9-math-quad',
+    question: 'A rhombus is a quadrilateral with:',
+    options: ['All sides equal', 'All angles equal', 'One pair of parallel sides', 'Diagonals are equal'],
+    correctAnswer: 0,
+    explanation: 'The defining property of a rhombus is that all four of its sides have the same length.',
+  },
 
-  // Chapter: Circles
+  // Chapter: Circles (g9-math-circles)
   {
     id: 113,
     chapterId: 'g9-math-circles',
@@ -243,8 +395,40 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 3,
     explanation: 'The diameter is a chord that passes through the center of the circle, making it the longest possible chord.',
   },
-
-  // Chapter: Heron’s Formula
+  {
+    id: 145,
+    chapterId: 'g9-math-circles',
+    question: 'The angle subtended by an arc at the center is ______ the angle subtended by it at any point on the remaining part of the circle.',
+    options: ['Half', 'Equal to', 'Double', 'Triple'],
+    correctAnswer: 2,
+    explanation: 'This is a fundamental theorem of circles relating the central angle and the inscribed angle.',
+  },
+  {
+    id: 146,
+    chapterId: 'g9-math-circles',
+    question: 'How many tangents can be drawn to a circle from a point outside the circle?',
+    options: ['One', 'Two', 'Infinite', 'Zero'],
+    correctAnswer: 1,
+    explanation: 'Exactly two tangents can be drawn from an external point to a circle.',
+  },
+  {
+    id: 147,
+    chapterId: 'g9-math-circles',
+    question: 'A line intersecting a circle in two points is called a:',
+    options: ['Tangent', 'Secant', 'Chord', 'Radius'],
+    correctAnswer: 1,
+    explanation: 'A secant is a line that intersects a circle at two distinct points.',
+  },
+  {
+    id: 148,
+    chapterId: 'g9-math-circles',
+    question: 'Angles in the same segment of a circle are:',
+    options: ['Equal', 'Complementary', 'Supplementary', 'Unequal'],
+    correctAnswer: 0,
+    explanation: 'This theorem states that any angles subtended by the same arc at the circumference are equal.',
+  },
+  
+  // Chapter: Heron’s Formula (g9-math-heron)
   {
     id: 114,
     chapterId: 'g9-math-heron',
@@ -253,8 +437,40 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Heron\'s formula calculates the area of a triangle when the lengths of all three sides are known.',
   },
+  {
+    id: 149,
+    chapterId: 'g9-math-heron',
+    question: 'In Heron\'s formula, what does \'s\' represent?',
+    options: ['Side length', 'Sum of sides', 'Semi-perimeter', 'Square root'],
+    correctAnswer: 2,
+    explanation: 's = (a + b + c) / 2, where a, b, and c are the side lengths of the triangle.',
+  },
+  {
+    id: 150,
+    chapterId: 'g9-math-heron',
+    question: 'What is the area of an equilateral triangle with side length \'a\'?',
+    options: ['a²/2', '(√3/4)a²', '(√3/2)a²', 'a²'],
+    correctAnswer: 1,
+    explanation: 'Using Heron\'s formula or standard trigonometry, the area of an equilateral triangle is (√3/4)a².',
+  },
+  {
+    id: 151,
+    chapterId: 'g9-math-heron',
+    question: 'A triangle has sides 13 cm, 14 cm, and 15 cm. What is its semi-perimeter?',
+    options: ['42 cm', '21 cm', '28 cm', '14 cm'],
+    correctAnswer: 1,
+    explanation: 's = (13 + 14 + 15) / 2 = 42 / 2 = 21 cm.',
+  },
+  {
+    id: 152,
+    chapterId: 'g9-math-heron',
+    question: 'The sides of a triangular plot are in the ratio 3:5:7 and its perimeter is 300 m. Find its area.',
+    options: ['1500√3 m²', '1000√3 m²', '500√3 m²', '3000√3 m²'],
+    correctAnswer: 0,
+    explanation: 'Sides are 60, 100, 140. s=150. Area = √[150(90)(50)(10)] = 1500√3.',
+  },
 
-  // Chapter: Surface Areas and Volumes
+  // Chapter: Surface Areas and Volumes (g9-math-surface)
   {
     id: 115,
     chapterId: 'g9-math-surface',
@@ -263,8 +479,40 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 3,
     explanation: 'The volume of a sphere with radius r is given by the formula V = (4/3)πr³.',
   },
+  {
+    id: 153,
+    chapterId: 'g9-math-surface',
+    question: 'What is the total surface area of a cube with side length \'a\'?',
+    options: ['a³', '4a²', '6a²', 'a²'],
+    correctAnswer: 2,
+    explanation: 'A cube has 6 faces, and each face is a square with area a². So the total surface area is 6a².',
+  },
+  {
+    id: 154,
+    chapterId: 'g9-math-surface',
+    question: 'The formula for the curved surface area of a cylinder is:',
+    options: ['2πr(r+h)', 'πr²h', '2πr²', '2πrh'],
+    correctAnswer: 3,
+    explanation: 'The curved surface area of a cylinder with radius r and height h is 2πrh.',
+  },
+  {
+    id: 155,
+    chapterId: 'g9-math-surface',
+    question: 'If the radius of a sphere is doubled, its volume becomes:',
+    options: ['2 times', '4 times', '6 times', '8 times'],
+    correctAnswer: 3,
+    explanation: 'Volume is proportional to r³. If r becomes 2r, the volume becomes (2r)³ = 8r³, which is 8 times the original.',
+  },
+  {
+    id: 156,
+    chapterId: 'g9-math-surface',
+    question: 'What is the volume of a cone with radius \'r\' and height \'h\'?',
+    options: ['πr²h', '(1/3)πr²h', 'πrl', '2πrh'],
+    correctAnswer: 1,
+    explanation: 'The volume of a cone is one-third the volume of a cylinder with the same base radius and height.',
+  },
 
-  // Chapter: Statistics
+  // Chapter: Statistics (g9-math-stats)
   {
     id: 116,
     chapterId: 'g9-math-stats',
@@ -273,9 +521,41 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'The mode is the number that appears most frequently in a data set. In this case, 3 appears three times.',
   },
+  {
+    id: 157,
+    chapterId: 'g9-math-stats',
+    question: 'What is the median of the data: 2, 5, 8, 4, 9, 6, 1?',
+    options: ['4', '9', '5', '6'],
+    correctAnswer: 2,
+    explanation: 'First, arrange the data in order: 1, 2, 4, 5, 6, 8, 9. The median is the middle value, which is 5.',
+  },
+  {
+    id: 158,
+    chapterId: 'g9-math-stats',
+    question: 'The range of the data 25, 18, 20, 22, 16, 6, 17, 15, 12, 30, 32 is:',
+    options: ['10', '15', '18', '26'],
+    correctAnswer: 3,
+    explanation: 'Range = Highest value - Lowest value = 32 - 6 = 26.',
+  },
+  {
+    id: 159,
+    chapterId: 'g9-math-stats',
+    question: 'What is the mean of the first five natural numbers?',
+    options: ['2', '3', '4', '5'],
+    correctAnswer: 1,
+    explanation: 'The first five natural numbers are 1, 2, 3, 4, 5. Mean = (1+2+3+4+5)/5 = 15/5 = 3.',
+  },
+  {
+    id: 160,
+    chapterId: 'g9-math-stats',
+    question: 'A graphical representation of a frequency distribution is called a:',
+    options: ['Bar graph', 'Pictograph', 'Pie chart', 'Histogram'],
+    correctAnswer: 3,
+    explanation: 'A histogram is a bar graph-like representation of data that buckets a range of outcomes into columns along the x-axis.',
+  },
 
   // == Physics ==
-  // Chapter: Motion
+  // Chapter: Motion (g9-phy-motion)
   {
     id: 201,
     chapterId: 'g9-phy-motion',
@@ -308,8 +588,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'The area under a v-t graph gives the displacement of the object.',
   },
+  {
+    id: 214,
+    chapterId: 'g9-phy-motion',
+    question: 'Which equation of motion relates initial velocity (u), final velocity (v), acceleration (a) and displacement (s)?',
+    options: ['v = u + at', 's = ut + ½at²', 'v² = u² + 2as', 's = (u+v)t / 2'],
+    correctAnswer: 2,
+    explanation: 'v² = u² + 2as is the third equation of motion, which does not involve time (t).',
+  },
 
-  // Chapter: Force and Laws of Motion
+  // Chapter: Force and Laws of Motion (g9-phy-force)
   {
     id: 203,
     chapterId: 'g9-phy-force',
@@ -334,8 +622,24 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'Momentum (p) is defined as mass (m) times velocity (v), p = mv.',
   },
+  {
+    id: 215,
+    chapterId: 'g9-phy-force',
+    question: 'When a gun is fired, it recoils. This is an example of:',
+    options: ['Newton\'s First Law', 'Newton\'s Second Law', 'Newton\'s Third Law', 'Law of Conservation of Energy'],
+    correctAnswer: 2,
+    explanation: 'The force on the bullet is equal and opposite to the force on the gun (recoil), which is an application of Newton\'s Third Law.',
+  },
+  {
+    id: 216,
+    chapterId: 'g9-phy-force',
+    question: 'The SI unit of force is:',
+    options: ['Joule', 'Watt', 'Newton', 'Pascal'],
+    correctAnswer: 2,
+    explanation: 'The SI unit of force is the Newton (N), which is defined as kg⋅m/s².',
+  },
 
-  // Chapter: Gravitation
+  // Chapter: Gravitation (g9-phy-grav)
   {
     id: 205,
     chapterId: 'g9-phy-grav',
@@ -352,8 +656,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'The moon\'s gravity is much weaker than Earth\'s, approximately one-sixth.',
   },
+  {
+    id: 217,
+    chapterId: 'g9-phy-grav',
+    question: 'The force of attraction between two unit masses separated by a unit distance is called:',
+    options: ['Gravitational potential', 'Acceleration due to gravity', 'Universal gravitational constant', 'Gravitational field'],
+    correctAnswer: 2,
+    explanation: 'This is the definition of the Universal Gravitational Constant, G.',
+  },
+  {
+    id: 218,
+    chapterId: 'g9-phy-grav',
+    question: 'An object is thrown vertically upwards. At its highest point, its acceleration is:',
+    options: ['Zero', 'Upwards', 'Downwards (g)', 'Variable'],
+    correctAnswer: 2,
+    explanation: 'Even at the highest point when velocity is momentarily zero, the acceleration due to gravity (g) is still acting on it, pulling it downwards.',
+  },
+  {
+    id: 219,
+    chapterId: 'g9-phy-grav',
+    question: 'Mass is a measure of an object\'s inertia, while weight is a measure of:',
+    options: ['Volume', 'Density', 'The force of gravity on it', 'Its size'],
+    correctAnswer: 2,
+    explanation: 'Weight is a force, specifically the force of gravity acting on an object\'s mass (W = mg).',
+  },
 
-  // Chapter: Work and Energy
+  // Chapter: Work and Energy (g9-phy-work)
   {
     id: 206,
     chapterId: 'g9-phy-work',
@@ -370,8 +698,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Kinetic Energy (KE) = 1/2 * m * v². KE = 0.5 * 10 * (5)² = 0.5 * 10 * 25 = 125 J.',
   },
+  {
+    id: 220,
+    chapterId: 'g9-phy-work',
+    question: 'The energy possessed by an object due to its position or configuration is called:',
+    options: ['Kinetic Energy', 'Potential Energy', 'Chemical Energy', 'Heat Energy'],
+    correctAnswer: 1,
+    explanation: 'This is the definition of potential energy. For example, gravitational potential energy depends on height.',
+  },
+  {
+    id: 221,
+    chapterId: 'g9-phy-work',
+    question: 'What is the commercial unit of energy?',
+    options: ['Joule', 'Watt-hour', 'Kilowatt-hour (kWh)', 'Calorie'],
+    correctAnswer: 2,
+    explanation: 'Kilowatt-hour (kWh) is commonly used by utility companies to measure energy consumption. 1 kWh = 3.6 x 10⁶ J.',
+  },
+  {
+    id: 222,
+    chapterId: 'g9-phy-work',
+    question: 'The law of conservation of energy states that energy can neither be created nor destroyed, but can be:',
+    options: ['Lost', 'Gained', 'Changed from one form to another', 'Measured'],
+    correctAnswer: 2,
+    explanation: 'This fundamental law states that the total energy of an isolated system remains constant.',
+  },
 
-  // Chapter: Sound
+  // Chapter: Sound (g9-phy-sound)
   {
     id: 207,
     chapterId: 'g9-phy-sound',
@@ -388,9 +740,33 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'Reverberation is the collection of reflected sounds from the surfaces in an enclosure.',
   },
+  {
+    id: 223,
+    chapterId: 'g9-phy-sound',
+    question: 'The audible range of frequency for human beings is approximately:',
+    options: ['20 Hz to 20,000 Hz', 'Below 20 Hz', 'Above 20,000 Hz', '0 Hz to 100 Hz'],
+    correctAnswer: 0,
+    explanation: 'Humans can typically hear sound frequencies between 20 Hz and 20 kHz.',
+  },
+  {
+    id: 224,
+    chapterId: 'g9-phy-sound',
+    question: 'The loudness of a sound is determined by its:',
+    options: ['Frequency', 'Wavelength', 'Amplitude', 'Speed'],
+    correctAnswer: 2,
+    explanation: 'The amplitude of a sound wave determines its loudness or intensity.',
+  },
+  {
+    id: 225,
+    chapterId: 'g9-phy-sound',
+    question: 'The pitch of a sound is determined by its:',
+    options: ['Frequency', 'Wavelength', 'Amplitude', 'Speed'],
+    correctAnswer: 0,
+    explanation: 'The frequency of a sound wave determines its pitch (how high or low it sounds).',
+  },
   
   // == Chemistry ==
-  // Chapter: Matter in Our Surroundings
+  // Chapter: Matter in Our Surroundings (g9-chem-matter)
   {
     id: 301,
     chapterId: 'g9-chem-matter',
@@ -423,8 +799,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'The particles of a liquid absorb energy from the surroundings to evaporate, which leads to a cooling effect.',
   },
-
-  // Chapter: Is Matter Around Us Pure?
+  {
+    id: 312,
+    chapterId: 'g9-chem-matter',
+    question: 'Which state of matter has particles with the highest kinetic energy?',
+    options: ['Solid', 'Liquid', 'Gas', 'All are equal'],
+    correctAnswer: 2,
+    explanation: 'Gas particles move rapidly and randomly, possessing the highest kinetic energy among the three common states.',
+  },
+  
+  // Chapter: Is Matter Around Us Pure? (g9-chem-pure)
   {
     id: 303,
     chapterId: 'g9-chem-pure',
@@ -449,8 +833,24 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Burning wood (combustion) is a chemical change because it results in new substances (ash, smoke, CO2).',
   },
+  {
+    id: 313,
+    chapterId: 'g9-chem-pure',
+    question: 'Milk is an example of a:',
+    options: ['Solution', 'Suspension', 'Colloid', 'Pure substance'],
+    correctAnswer: 2,
+    explanation: 'Milk is a colloid, specifically an emulsion, where fat globules are dispersed in a water-based liquid.',
+  },
+  {
+    id: 314,
+    chapterId: 'g9-chem-pure',
+    question: 'The components of a mixture can be separated by:',
+    options: ['Chemical methods only', 'Physical methods only', 'Both physical and chemical methods', 'Neither method'],
+    correctAnswer: 1,
+    explanation: 'Mixtures can be separated by physical means such as filtration, evaporation, distillation, etc., because no chemical bonds are formed between the components.',
+  },
 
-  // Chapter: Atoms and Molecules
+  // Chapter: Atoms and Molecules (g9-chem-atoms)
   {
     id: 305,
     chapterId: 'g9-chem-atoms',
@@ -467,8 +867,32 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 0,
     explanation: 'Avogadro\'s number is the number of constituent particles (usually atoms or molecules) that are contained in one mole of a substance.',
   },
+  {
+    id: 315,
+    chapterId: 'g9-chem-atoms',
+    question: 'What is the molar mass of CO₂? (Atomic mass C=12, O=16)',
+    options: ['28 g/mol', '32 g/mol', '44 g/mol', '56 g/mol'],
+    correctAnswer: 2,
+    explanation: 'Molar mass of CO₂ = 1 * (mass of C) + 2 * (mass of O) = 12 + 2 * 16 = 12 + 32 = 44 g/mol.',
+  },
+  {
+    id: 316,
+    chapterId: 'g9-chem-atoms',
+    question: 'The law of conservation of mass states that mass is neither created nor _____ in a chemical reaction.',
+    options: ['Destroyed', 'Changed', 'Multiplied', 'Reduced'],
+    correctAnswer: 0,
+    explanation: 'This fundamental law means the mass of the reactants must equal the mass of the products.',
+  },
+  {
+    id: 317,
+    chapterId: 'g9-chem-atoms',
+    question: 'A group of atoms carrying a charge is known as a(n):',
+    options: ['Molecule', 'Element', 'Polyatomic ion', 'Isotope'],
+    correctAnswer: 2,
+    explanation: 'For example, the sulfate ion (SO₄²⁻) is a polyatomic ion.',
+  },
   
-  // Chapter: Structure of the Atom
+  // Chapter: Structure of the Atom (g9-chem-structure)
   {
     id: 306,
     chapterId: 'g9-chem-structure',
@@ -485,9 +909,33 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'Isotopes have the same number of protons (same atomic number) but different numbers of neutrons (different mass number).',
   },
+  {
+    id: 318,
+    chapterId: 'g9-chem-structure',
+    question: 'The nucleus of an atom contains:',
+    options: ['Protons only', 'Electrons only', 'Protons and neutrons', 'Neutrons and electrons'],
+    correctAnswer: 2,
+    explanation: 'The dense central nucleus contains protons and neutrons, collectively known as nucleons.',
+  },
+  {
+    id: 319,
+    chapterId: 'g9-chem-structure',
+    question: 'The atomic number of an element is the number of ______ in its nucleus.',
+    options: ['Neutrons', 'Electrons', 'Protons', 'Nucleons'],
+    correctAnswer: 2,
+    explanation: 'The atomic number (Z) uniquely identifies a chemical element and is equal to the number of protons.',
+  },
+  {
+    id: 320,
+    chapterId: 'g9-chem-structure',
+    question: 'Who discovered the electron?',
+    options: ['Rutherford', 'Chadwick', 'J.J. Thomson', 'Goldstein'],
+    correctAnswer: 2,
+    explanation: 'J.J. Thomson is credited with the discovery of the electron in 1897 through his experiments with cathode ray tubes.',
+  },
 
   // == Biology ==
-  // Chapter: The Fundamental Unit of Life (Cell)
+  // Chapter: The Fundamental Unit of Life (Cell) (g9-bio-cell)
   {
     id: 401,
     chapterId: 'g9-bio-cell',
@@ -520,8 +968,16 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 2,
     explanation: 'In eukaryotic cells, the vast majority of the genetic material (DNA) is contained within the nucleus.',
   },
+  {
+    id: 410,
+    chapterId: 'g9-bio-cell',
+    question: 'Which organelle is responsible for protein synthesis?',
+    options: ['Golgi apparatus', 'Ribosome', 'Lysosome', 'Mitochondrion'],
+    correctAnswer: 1,
+    explanation: 'Ribosomes are the cellular machinery responsible for making proteins.',
+  },
 
-  // Chapter: Tissues
+  // Chapter: Tissues (g9-bio-tissues)
   {
     id: 403,
     chapterId: 'g9-bio-tissues',
@@ -546,8 +1002,24 @@ export const quizQuestions: QuizQuestion[] = [
     correctAnswer: 1,
     explanation: 'Xylem is the vascular tissue in plants that conducts water and dissolved nutrients upward from the root.',
   },
+  {
+    id: 411,
+    chapterId: 'g9-bio-tissues',
+    question: 'Which tissue type forms the brain, spinal cord, and nerves?',
+    options: ['Connective tissue', 'Epithelial tissue', 'Muscular tissue', 'Nervous tissue'],
+    correctAnswer: 3,
+    explanation: 'Nervous tissue is the main component of the nervous system, which controls the body\'s functions.',
+  },
+  {
+    id: 412,
+    chapterId: 'g9-bio-tissues',
+    question: 'Which plant tissue transports food (sugars) from the leaves to other parts of the plant?',
+    options: ['Xylem', 'Phloem', 'Meristem', 'Epidermis'],
+    correctAnswer: 1,
+    explanation: 'Phloem is the vascular tissue responsible for transporting sugars, produced during photosynthesis, to parts of the plant where they are needed for growth or storage.',
+  },
 
-  // Chapter: Improvement in Food Resources
+  // Chapter: Improvement in Food Resources (g9-bio-food)
   {
     id: 405,
     chapterId: 'g9-bio-food',
@@ -563,5 +1035,29 @@ export const quizQuestions: QuizQuestion[] = [
     options: ['Crop rotation', 'Mixed cropping', 'Intercropping', 'Fallowing'],
     correctAnswer: 2,
     explanation: 'Intercropping involves growing two or more crops simultaneously in the same field in a definite pattern.',
+  },
+  {
+    id: 413,
+    chapterId: 'g9-bio-food',
+    question: 'Which of the following is a Rabi crop?',
+    options: ['Maize', 'Soyabean', 'Cotton', 'Wheat'],
+    correctAnswer: 3,
+    explanation: 'Rabi crops are sown in winter and harvested in spring. Wheat is a primary example.',
+  },
+  {
+    id: 414,
+    chapterId: 'g9-bio-food',
+    question: 'The process of supplying water to crops at different intervals is called:',
+    options: ['Weeding', 'Sowing', 'Irrigation', 'Harvesting'],
+    correctAnswer: 2,
+    explanation: 'Irrigation is the artificial application of water to the land or soil to assist in growing crops.',
+  },
+  {
+    id: 415,
+    chapterId: 'g9-bio-food',
+    question: 'Apiculture is the scientific method of rearing:',
+    options: ['Fish', 'Silkworms', 'Honey Bees', 'Birds'],
+    correctAnswer: 2,
+    explanation: 'Apiculture, or beekeeping, is the maintenance of bee colonies, commonly in man-made hives.',
   },
 ];
