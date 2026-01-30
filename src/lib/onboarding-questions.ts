@@ -20,7 +20,18 @@ export type OnboardingQuestion = {
       ],
     },
     {
-        id: 2,
+      id: 2,
+      text: "Which board are you studying under?",
+      type: 'single-choice',
+      firestoreField: 'board',
+      options: [
+        { label: "CBSE", value: "cbse" },
+        { label: "ICSE", value: "icse" },
+        { label: "Other", value: "other" },
+      ],
+    },
+    {
+        id: 3,
         text: "Which subject troubles you the most?",
         type: 'multi-select',
         firestoreField: 'troublingSubjects',
@@ -32,7 +43,7 @@ export type OnboardingQuestion = {
         ],
     },
     {
-      id: 3,
+      id: 4,
       text: "How much time can you study daily?",
       type: 'single-choice',
       firestoreField: 'studyTime',
@@ -44,7 +55,7 @@ export type OnboardingQuestion = {
       ],
     },
     {
-        id: 4,
+        id: 5,
         text: "When do you usually study?",
         type: 'multi-select',
         firestoreField: 'studySchedule',
@@ -56,7 +67,7 @@ export type OnboardingQuestion = {
         ],
     },
     {
-        id: 5,
+        id: 6,
         text: "What’s your biggest problem right now?",
         type: 'multi-select',
         firestoreField: 'biggestProblems',
@@ -68,7 +79,7 @@ export type OnboardingQuestion = {
         ],
     },
     {
-      id: 6,
+      id: 7,
       text: "When is your next exam?",
       type: 'date',
       firestoreField: 'nextExamDate',

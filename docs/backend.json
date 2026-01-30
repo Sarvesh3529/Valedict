@@ -13,6 +13,11 @@
           "type": "string",
           "description": "The user's selected grade."
         },
+        "board": {
+          "type": "string",
+          "description": "The educational board the user is studying under.",
+          "enum": ["cbse", "icse", "other"]
+        },
         "troublingSubjects": {
           "type": "array",
           "items": {
