@@ -100,7 +100,6 @@ export default function QuizSetup({ onStart }: QuizSetupProps) {
             <SelectItem value="5">5 Questions</SelectItem>
             <SelectItem value="10">10 Questions</SelectItem>
             <SelectItem value="15">15 Questions</SelectItem>
-            <SelectItem value="20">20 Questions</SelectItem>
           </SelectContent>
         </Select>
       </div>
