@@ -49,49 +49,43 @@ export const subjects: Subject[] = baseSubjects.map((subject) => ({
 
 
 export const quizQuestions: QuizQuestion[] = [
-  // Math
+  // Math - Number Systems
   {
-    id: 1,
-    chapterId: 'g9-math-lineq',
-    question: 'What is the value of x in the equation 2x + 3 = 7?',
-    options: ['1', '2', '3', '4'],
-    correctAnswer: 1,
-    explanation: 'Subtract 3 from both sides to get 2x = 4. Then divide by 2 to get x = 2.',
-  },
-  {
-    id: 2,
-    chapterId: 'g9-math-poly',
-    question: 'What is (x+y)^2 ?',
-    options: ['x^2 + y^2', 'x^2 + 2xy + y^2', 'x^2 - 2xy + y^2', '2x + 2y'],
-    correctAnswer: 1,
-    explanation: 'The formula for the square of a binomial (a+b)^2 is a^2 + 2ab + b^2.',
-  },
-  {
-    id: 3,
-    chapterId: 'g9-math-tri',
-    question: 'What is the sum of angles in a triangle?',
-    options: ['90 degrees', '180 degrees', '270 degrees', '360 degrees'],
-    correctAnswer: 1,
-    explanation: 'The sum of the interior angles of any triangle is always 180 degrees.',
-  },
-  {
-    id: 13,
-    chapterId: 'g9-math-surface',
-    question: 'What is the formula for the volume of a sphere?',
-    options: ['4/3 * pi * r^3', 'pi * r^2 * h', '2 * pi * r', 'pi * r^2'],
-    correctAnswer: 0,
-    explanation: 'The volume of a sphere with radius r is given by the formula V = (4/3)πr³.',
-  },
-  {
-    id: 19,
+    id: 101,
     chapterId: 'g9-math-numsys',
     question: 'Which of the following is an irrational number?',
     options: ['√4', '√9', '√2', '0.333...'],
     correctAnswer: 2,
-    explanation: '√2 cannot be expressed as a simple fraction, making it an irrational number. √4=2 and √9=3 are integers, and 0.333... is a repeating decimal (1/3).',
+    explanation: '√2 cannot be expressed as a simple fraction. √4=2 and √9=3 are integers. 0.333... is a rational number (1/3).',
   },
   {
-    id: 20,
+    id: 102,
+    chapterId: 'g9-math-numsys',
+    question: 'The decimal expansion of a rational number is either terminating or...',
+    options: ['Non-terminating non-repeating', 'Non-terminating repeating', 'Terminating repeating', 'None of the above'],
+    correctAnswer: 1,
+    explanation: 'Rational numbers have decimal expansions that either terminate or repeat in a pattern.',
+  },
+  // Math - Polynomials
+  {
+    id: 103,
+    chapterId: 'g9-math-poly',
+    question: 'What is the degree of the polynomial 5x³ + 4x² + 7x?',
+    options: ['3', '2', '1', '4'],
+    correctAnswer: 0,
+    explanation: 'The degree of a polynomial is the highest exponent of its variable. Here, the highest exponent is 3.',
+  },
+  {
+    id: 104,
+    chapterId: 'g9-math-poly',
+    question: 'What is (x+y)²?',
+    options: ['x² + y²', 'x² + 2xy + y²', 'x² - 2xy + y²', '2x + 2y'],
+    correctAnswer: 1,
+    explanation: 'The formula for the square of a binomial (a+b)² is a² + 2ab + b².',
+  },
+  // Math - Coordinate Geometry
+  {
+    id: 105,
     chapterId: 'g9-math-coord',
     question: 'What are the coordinates of the origin in a Cartesian plane?',
     options: ['(1, 1)', '(0, 0)', '(1, 0)', '(0, 1)'],
@@ -99,72 +93,106 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'The origin is the point where the x-axis and y-axis intersect, which is at the coordinates (0, 0).',
   },
   {
-    id: 21,
+    id: 106,
+    chapterId: 'g9-math-coord',
+    question: 'The point (-3, -5) lies in which quadrant?',
+    options: ['First quadrant', 'Second quadrant', 'Third quadrant', 'Fourth quadrant'],
+    correctAnswer: 2,
+    explanation: 'In the third quadrant, both the x-coordinate and y-coordinate are negative.',
+  },
+  // Math - Linear Equations
+  {
+    id: 107,
+    chapterId: 'g9-math-lineq',
+    question: 'What is the value of x in the equation 2x + 3 = 7?',
+    options: ['1', '2', '3', '4'],
+    correctAnswer: 1,
+    explanation: 'Subtract 3 from both sides to get 2x = 4. Then divide by 2 to get x = 2.',
+  },
+  {
+    id: 108,
+    chapterId: 'g9-math-lineq',
+    question: 'The graph of a linear equation in two variables is a...',
+    options: ['Straight line', 'Circle', 'Parabola', 'Point'],
+    correctAnswer: 0,
+    explanation: 'The equation ax + by + c = 0 always represents a straight line on a graph.',
+  },
+  // Math - Euclid’s Geometry
+  {
+    id: 109,
     chapterId: 'g9-math-euclid',
     question: 'According to Euclid\'s postulates, all right angles are equal to one another. True or False?',
     options: ['True', 'False'],
     correctAnswer: 0,
-    explanation: 'This is one of Euclid\'s five postulates, a fundamental assumption in Euclidean geometry.',
+    explanation: 'This is Euclid\'s fourth postulate, a fundamental assumption in Euclidean geometry.',
   },
+  // Math - Lines and Angles
   {
-    id: 22,
+    id: 110,
     chapterId: 'g9-math-linesangles',
     question: 'If two lines intersect, the vertically opposite angles are:',
     options: ['Complementary', 'Supplementary', 'Equal', 'Unequal'],
     correctAnswer: 2,
-    explanation: 'When two lines intersect, the angles opposite each other are always equal.',
+    explanation: 'When two lines intersect, the angles opposite each other at the vertex are always equal.',
   },
+  // Math - Triangles
   {
-    id: 23,
+    id: 111,
+    chapterId: 'g9-math-tri',
+    question: 'What is the sum of angles in a triangle?',
+    options: ['90 degrees', '180 degrees', '270 degrees', '360 degrees'],
+    correctAnswer: 1,
+    explanation: 'The sum of the interior angles of any triangle is always 180 degrees.',
+  },
+  // Math - Quadrilaterals
+  {
+    id: 112,
     chapterId: 'g9-math-quad',
-    question: 'What is the sum of the interior angles of a quadrilateral?',
-    options: ['180°', '270°', '360°', '540°'],
+    question: 'A quadrilateral with all four sides equal and all four angles right angles is a:',
+    options: ['Rhombus', 'Rectangle', 'Square', 'Trapezium'],
     correctAnswer: 2,
-    explanation: 'A quadrilateral can be divided into two triangles, and since each triangle has an angle sum of 180°, the total for the quadrilateral is 2 * 180° = 360°.',
+    explanation: 'A square has four equal sides and four 90-degree angles.',
   },
+  // Math - Circles
   {
-    id: 24,
+    id: 113,
     chapterId: 'g9-math-circles',
     question: 'The longest chord in a circle is called the:',
     options: ['Radius', 'Tangent', 'Secant', 'Diameter'],
     correctAnswer: 3,
     explanation: 'The diameter is a chord that passes through the center of the circle, making it the longest possible chord.',
   },
+  // Math - Heron’s Formula
   {
-    id: 25,
+    id: 114,
     chapterId: 'g9-math-heron',
     question: 'Heron\'s formula is used to calculate the area of a:',
     options: ['Circle', 'Square', 'Triangle', 'Rectangle'],
     correctAnswer: 2,
     explanation: 'Heron\'s formula calculates the area of a triangle when the lengths of all three sides are known.',
   },
+  // Math - Surface Areas and Volumes
   {
-    id: 26,
+    id: 115,
+    chapterId: 'g9-math-surface',
+    question: 'What is the formula for the volume of a cylinder?',
+    options: ['πr²h', '2πrh', 'l*b*h', '4/3 πr³'],
+    correctAnswer: 0,
+    explanation: 'The volume of a cylinder is the area of the base (πr²) multiplied by the height (h).',
+  },
+  // Math - Statistics
+  {
+    id: 116,
     chapterId: 'g9-math-stats',
     question: 'What is the mode of the following data set: 2, 3, 5, 3, 7, 3, 8?',
     options: ['5', '3', '7', '8'],
     correctAnswer: 1,
     explanation: 'The mode is the number that appears most frequently in a data set. In this case, 3 appears three times.',
   },
-  // Physics
+
+  // Physics - Motion
   {
-    id: 4,
-    chapterId: 'g9-phy-force',
-    question: "What is Newton's second law of motion?",
-    options: ['F=ma', 'E=mc^2', 'v=u+at', 'P=V*I'],
-    correctAnswer: 0,
-    explanation: "Newton's second law states that the force on an object is equal to its mass times its acceleration (F=ma).",
-  },
-  {
-    id: 14,
-    chapterId: 'g9-phy-grav',
-    question: 'The value of acceleration due to gravity (g) is highest at:',
-    options: ['The equator', 'The poles', 'The center of the Earth', 'It is constant everywhere'],
-    correctAnswer: 1,
-    explanation: 'The Earth is not a perfect sphere; it is slightly flattened at the poles. Since g is inversely proportional to the square of the distance from the center, it is highest at the poles.',
-  },
-  {
-    id: 15,
+    id: 201,
     chapterId: 'g9-phy-motion',
     question: 'Which of the following is a vector quantity?',
     options: ['Speed', 'Distance', 'Mass', 'Velocity'],
@@ -172,40 +200,78 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'Velocity has both magnitude and direction, making it a vector quantity. Speed, distance, and mass are scalar quantities.',
   },
   {
-    id: 27,
+    id: 202,
+    chapterId: 'g9-phy-motion',
+    question: 'Acceleration is the rate of change of:',
+    options: ['Distance', 'Speed', 'Velocity', 'Time'],
+    correctAnswer: 2,
+    explanation: 'Acceleration is defined as the rate at which an object changes its velocity.',
+  },
+  // Physics - Force and Laws of Motion
+  {
+    id: 203,
+    chapterId: 'g9-phy-force',
+    question: 'What is Newton\'s second law of motion?',
+    options: ['F=ma', 'E=mc²', 'v=u+at', 'P=V*I'],
+    correctAnswer: 0,
+    explanation: 'Newton\'s second law states that the force on an object is equal to its mass times its acceleration (F=ma).',
+  },
+  {
+    id: 204,
+    chapterId: 'g9-phy-force',
+    question: 'Inertia is the property of a body to resist a change in its state of:',
+    options: ['Rest only', 'Motion only', 'Rest or uniform motion', 'Acceleration'],
+    correctAnswer: 2,
+    explanation: 'Inertia is the resistance of any physical object to any change in its velocity. This includes changes to its speed, direction, or state of rest.',
+  },
+  // Physics - Gravitation
+  {
+    id: 205,
+    chapterId: 'g9-phy-grav',
+    question: 'The value of acceleration due to gravity (g) is highest at:',
+    options: ['The equator', 'The poles', 'The center of the Earth', 'It is constant everywhere'],
+    correctAnswer: 1,
+    explanation: 'The Earth is not a perfect sphere; it is slightly flattened at the poles. Since g is inversely proportional to the square of the distance from the center, it is highest at the poles.',
+  },
+  // Physics - Work and Energy
+  {
+    id: 206,
     chapterId: 'g9-phy-work',
     question: 'The unit of work is:',
     options: ['Watt', 'Newton', 'Joule', 'Pascal'],
     correctAnswer: 2,
     explanation: 'The SI unit of work and energy is the Joule (J).',
   },
+  // Physics - Sound
   {
-    id: 28,
+    id: 207,
     chapterId: 'g9-phy-sound',
     question: 'Sound waves cannot travel through:',
     options: ['Solid', 'Liquid', 'Gas', 'Vacuum'],
     correctAnswer: 3,
     explanation: 'Sound is a mechanical wave, which means it requires a medium (particles) to propagate. A vacuum is empty of matter.',
   },
-  // Chemistry
+  
+  // Chemistry - Matter in Our Surroundings
   {
-    id: 11,
-    chapterId: 'g9-chem-atoms',
-    question: 'What is the chemical formula for water?',
-    options: ['CO2', 'O2', 'H2O2', 'H2O'],
-    correctAnswer: 3,
-    explanation: 'A molecule of water is composed of two hydrogen atoms and one oxygen atom.',
-  },
-  {
-    id: 16,
-    chapterId: 'g9-chem-structure',
-    question: 'Which subatomic particle has a negative charge?',
-    options: ['Proton', 'Neutron', 'Electron', 'Photon'],
+    id: 301,
+    chapterId: 'g9-chem-matter',
+    question: 'The process of a solid turning directly into a gas is called:',
+    options: ['Evaporation', 'Condensation', 'Sublimation', 'Melting'],
     correctAnswer: 2,
-    explanation: 'Electrons are negatively charged particles that orbit the nucleus of an atom.',
+    explanation: 'Sublimation is the phase transition of a substance directly from the solid to the gas state, without passing through the liquid state.',
   },
   {
-    id: 17,
+    id: 302,
+    chapterId: 'g9-chem-matter',
+    question: 'Which state of matter has a definite volume but no definite shape?',
+    options: ['Solid', 'Liquid', 'Gas', 'Plasma'],
+    correctAnswer: 1,
+    explanation: 'Liquids take the shape of their container but have a fixed volume.',
+  },
+  // Chemistry - Is Matter Around Us Pure?
+  {
+    id: 303,
     chapterId: 'g9-chem-pure',
     question: 'Which of the following is a mixture?',
     options: ['Salt', 'Water', 'Air', 'Sugar'],
@@ -213,16 +279,35 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'Air is a mixture of various gases like nitrogen, oxygen, argon, and carbon dioxide. Salt, water, and sugar are pure substances (compounds).',
   },
   {
-    id: 29,
-    chapterId: 'g9-chem-matter',
-    question: 'The process of a solid turning directly into a gas is called:',
-    options: ['Evaporation', 'Condensation', 'Sublimation', 'Melting'],
-    correctAnswer: 2,
-    explanation: 'Sublimation is the phase transition of a substance directly from the solid to the gas state, without passing through the liquid state.',
+    id: 304,
+    chapterId: 'g9-chem-pure',
+    question: 'A solution in which no more solute can be dissolved at a given temperature is known as:',
+    options: ['Unsaturated solution', 'Saturated solution', 'Supersaturated solution', 'Colloid'],
+    correctAnswer: 1,
+    explanation: 'A saturated solution contains the maximum amount of solute that will dissolve in a solvent at that temperature.',
   },
-  // Biology
+  // Chemistry - Atoms and Molecules
   {
-    id: 7,
+    id: 305,
+    chapterId: 'g9-chem-atoms',
+    question: 'What is the chemical formula for water?',
+    options: ['CO₂', 'O₂', 'H₂O₂', 'H₂O'],
+    correctAnswer: 3,
+    explanation: 'A molecule of water is composed of two hydrogen atoms and one oxygen atom.',
+  },
+  // Chemistry - Structure of the Atom
+  {
+    id: 306,
+    chapterId: 'g9-chem-structure',
+    question: 'Which subatomic particle has a negative charge?',
+    options: ['Proton', 'Neutron', 'Electron', 'Photon'],
+    correctAnswer: 2,
+    explanation: 'Electrons are negatively charged particles that orbit the nucleus of an atom.',
+  },
+
+  // Biology - The Fundamental Unit of Life (Cell)
+  {
+    id: 401,
     chapterId: 'g9-bio-cell',
     question: 'What is the powerhouse of the cell?',
     options: ['Nucleus', 'Ribosome', 'Mitochondrion', 'Chloroplast'],
@@ -230,7 +315,16 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'Mitochondria are responsible for generating most of the cell\'s supply of adenosine triphosphate (ATP), used as a source of chemical energy.',
   },
   {
-    id: 18,
+    id: 402,
+    chapterId: 'g9-bio-cell',
+    question: 'Which organelle is known as the "suicide bag" of the cell?',
+    options: ['Lysosome', 'Ribosome', 'Vacuole', 'Golgi apparatus'],
+    correctAnswer: 0,
+    explanation: 'Lysosomes contain digestive enzymes. If the cell is damaged, they can burst and digest the entire cell.',
+  },
+  // Biology - Tissues
+  {
+    id: 403,
     chapterId: 'g9-bio-tissues',
     question: 'Which type of tissue is responsible for movement in our body?',
     options: ['Epithelial tissue', 'Connective tissue', 'Muscular tissue', 'Nervous tissue'],
@@ -238,11 +332,20 @@ export const quizQuestions: QuizQuestion[] = [
     explanation: 'Muscular tissue is composed of cells that have the special ability to shorten or contract in order to produce movement of the body parts.',
   },
   {
-    id: 30,
+    id: 404,
+    chapterId: 'g9-bio-tissues',
+    question: 'Blood is an example of which type of tissue?',
+    options: ['Epithelial tissue', 'Connective tissue', 'Muscular tissue', 'Nervous tissue'],
+    correctAnswer: 1,
+    explanation: 'Blood is considered a specialized form of connective tissue because it has a matrix (plasma) and originates from bone marrow.',
+  },
+  // Biology - Improvement in Food Resources
+  {
+    id: 405,
     chapterId: 'g9-bio-food',
     question: 'Which of the following is a Kharif crop?',
     options: ['Wheat', 'Pea', 'Paddy (Rice)', 'Mustard'],
     correctAnswer: 2,
-    explanation: 'Kharif crops are grown with the onset of monsoon in different parts of the country and these are harvested in September-October. Paddy, maize, and cotton are examples.',
+    explanation: 'Kharif crops are grown with the onset of monsoon and harvested in September-October. Examples include paddy, maize, and cotton.',
   },
 ];
