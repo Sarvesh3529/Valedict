@@ -29,6 +29,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
+import React from 'react';
 
 interface QuizResultsProps {
   results: QuizResult[];
@@ -122,7 +123,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <p>
                     Your answer:{' '}
                     <span className={cn('prose prose-sm dark:prose-invert inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                         {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                       </ReactMarkdown>
                     </span>
@@ -130,7 +131,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <p>
                     Correct answer:{' '}
                     <span className="font-medium text-muted-foreground prose prose-sm dark:prose-invert inline">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                             {result.question.options[result.question.correctAnswer]}
                         </ReactMarkdown>
                     </span>

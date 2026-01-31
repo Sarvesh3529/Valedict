@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
+import React from 'react';
 
 interface QuizViewProps {
   questions: QuizQuestion[];
@@ -88,7 +89,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
             >
               <RadioGroupItem value={index.toString()} id={`option-${index}`} />
               <Label htmlFor={`option-${index}`} className="text-base font-normal cursor-pointer flex-1 prose dark:prose-invert max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                     {option}
                 </ReactMarkdown>
               </Label>
