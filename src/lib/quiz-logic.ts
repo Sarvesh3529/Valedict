@@ -13,12 +13,19 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export function generateQuiz(
   chapterIds: string[],
-  count: number
+  count: number,
+  grade: string,
+  difficulty: 'all' | 'easy' | 'medium' | 'hard'
 ): QuizQuestion[] {
   // Filter questions by selected chapters
-  const availableQuestions = quizQuestions.filter((q) =>
+  let availableQuestions = quizQuestions.filter((q) =>
     chapterIds.includes(q.chapterId)
   );
+
+  // If grade is 10 and a specific difficulty is selected, filter further
+  if (grade === '10' && difficulty !== 'all') {
+    availableQuestions = availableQuestions.filter(q => q.difficulty === difficulty);
+  }
 
   // Shuffle the available questions
   const shuffledQuestions = shuffleArray(availableQuestions);

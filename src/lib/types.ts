@@ -9,6 +9,7 @@ export type Chapter = {
   id: string;
   name: string;
   subjectId: string;
+  grade: string;
 };
 
 export type QuizQuestion = {

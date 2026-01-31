@@ -15,17 +15,25 @@ export default function QuizPage() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
 
-  const handleStartQuiz = (chapterIds: string[], count: number) => {
-    const generatedQuestions = generateQuiz(chapterIds, count);
+  const handleStartQuiz = (
+    chapterIds: string[],
+    count: number,
+    grade: string,
+    difficulty: 'all' | 'easy' | 'medium' | 'hard'
+  ) => {
+    const generatedQuestions = generateQuiz(chapterIds, count, grade, difficulty);
     if (generatedQuestions.length > 0) {
       if (generatedQuestions.length < count) {
-        alert(`Only ${generatedQuestions.length} questions were available for the selected chapters. The quiz has been adjusted.`);
+        alert(
+          `Only ${generatedQuestions.length} questions were available for the selected chapters and difficulty. The quiz has been adjusted.`
+        );
       }
       setQuestions(generatedQuestions);
       setQuizState('active');
     } else {
-      // Handle case where no questions are available for selected chapters
-      alert("No questions available for the selected chapters. Please select different chapters.");
+      alert(
+        'No questions available for the selected chapters and difficulty. Please select different chapters.'
+      );
     }
   };
 
@@ -39,9 +47,9 @@ export default function QuizPage() {
     setQuestions([]);
     setResults([]);
   };
-  
+
   const getTitle = () => {
-    switch(quizState) {
+    switch (quizState) {
       case 'setup':
         return 'Create Your Quiz';
       case 'active':
@@ -49,20 +57,24 @@ export default function QuizPage() {
       case 'results':
         return 'Quiz Results';
     }
-  }
+  };
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
-       <Card className="overflow-hidden">
+      <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-primary text-center">
             {getTitle()}
           </CardTitle>
         </CardHeader>
         <div className="p-6 md:p-8">
-            {quizState === 'setup' && <QuizSetup onStart={handleStartQuiz} />}
-            {quizState === 'active' && questions.length > 0 && <QuizView questions={questions} onFinish={handleFinishQuiz} />}
-            {quizState === 'results' && <QuizResults results={results} onRestart={handleRestart} />}
+          {quizState === 'setup' && <QuizSetup onStart={handleStartQuiz} />}
+          {quizState === 'active' && questions.length > 0 && (
+            <QuizView questions={questions} onFinish={handleFinishQuiz} />
+          )}
+          {quizState === 'results' && (
+            <QuizResults results={results} onRestart={handleRestart} />
+          )}
         </div>
       </Card>
     </div>
