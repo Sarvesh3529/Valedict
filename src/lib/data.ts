@@ -6,6 +6,7 @@ import { grade9BiologyQuestions } from './quiz-questions/grade-9/biology';
 import { grade10MathQuestions } from './quiz-questions/grade-10/maths';
 import { grade10PhysicsQuestions } from './quiz-questions/grade-10/physics';
 import { grade10ChemistryQuestions } from './quiz-questions/grade-10/chemistry';
+import { grade10BiologyQuestions } from './quiz-questions/grade-10/biology';
 
 // Grade 9 Chapters
 export const chapters: Chapter[] = [
@@ -68,6 +69,13 @@ export const chapters: Chapter[] = [
   { id: 'g10-chem-acids', name: 'Acids, Bases and Salts', subjectId: 'chem' },
   { id: 'g10-chem-metals', name: 'Metals and Non-metals', subjectId: 'chem' },
   { id: 'g10-chem-carbon', name: 'Carbon and its Compounds', subjectId: 'chem' },
+
+  // Grade 10 Biology
+  { id: 'g10-bio-lifeprocesses', name: 'Life Processes', subjectId: 'bio' },
+  { id: 'g10-bio-control', name: 'Control and Coordination', subjectId: 'bio' },
+  { id: 'g10-bio-reproduction', name: 'How do Organisms Reproduce?', subjectId: 'bio' },
+  { id: 'g10-bio-heredity', name: 'Heredity', subjectId: 'bio' },
+  { id: 'g10-bio-environment', name: 'Our Environment', subjectId: 'bio' },
 ];
 
 const baseSubjects: Omit<Subject, 'chapters'>[] = [
@@ -90,4 +98,5 @@ export const quizQuestions: QuizQuestion[] = [
     ...grade10MathQuestions,
     ...grade10PhysicsQuestions,
     ...grade10ChemistryQuestions,
+    ...grade10BiologyQuestions,
 ];
