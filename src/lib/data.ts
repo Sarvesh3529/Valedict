@@ -2,6 +2,7 @@ import type { Subject, Chapter, QuizQuestion } from './types';
 import { grade9MathQuestions } from './quiz-questions/grade-9/math';
 import { grade9PhysicsQuestions } from './quiz-questions/grade-9/physics';
 import { grade9ChemistryQuestions } from './quiz-questions/grade-9/chemistry';
+import { grade9BiologyQuestions } from './quiz-questions/grade-9/biology';
 
 // Grade 9 Chapters
 export const chapters: Chapter[] = [
@@ -54,5 +55,6 @@ export const quizQuestions: QuizQuestion[] = [
     ...grade9MathQuestions,
     ...grade9PhysicsQuestions,
     ...grade9ChemistryQuestions,
+    ...grade9BiologyQuestions,
     // When you provide questions for other subjects, they will be imported and added here.
 ];
