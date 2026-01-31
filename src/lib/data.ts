@@ -44,6 +44,13 @@ export const chapters: Chapter[] = [
   { id: 'g10-math-poly', name: 'Polynomials (Grade 10)', subjectId: 'math' },
   { id: 'g10-math-lineq', name: 'Pair of Linear Equations', subjectId: 'math' },
   { id: 'g10-math-quad', name: 'Quadratic Equations', subjectId: 'math' },
+  { id: 'g10-math-ap', name: 'Arithmetic Progressions', subjectId: 'math' },
+  { id: 'g10-math-triangles', name: 'Triangles', subjectId: 'math' },
+  { id: 'g10-math-coord', name: 'Coordinate Geometry', subjectId: 'math' },
+  { id: 'g10-math-trigo', name: 'Introduction to Trigonometry', subjectId: 'math' },
+  { id: 'g10-math-app-trig', name: 'Applications of Trigonometry', subjectId: 'math' },
+  { id: 'g10-math-circles', name: 'Circles', subjectId: 'math' },
+  { id: 'g10-math-areas-circles', name: 'Areas Related to Circles', subjectId: 'math' },
 ];
 
 const baseSubjects: Omit<Subject, 'chapters'>[] = [
