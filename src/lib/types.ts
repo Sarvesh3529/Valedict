@@ -18,6 +18,7 @@ export type QuizQuestion = {
   correctAnswer: number;
   explanation: string;
   chapterId: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
 };
 
 export type QuizResult = {
