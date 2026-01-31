@@ -72,7 +72,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
 
       <div className="space-y-4">
         <div className="prose dark:prose-invert text-xl font-semibold leading-relaxed max-w-none">
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
             {currentQuestion.question}
           </ReactMarkdown>
         </div>

@@ -115,7 +115,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
               </AccordionTrigger>
               <AccordionContent className="p-4 border border-border border-t-0 rounded-b-lg bg-card">
                 <div className="prose dark:prose-invert max-w-none text-foreground font-semibold mb-2">
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                         {result.question.question}
                     </ReactMarkdown>
                 </div>
@@ -141,7 +141,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <AlertTitle>Explanation</AlertTitle>
                   <AlertDescription className="text-secondary-foreground/80">
                     <div className="prose prose-sm max-w-none dark:prose-invert text-secondary-foreground/80">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                             {result.question.explanation}
                         </ReactMarkdown>
                     </div>
