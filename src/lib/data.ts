@@ -51,6 +51,9 @@ export const chapters: Chapter[] = [
   { id: 'g10-math-app-trig', name: 'Applications of Trigonometry', subjectId: 'math' },
   { id: 'g10-math-circles', name: 'Circles', subjectId: 'math' },
   { id: 'g10-math-areas-circles', name: 'Areas Related to Circles', subjectId: 'math' },
+  { id: 'g10-math-surface-volumes', name: 'Surface Areas and Volumes', subjectId: 'math' },
+  { id: 'g10-math-stats', name: 'Statistics', subjectId: 'math' },
+  { id: 'g10-math-prob', name: 'Probability', subjectId: 'math' },
 ];
 
 const baseSubjects: Omit<Subject, 'chapters'>[] = [
