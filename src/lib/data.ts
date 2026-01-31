@@ -5,6 +5,7 @@ import { grade9ChemistryQuestions } from './quiz-questions/grade-9/chemistry';
 import { grade9BiologyQuestions } from './quiz-questions/grade-9/biology';
 import { grade10MathQuestions } from './quiz-questions/grade-10/maths';
 import { grade10PhysicsQuestions } from './quiz-questions/grade-10/physics';
+import { grade10ChemistryQuestions } from './quiz-questions/grade-10/chemistry';
 
 // Grade 9 Chapters
 export const chapters: Chapter[] = [
@@ -61,6 +62,12 @@ export const chapters: Chapter[] = [
   { id: 'g10-phys-eye', name: 'The Human Eye and the Colorful World', subjectId: 'phy' },
   { id: 'g10-phys-electricity', name: 'Electricity', subjectId: 'phy' },
   { id: 'g10-phys-mag', name: 'Magnetic Effects of Electric Current', subjectId: 'phy' },
+
+  // Grade 10 Chemistry
+  { id: 'g10-chem-react', name: 'Chemical Reactions and Equations', subjectId: 'chem' },
+  { id: 'g10-chem-acids', name: 'Acids, Bases and Salts', subjectId: 'chem' },
+  { id: 'g10-chem-metals', name: 'Metals and Non-metals', subjectId: 'chem' },
+  { id: 'g10-chem-carbon', name: 'Carbon and its Compounds', subjectId: 'chem' },
 ];
 
 const baseSubjects: Omit<Subject, 'chapters'>[] = [
@@ -82,4 +89,5 @@ export const quizQuestions: QuizQuestion[] = [
     ...grade9BiologyQuestions,
     ...grade10MathQuestions,
     ...grade10PhysicsQuestions,
+    ...grade10ChemistryQuestions,
 ];
