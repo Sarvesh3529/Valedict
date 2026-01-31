@@ -4,6 +4,7 @@ import { grade9PhysicsQuestions } from './quiz-questions/grade-9/physics';
 import { grade9ChemistryQuestions } from './quiz-questions/grade-9/chemistry';
 import { grade9BiologyQuestions } from './quiz-questions/grade-9/biology';
 import { grade10MathQuestions } from './quiz-questions/grade-10/maths';
+import { grade10PhysicsQuestions } from './quiz-questions/grade-10/physics';
 
 // Grade 9 Chapters
 export const chapters: Chapter[] = [
@@ -45,15 +46,21 @@ export const chapters: Chapter[] = [
   { id: 'g10-math-lineq', name: 'Pair of Linear Equations', subjectId: 'math' },
   { id: 'g10-math-quad', name: 'Quadratic Equations', subjectId: 'math' },
   { id: 'g10-math-ap', name: 'Arithmetic Progressions', subjectId: 'math' },
-  { id: 'g10-math-triangles', name: 'Triangles', subjectId: 'math' },
-  { id: 'g10-math-coord', name: 'Coordinate Geometry', subjectId: 'math' },
+  { id: 'g10-math-triangles', name: 'Triangles (Grade 10)', subjectId: 'math' },
+  { id: 'g10-math-coord', name: 'Coordinate Geometry (Grade 10)', subjectId: 'math' },
   { id: 'g10-math-trigo', name: 'Introduction to Trigonometry', subjectId: 'math' },
   { id: 'g10-math-app-trig', name: 'Applications of Trigonometry', subjectId: 'math' },
-  { id: 'g10-math-circles', name: 'Circles', subjectId: 'math' },
+  { id: 'g10-math-circles', name: 'Circles (Grade 10)', subjectId: 'math' },
   { id: 'g10-math-areas-circles', name: 'Areas Related to Circles', subjectId: 'math' },
-  { id: 'g10-math-surface-volumes', name: 'Surface Areas and Volumes', subjectId: 'math' },
-  { id: 'g10-math-stats', name: 'Statistics', subjectId: 'math' },
+  { id: 'g10-math-surface-volumes', name: 'Surface Areas and Volumes (Grade 10)', subjectId: 'math' },
+  { id: 'g10-math-stats', name: 'Statistics (Grade 10)', subjectId: 'math' },
   { id: 'g10-math-prob', name: 'Probability', subjectId: 'math' },
+
+  // Grade 10 Physics
+  { id: 'g10-phys-light', name: 'Light – Reflection and Refraction', subjectId: 'phy' },
+  { id: 'g10-phys-eye', name: 'The Human Eye and the Colorful World', subjectId: 'phy' },
+  { id: 'g10-phys-electricity', name: 'Electricity', subjectId: 'phy' },
+  { id: 'g10-phys-mag', name: 'Magnetic Effects of Electric Current', subjectId: 'phy' },
 ];
 
 const baseSubjects: Omit<Subject, 'chapters'>[] = [
@@ -74,4 +81,5 @@ export const quizQuestions: QuizQuestion[] = [
     ...grade9ChemistryQuestions,
     ...grade9BiologyQuestions,
     ...grade10MathQuestions,
+    ...grade10PhysicsQuestions,
 ];
