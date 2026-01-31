@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { QuizQuestion, QuizResult } from '@/lib/types';
 import QuizSetup from '@/components/quiz/quiz-setup';
 import QuizView from '@/components/quiz/quiz-view';
 import QuizResults from '@/components/quiz/quiz-results';
 import { generateQuiz } from '@/lib/quiz-logic';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth, useFirestore } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
 
 type QuizState = 'setup' | 'active' | 'results';
 
@@ -14,14 +17,40 @@ export default function QuizPage() {
   const [quizState, setQuizState] = useState<QuizState>('setup');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
+  const [userGrade, setUserGrade] = useState<string | null>(null);
+
+  const auth = useAuth();
+  const firestore = useFirestore();
+
+  useEffect(() => {
+    if (!auth || !firestore) return;
+    
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const docRef = doc(firestore, 'onboardingResponses', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().grade) {
+          setUserGrade(docSnap.data().grade);
+        } else {
+          setUserGrade('9'); // Default to Grade 9 if not specified in profile
+        }
+      } else {
+        // If there's no user for some reason, default to Grade 9
+        setUserGrade('9');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth, firestore]);
 
   const handleStartQuiz = (
     chapterIds: string[],
     count: number,
-    grade: string,
     difficulty: 'all' | 'easy' | 'medium' | 'hard'
   ) => {
-    const generatedQuestions = generateQuiz(chapterIds, count, grade, difficulty);
+    if (!userGrade) return; // Should not happen due to UI gating
+
+    const generatedQuestions = generateQuiz(chapterIds, count, userGrade, difficulty);
     if (generatedQuestions.length > 0) {
       if (generatedQuestions.length < count) {
         alert(
@@ -68,12 +97,21 @@ export default function QuizPage() {
           </CardTitle>
         </CardHeader>
         <div className="p-6 md:p-8">
-          {quizState === 'setup' && <QuizSetup onStart={handleStartQuiz} />}
-          {quizState === 'active' && questions.length > 0 && (
-            <QuizView questions={questions} onFinish={handleFinishQuiz} />
-          )}
-          {quizState === 'results' && (
-            <QuizResults results={results} onRestart={handleRestart} />
+          {!userGrade ? (
+             <div className="flex flex-col items-center justify-center min-h-[300px]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="mt-4 text-muted-foreground">Loading your profile...</p>
+            </div>
+          ) : (
+            <>
+              {quizState === 'setup' && <QuizSetup onStart={handleStartQuiz} userGrade={userGrade} />}
+              {quizState === 'active' && questions.length > 0 && (
+                <QuizView questions={questions} onFinish={handleFinishQuiz} />
+              )}
+              {quizState === 'results' && (
+                <QuizResults results={results} onRestart={handleRestart} />
+              )}
+            </>
           )}
         </div>
       </Card>

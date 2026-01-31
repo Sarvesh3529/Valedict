@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { subjects as allSubjects } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,36 +13,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BookCopy, GraduationCap, Star } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { BookCopy, Star } from 'lucide-react';
 
 interface QuizSetupProps {
   onStart: (
     chapterIds: string[],
     count: number,
-    grade: string,
     difficulty: 'all' | 'easy' | 'medium' | 'hard'
   ) => void;
+  userGrade: string;
 }
 
-export default function QuizSetup({ onStart }: QuizSetupProps) {
-  const [selectedGrade, setSelectedGrade] = useState<string>('10');
+export default function QuizSetup({ onStart, userGrade }: QuizSetupProps) {
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<string>('5');
   const [selectedDifficulty, setSelectedDifficulty] = useState<
     'all' | 'easy' | 'medium' | 'hard'
   >('all');
 
+  // Reset chapter selection if the grade prop changes
+  useEffect(() => {
+    setSelectedChapters([]);
+  }, [userGrade]);
+
   const filteredSubjects = useMemo(() => {
     return allSubjects
       .map((subject) => ({
         ...subject,
         chapters: subject.chapters.filter(
-          (chapter) => chapter.grade === selectedGrade
+          (chapter) => chapter.grade === userGrade
         ),
       }))
       .filter((subject) => subject.chapters.length > 0);
-  }, [selectedGrade]);
+  }, [userGrade]);
 
   const handleChapterToggle = (chapterId: string) => {
     setSelectedChapters((prev) =>
@@ -50,11 +53,6 @@ export default function QuizSetup({ onStart }: QuizSetupProps) {
         ? prev.filter((id) => id !== chapterId)
         : [...prev, chapterId]
     );
-  };
-
-  const handleGradeChange = (grade: string) => {
-    setSelectedGrade(grade);
-    setSelectedChapters([]); // Reset chapter selection when grade changes
   };
 
   const handleSelectAll = (subjectId: string) => {
@@ -85,35 +83,22 @@ export default function QuizSetup({ onStart }: QuizSetupProps) {
     onStart(
       selectedChapters,
       parseInt(questionCount, 10),
-      selectedGrade,
       selectedDifficulty
     );
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Grade and Difficulty Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <Label className="text-lg font-semibold flex items-center gap-2 mb-2">
-            <GraduationCap /> Select Grade
+            Your Grade
           </Label>
-          <RadioGroup
-            defaultValue={selectedGrade}
-            onValueChange={handleGradeChange}
-            className="flex gap-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="9" id="grade9" />
-              <Label htmlFor="grade9">Grade 9</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="10" id="grade10" />
-              <Label htmlFor="grade10">Grade 10</Label>
-            </div>
-          </RadioGroup>
+          <p className="text-2xl font-bold text-primary">
+            {userGrade}
+          </p>
         </div>
-        {selectedGrade === '10' && (
+        {userGrade === '10' && (
           <div>
             <Label
               htmlFor="difficulty-select"
