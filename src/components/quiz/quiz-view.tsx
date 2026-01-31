@@ -7,6 +7,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import remarkGfm from 'remark-gfm';
 
 interface QuizViewProps {
   questions: QuizQuestion[];
@@ -66,11 +70,12 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold leading-relaxed">
-          {currentQuestion.question}
-        </h3>
+        <div className="prose dark:prose-invert text-xl font-semibold leading-relaxed max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+            {currentQuestion.question}
+          </ReactMarkdown>
+        </div>
         <RadioGroup
-          // The key ensures the component re-mounts when the question changes, clearing state
           key={currentQuestionIndex}
           value={selectedOption?.toString()}
           onValueChange={handleOptionChange}
@@ -82,8 +87,10 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
               className="flex items-center space-x-3 p-4 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors"
             >
               <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-              <Label htmlFor={`option-${index}`} className="text-base font-normal cursor-pointer flex-1">
-                {option}
+              <Label htmlFor={`option-${index}`} className="text-base font-normal cursor-pointer flex-1 prose dark:prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    {option}
+                </ReactMarkdown>
               </Label>
             </div>
           ))}

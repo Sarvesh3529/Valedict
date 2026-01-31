@@ -25,6 +25,10 @@ import {
 } from '@/components/ui/chart';
 import { PieChart, Pie, Cell } from 'recharts';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import remarkGfm from 'remark-gfm';
 
 interface QuizResultsProps {
   results: QuizResult[];
@@ -109,25 +113,37 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="p-4 border border-border border-t-0 rounded-b-lg bg-card">
-                <p className="font-semibold mb-2">{result.question.question}</p>
+                <div className="prose dark:prose-invert max-w-none text-foreground font-semibold mb-2">
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        {result.question.question}
+                    </ReactMarkdown>
+                </div>
                 <div className="space-y-2 text-sm">
                   <p>
                     Your answer:{' '}
-                    <span className={result.isCorrect ? 'text-accent' : 'text-destructive'}>
-                      {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
+                    <span className={cn('prose prose-sm dark:prose-invert inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
+                      </ReactMarkdown>
                     </span>
                   </p>
                   <p>
                     Correct answer:{' '}
-                    <span className="font-medium text-muted-foreground">
-                      {result.question.options[result.question.correctAnswer]}
+                    <span className="font-medium text-muted-foreground prose prose-sm dark:prose-invert inline">
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                            {result.question.options[result.question.correctAnswer]}
+                        </ReactMarkdown>
                     </span>
                   </p>
                 </div>
                 <Alert className="mt-4 bg-secondary border-none">
                   <AlertTitle>Explanation</AlertTitle>
                   <AlertDescription className="text-secondary-foreground/80">
-                    {result.question.explanation}
+                    <div className="prose prose-sm max-w-none dark:prose-invert text-secondary-foreground/80">
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                            {result.question.explanation}
+                        </ReactMarkdown>
+                    </div>
                   </AlertDescription>
                 </Alert>
               </AccordionContent>
