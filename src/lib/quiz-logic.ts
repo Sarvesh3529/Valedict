@@ -1,11 +1,14 @@
 import { quizQuestions, chapters } from './data';
 import type { QuizQuestion } from './types';
 
-// Function to shuffle an array
+// Function to shuffle an array (Fisher-Yates shuffle)
 function shuffleArray<T>(array: T[]): T[] {
+  // Create a copy to avoid modifying the original array
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
+    // Pick a random index from 0 to i
     const j = Math.floor(Math.random() * (i + 1));
+    // Swap elements
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
@@ -17,54 +20,45 @@ export function generateQuiz(
   grade: string,
   difficulty: 'all' | 'easy' | 'medium' | 'hard'
 ): QuizQuestion[] {
-  // 1. Get primary questions from selected chapters
-  let primaryQuestions = quizQuestions.filter((q) =>
+  // 1. Get a pool of available questions based on selected chapters and difficulty
+  let availableQuestions = quizQuestions.filter((q) =>
     chapterIds.includes(q.chapterId)
   );
 
   if (grade === '10' && difficulty !== 'all') {
-    primaryQuestions = primaryQuestions.filter(q => q.difficulty === difficulty);
+    availableQuestions = availableQuestions.filter(q => q.difficulty === difficulty);
   }
   
-  // Shuffle primary questions before potentially adding more
-  primaryQuestions = shuffleArray(primaryQuestions);
+  // 2. If the initial pool is too small, expand it to the entire subject
+  if (availableQuestions.length < count) {
+    // Determine the subject from the first selected chapter
+    const firstChapter = chapters.find(c => c.id === chapterIds[0]);
+    
+    if (firstChapter) {
+      const subjectId = firstChapter.subjectId;
 
-  // If we have enough questions, we're done.
-  if (primaryQuestions.length >= count) {
-    return primaryQuestions.slice(0, count);
+      // Find all chapter IDs in the same subject and grade
+      const allChapterIdsInSubject = chapters
+        .filter(c => c.subjectId === subjectId && c.grade === grade)
+        .map(c => c.id);
+
+      // Get all questions from that subject, respecting the difficulty filter
+      let allQuestionsInSubject = quizQuestions.filter(q => 
+        allChapterIdsInSubject.includes(q.chapterId)
+      );
+      
+      if (grade === '10' && difficulty !== 'all') {
+        allQuestionsInSubject = allQuestionsInSubject.filter(q => q.difficulty === difficulty);
+      }
+      
+      // Use this larger pool of questions
+      availableQuestions = allQuestionsInSubject;
+    }
   }
 
-  // 2. If not enough, find more questions from the same subject
-  const needed = count - primaryQuestions.length;
-  
-  // Determine the subject from the first selected chapter
-  const firstChapter = chapters.find(c => c.id === chapterIds[0]);
-  if (!firstChapter) {
-    // Should not happen, but as a fallback, return what we have
-    return primaryQuestions;
-  }
-  const subjectId = firstChapter.subjectId;
+  // 3. Shuffle the final pool of questions
+  const shuffledQuestions = shuffleArray(availableQuestions);
 
-  // Find all other chapters in the same subject and grade
-  const allChapterIdsInSubject = chapters
-    .filter(c => c.subjectId === subjectId && c.grade === grade)
-    .map(c => c.id);
-
-  // Get all questions from that subject, excluding the ones we already have
-  const existingQuestionIds = new Set(primaryQuestions.map(q => q.id));
-  let extraQuestions = quizQuestions.filter(q => 
-    !existingQuestionIds.has(q.id) && allChapterIdsInSubject.includes(q.chapterId)
-  );
-  
-  if (grade === '10' && difficulty !== 'all') {
-    extraQuestions = extraQuestions.filter(q => q.difficulty === difficulty);
-  }
-  
-  // Shuffle and take the needed amount
-  const shuffledExtra = shuffleArray(extraQuestions).slice(0, needed);
-
-  // 3. Combine and return
-  const finalQuestions = shuffleArray([...primaryQuestions, ...shuffledExtra]);
-
-  return finalQuestions;
+  // 4. Return the requested number of questions from the shuffled list
+  return shuffledQuestions.slice(0, count);
 }
