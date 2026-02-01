@@ -51,12 +51,8 @@ export default function QuizPage() {
     if (!userGrade) return; // Should not happen due to UI gating
 
     const generatedQuestions = generateQuiz(chapterIds, count, userGrade, difficulty);
+    
     if (generatedQuestions.length > 0) {
-      if (generatedQuestions.length < count) {
-        alert(
-          `Only ${generatedQuestions.length} questions were available for the selected chapters and difficulty. The quiz has been adjusted.`
-        );
-      }
       setQuestions(generatedQuestions);
       setQuizState('active');
     } else {
