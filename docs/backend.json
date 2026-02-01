@@ -78,14 +78,18 @@
           "format": "uri",
           "description": "URL for the user's profile picture."
         },
-        "streak": {
-            "type": "number",
-            "description": "The user's current study streak in days."
+        "currentStreak": {
+          "type": "number",
+          "description": "The user's current study streak in days."
         },
-        "lastQuizDate": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The date of the user's last completed quiz."
+        "highestStreak": {
+            "type": "number",
+            "description": "The user's all-time highest study streak."
+        },
+        "lastActivityDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date of the user's last completed activity."
         }
       },
       "required": ["uid", "email"]

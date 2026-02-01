@@ -16,7 +16,7 @@ import QuizResults from '@/components/quiz/quiz-results';
 function RevisionSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { updateStreak } = useAuth();
+  const { updateUserStreak } = useAuth();
   const subjectIdsParam = searchParams.get('subjects');
   const grade = searchParams.get('grade');
 
@@ -42,7 +42,7 @@ function RevisionSessionContent() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setIsFinished(true);
-    updateStreak();
+    updateUserStreak();
   };
 
   const handleRestart = () => {

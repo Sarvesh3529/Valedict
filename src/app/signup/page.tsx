@@ -63,7 +63,9 @@ export default function SignupPage() {
           email: user.email,
           displayName: displayName,
           photoURL: user.photoURL,
-          streak: 0,
+          currentStreak: 0,
+          highestStreak: 0,
+          lastActivityDate: null,
       }, { merge: true });
       
       router.push('/home');

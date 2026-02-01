@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 type QuizState = 'setup' | 'active' | 'results';
 
 export default function QuizPage() {
-  const { user, loading: userLoading, updateStreak } = useAuth();
+  const { user, loading: userLoading, updateUserStreak } = useAuth();
   const router = useRouter();
 
   const [quizState, setQuizState] = useState<QuizState>('setup');
@@ -75,7 +75,7 @@ export default function QuizPage() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setQuizState('results');
-    updateStreak();
+    updateUserStreak();
   };
 
   const handleRestart = () => {

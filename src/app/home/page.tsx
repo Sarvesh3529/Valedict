@@ -10,8 +10,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { subjects } from '@/lib/data';
 import * as Icons from 'lucide-react';
-import { Flame, BrainCircuit, NotebookText, ArrowRight, Loader2 } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import StreakDisplay from '@/components/StreakDisplay';
 
 // This is needed because of the dynamic icon loading
 const iconComponents: { [key: string]: React.ElementType } = {
@@ -45,16 +46,10 @@ export default function HomePage() {
 
       {/* Stats Section */}
       <div className="mb-12">
-        <Card className="flex flex-col justify-center">
-          <CardHeader className="flex-row items-center gap-4 space-y-0">
-            <Flame className="h-8 w-8 text-orange-500" />
-            <CardTitle className="font-headline">Your Streak</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{profile?.streak || 0} <span className="text-xl font-normal text-muted-foreground">days</span></p>
-            <p className="text-sm text-muted-foreground mt-1">Complete a quiz each day to build your streak!</p>
-          </CardContent>
-        </Card>
+        <StreakDisplay 
+            currentStreak={profile?.currentStreak || 0}
+            highestStreak={profile?.highestStreak || 0}
+        />
       </div>
 
       {/* Quick Actions */}
