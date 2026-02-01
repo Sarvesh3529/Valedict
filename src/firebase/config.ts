@@ -1,11 +1,17 @@
 import type { FirebaseOptions } from "firebase/app";
 
-// TODO: Replace with your actual Firebase project configuration.
+// Your web app's Firebase configuration
+// For more information on how to get this object, see the Firebase docs:
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// The values are sourced from the .env.local file. Make sure you have
+// created this file and added the correct values.
 export const firebaseConfig: FirebaseOptions = {
-  "projectId": "studio-9841885251-84744",
-  "appId": "1:464396456321:web:1d6c5f1f4179c8d0eed880",
-  "apiKey": "AIzaSyASqH1KEr6HHyj4oOgP5addPdlJwYvBNXs",
-  "authDomain": "studio-9841885251-84744.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "464396456321"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
