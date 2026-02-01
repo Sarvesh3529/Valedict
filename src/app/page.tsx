@@ -12,7 +12,7 @@ import { login } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 function GoogleSignInButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
@@ -62,18 +62,23 @@ function LoginForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Handle user setup in Firestore
+      // Check if user document exists
       const userRef = doc(db, 'users', user.uid);
-      const displayName = user.displayName || user.email?.split('@')[0];
-      await setDoc(userRef, {
-          uid: user.uid,
-          email: user.email,
-          displayName: displayName,
-          photoURL: user.photoURL,
-          currentStreak: 0,
-          highestStreak: 0,
-          lastActivityDate: null,
-      }, { merge: true });
+      const docSnap = await getDoc(userRef);
+
+      // If user does not exist in Firestore, create a new document
+      if (!docSnap.exists()) {
+        const displayName = user.displayName || user.email?.split('@')[0];
+        await setDoc(userRef, {
+            uid: user.uid,
+            email: user.email,
+            displayName: displayName,
+            photoURL: user.photoURL,
+            currentStreak: 0,
+            highestStreak: 0,
+            lastActivityDate: null,
+        });
+      }
       
       router.push('/home');
     } catch (error: any) {

@@ -2,23 +2,25 @@
 
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { redirect } from 'next/navigation';
 
 async function handleUserSetup(user: any) {
     const userRef = doc(db, 'users', user.uid);
-    // Use the provider data for display name if available (e.g., from Google)
-    const displayName = user.displayName || user.email?.split('@')[0];
-    
-    await setDoc(userRef, {
-        uid: user.uid,
-        email: user.email,
-        displayName: displayName,
-        photoURL: user.photoURL,
-        currentStreak: 0,
-        highestStreak: 0,
-        lastActivityDate: null,
-    }, { merge: true });
+    const docSnap = await getDoc(userRef);
+
+    if (!docSnap.exists()) {
+        const displayName = user.displayName || user.email?.split('@')[0];
+        await setDoc(userRef, {
+            uid: user.uid,
+            email: user.email,
+            displayName: displayName,
+            photoURL: user.photoURL,
+            currentStreak: 0,
+            highestStreak: 0,
+            lastActivityDate: null,
+        });
+    }
 }
 
 export async function signup(prevState: any, formData: FormData) {
