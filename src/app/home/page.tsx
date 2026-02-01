@@ -39,9 +39,6 @@ export default function HomePage() {
         <h1 className="font-headline text-2xl md:text-3xl font-bold text-primary mb-2">
           Welcome Back, {profile?.displayName?.split(' ')[0] || 'Student'}!
         </h1>
-        <p className="text-lg text-muted-foreground">
-          Let's make today a productive day.
-        </p>
       </header>
 
       {/* Stats Section */}
@@ -96,9 +93,6 @@ export default function HomePage() {
                   <CardTitle className="font-headline">{subject.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p className="text-sm text-muted-foreground">
-                    Practice questions from all chapters in {subject.name}.
-                  </p>
                 </CardContent>
                 <div className="p-4 md:p-6 pt-0">
                   <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
