@@ -13,6 +13,8 @@ import { Loader2, Sparkles, X } from 'lucide-react';
 import { solveDoubt } from './actions';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -117,8 +119,8 @@ export default function DoubtSolverPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="prose prose-sm max-w-none text-foreground font-body dark:prose-invert">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.explanation}</ReactMarkdown>
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{state.explanation}</ReactMarkdown>
                     </div>
                 </CardContent>
             </Card>

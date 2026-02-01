@@ -140,7 +140,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                 <Alert className="mt-4 bg-secondary border-none">
                   <AlertTitle>Explanation</AlertTitle>
                   <AlertDescription className="text-secondary-foreground/80">
-                    <div>
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                             {result.question.explanation}
                         </ReactMarkdown>
