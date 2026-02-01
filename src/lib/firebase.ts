@@ -2,6 +2,17 @@ import { initializeApp, getApps, getApp, type FirebaseOptions } from "firebase/a
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+if (
+  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+  !process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+  !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+) {
+  throw new Error(
+    "Firebase environment variables are not set. Please create a .env.local file with your Firebase project credentials. You can find them in your Firebase project settings."
+  );
+}
+
+
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
