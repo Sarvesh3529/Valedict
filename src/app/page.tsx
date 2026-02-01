@@ -82,14 +82,11 @@ function LoginForm() {
       
       router.push('/home');
     } catch (error: any) {
-      console.error("Google Sign-In Error:", error);
-      // Map common Firebase errors to user-friendly messages
-      if (error.code === 'auth/popup-closed-by-user') {
-         setGoogleError("The sign-in window was closed. Please try again.");
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        // Do nothing, as another popup was likely opened.
-      }
-      else {
+      // Don't treat closing the popup as an error.
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        // Silently ignore. The user intentionally closed the window.
+      } else {
+         console.error("Google Sign-In Error:", error);
          setGoogleError("Could not sign in with Google. Please try again.");
       }
     } finally {
