@@ -114,24 +114,24 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="p-4 border border-border border-t-0 rounded-b-lg bg-card">
-                <div className="prose dark:prose-invert max-w-none text-foreground font-semibold mb-2">
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: 'span' }}>
+                <div className="text-foreground font-semibold mb-2">
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                         {result.question.question}
                     </ReactMarkdown>
                 </div>
                 <div className="space-y-2 text-sm">
                   <p>
                     Your answer:{' '}
-                    <span className={cn('prose prose-sm dark:prose-invert inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: 'span' }}>
+                    <span className={cn('inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                         {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                       </ReactMarkdown>
                     </span>
                   </p>
                   <p>
                     Correct answer:{' '}
-                    <span className="font-medium text-muted-foreground prose prose-sm dark:prose-invert inline">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: 'span' }}>
+                    <span className="font-medium text-muted-foreground inline">
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                             {result.question.options[result.question.correctAnswer]}
                         </ReactMarkdown>
                     </span>
@@ -140,8 +140,8 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                 <Alert className="mt-4 bg-secondary border-none">
                   <AlertTitle>Explanation</AlertTitle>
                   <AlertDescription className="text-secondary-foreground/80">
-                    <div className="prose prose-sm max-w-none dark:prose-invert text-secondary-foreground/80">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: 'span' }}>
+                    <div>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                             {result.question.explanation}
                         </ReactMarkdown>
                     </div>
