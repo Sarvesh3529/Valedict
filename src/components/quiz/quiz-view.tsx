@@ -72,7 +72,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
 
       <div className="space-y-4">
         <div className="text-xl font-semibold leading-relaxed">
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
             {currentQuestion.question}
           </ReactMarkdown>
         </div>
@@ -89,7 +89,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
             >
               <RadioGroupItem value={index.toString()} id={`option-${index}`} />
               <Label htmlFor={`option-${index}`} className="text-base font-normal cursor-pointer flex-1">
-                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                     {option}
                 </ReactMarkdown>
               </Label>

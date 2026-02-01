@@ -115,7 +115,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
               </AccordionTrigger>
               <AccordionContent className="p-4 border border-border border-t-0 rounded-b-lg bg-card">
                 <div className="text-foreground font-semibold mb-2">
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                         {result.question.question}
                     </ReactMarkdown>
                 </div>
@@ -123,7 +123,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <p>
                     Your answer:{' '}
                     <span className={cn('inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                         {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                       </ReactMarkdown>
                     </span>
@@ -131,7 +131,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <p>
                     Correct answer:{' '}
                     <span className="font-medium text-muted-foreground inline">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                             {result.question.options[result.question.correctAnswer]}
                         </ReactMarkdown>
                     </span>
@@ -141,7 +141,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <AlertTitle>Explanation</AlertTitle>
                   <AlertDescription className="text-secondary-foreground/80">
                     <div>
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{ p: React.Fragment }}>
                             {result.question.explanation}
                         </ReactMarkdown>
                     </div>
