@@ -72,7 +72,7 @@ function RevisionSessionContent() {
                   <Loader2 className="animate-spin"/>
                   Preparing Your Lesson...
                 </CardTitle>
-                <CardDescription>We're finding the best questions for you. If this takes too long, please go to the dashboard.</CardDescription>
+                <CardDescription>Finding the best questions for you. This might take a moment.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Button onClick={() => router.push('/home')}>Go to Dashboard</Button>

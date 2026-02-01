@@ -25,7 +25,7 @@ function RevisionStartContent() {
         </div>
         <h1 className="text-2xl font-bold mb-2">Ready for your first lesson?</h1>
         <p className="text-slate-400 mb-6">
-          Based on your answers, we've prepared a quick revision session to get you started on the right foot.
+          Based on your answers, we've prepared a quick revision session to get you started.
         </p>
         <Button asChild size="lg" className="w-full">
           <Link href={`/revision/session?subjects=${subjects}&grade=${grade}`}>

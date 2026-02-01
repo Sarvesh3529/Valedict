@@ -103,7 +103,7 @@ export default function HomePage() {
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <p className="text-sm text-muted-foreground">
-                    Practice questions from all chapters in {subject.name} to master the concepts.
+                    Practice questions from all chapters in {subject.name}.
                   </p>
                 </CardContent>
                 <div className="p-6 pt-0">

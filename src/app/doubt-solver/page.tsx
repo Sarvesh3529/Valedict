@@ -67,7 +67,7 @@ export default function DoubtSolverPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-center text-muted-foreground">
-            Stuck on a problem? Type your question or upload an image to get an instant AI-powered explanation.
+            Stuck on a problem? Get an instant AI-powered explanation.
           </p>
           <form action={formAction} className="space-y-4">
             <div className="space-y-2">

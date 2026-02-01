@@ -19,7 +19,7 @@ export default function OnboardingStartPage() {
         </div>
         <h1 className="text-2xl font-bold mb-2">First, a few questions</h1>
         <p className="text-slate-400 mb-6">
-          To personalize your learning path, we need to know a little bit about you. It'll be quick!
+          Answer a few quick questions to personalize your learning path.
         </p>
         <Button asChild size="lg" className="w-full">
           <Link href="/onboarding">

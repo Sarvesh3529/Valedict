@@ -19,7 +19,7 @@ export default function LandingPage() {
         </div>
         <h1 className="text-3xl font-bold mb-2">Welcome to ExamPrep AI</h1>
         <p className="text-slate-400 mb-6">
-          Your personalized AI-powered study partner. Let's get you started on the path to success.
+          Your personalized AI study partner. Let's get you started.
         </p>
         <Button asChild size="lg" className="w-full">
           <Link href="/onboarding/start">
