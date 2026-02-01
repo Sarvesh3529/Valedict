@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Home, NotebookText, BrainCircuit, User } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
 
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
@@ -17,7 +17,7 @@ const navLinks = [
 export default function BottomNav() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const { user } = useUser();
+  const { user } = useAuth();
 
   if (!isMobile || !user) {
     return null;

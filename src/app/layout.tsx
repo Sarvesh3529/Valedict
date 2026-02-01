@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { FirebaseClientProvider } from '@/firebase';
+import { AuthProvider } from '@/context/AuthContext';
 import ConditionalHeader from '@/components/ConditionalHeader';
 import { ThemeProvider } from '@/components/theme-provider';
 import ConditionalFooter from '@/components/ConditionalFooter';
@@ -39,14 +39,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <FirebaseClientProvider>
+          <AuthProvider>
             <div className="relative flex min-h-screen flex-col">
               <ConditionalHeader />
               <main className="flex-1 pb-20 md:pb-0">{children}</main>
               <ConditionalFooter />
             </div>
             <Toaster />
-          </FirebaseClientProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

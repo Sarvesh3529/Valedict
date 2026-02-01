@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { logout } from '@/app/auth/actions';
@@ -21,7 +21,7 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const { user } = useUser();
+  const { user } = useAuth();
 
   const UserNav = () => {
     if (!user) {

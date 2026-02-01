@@ -1,13 +1,12 @@
 'use server';
 
-import { initializeFirebase } from '@/firebase';
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { redirect } from 'next/navigation';
 
 async function handleUserSetup(user: any) {
-    const { firestore } = initializeFirebase();
-    const userRef = doc(firestore, 'users', user.uid);
+    const userRef = doc(db, 'users', user.uid);
     // Use the provider data for display name if available (e.g., from Google)
     const displayName = user.displayName || user.email?.split('@')[0];
     
@@ -20,7 +19,6 @@ async function handleUserSetup(user: any) {
 }
 
 export async function signup(prevState: any, formData: FormData) {
-  const { auth } = initializeFirebase();
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
@@ -43,7 +41,6 @@ export async function signup(prevState: any, formData: FormData) {
 }
 
 export async function login(prevState: any, formData: FormData) {
-  const { auth } = initializeFirebase();
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   
@@ -65,7 +62,6 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function signInWithGoogle() {
-    const { auth } = initializeFirebase();
     const provider = new GoogleAuthProvider();
     try {
         const result = await signInWithPopup(auth, provider);
@@ -81,7 +77,6 @@ export async function signInWithGoogle() {
 }
 
 export async function logout() {
-    const { auth } = initializeFirebase();
     await auth.signOut();
     redirect('/');
 }

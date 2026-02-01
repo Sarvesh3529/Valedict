@@ -1,11 +1,11 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/header';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ConditionalHeader() {
   const pathname = usePathname();
-  const { user, loading } = useUser();
+  const { user, loading } = useAuth();
 
   const authRoutes = ['/signup'];
   

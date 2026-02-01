@@ -7,7 +7,8 @@ import QuizView from '@/components/quiz/quiz-view';
 import QuizResults from '@/components/quiz/quiz-results';
 import { generateQuiz } from '@/lib/quiz-logic';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser, useFirestore } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ import { useRouter } from 'next/navigation';
 type QuizState = 'setup' | 'active' | 'results';
 
 export default function QuizPage() {
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: userLoading } = useAuth();
   const router = useRouter();
 
   const [quizState, setQuizState] = useState<QuizState>('setup');
@@ -24,19 +25,15 @@ export default function QuizPage() {
   const [userGrade, setUserGrade] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const firestore = useFirestore();
-
   useEffect(() => {
     if (userLoading) return;
     if (!user) {
       router.replace('/');
       return;
     }
-
-    if (!firestore) return;
     
     const fetchGrade = async () => {
-      const docRef = doc(firestore, 'onboardingResponses', user.uid);
+      const docRef = doc(db, 'onboardingResponses', user.uid);
       try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists() && docSnap.data().grade) {
@@ -54,7 +51,7 @@ export default function QuizPage() {
     };
     
     fetchGrade();
-  }, [user, userLoading, firestore, router]);
+  }, [user, userLoading, router]);
 
   const handleStartQuiz = (
     chapterIds: string[],

@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUser } from "@/firebase";
+import { useAuth } from "@/context/AuthContext";
 import { Loader2, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -11,7 +11,7 @@ import { logout } from "../auth/actions";
 
 
 export default function ProfilePage() {
-    const { user, loading } = useUser();
+    const { user, loading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {

@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CalendarIcon, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/context/AuthContext';
 import { onboardingQuestions, type OnboardingQuestion } from '@/lib/onboarding-questions';
-import { saveOnboardingResponse } from '@/firebase/onboarding';
+import { saveOnboardingResponse } from '@/lib/onboarding';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
@@ -28,7 +28,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, loading } = useUser();
+  const { user, loading } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isAnimating, setIsAnimating] = useState(false);
