@@ -16,7 +16,7 @@ import QuizResults from '@/components/quiz/quiz-results';
 function RevisionSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { updateUserStreak } = useAuth();
+  const { updateUserStreak, awardXp } = useAuth();
   const subjectIdsParam = searchParams.get('subjects');
   const grade = searchParams.get('grade');
 
@@ -43,6 +43,7 @@ function RevisionSessionContent() {
     setResults(finalResults);
     setIsFinished(true);
     updateUserStreak();
+    awardXp(finalResults.length);
   };
 
   const handleRestart = () => {

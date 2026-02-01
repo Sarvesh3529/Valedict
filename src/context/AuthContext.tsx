@@ -5,8 +5,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { UserProfile } from '@/lib/types';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { differenceInCalendarDays } from 'date-fns';
+import { doc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
+import { differenceInCalendarDays, isSameWeek } from 'date-fns';
 import StreakAnimation from '@/components/StreakAnimation';
 
 type AuthContextType = {
@@ -14,6 +14,7 @@ type AuthContextType = {
   profile: UserProfile | null;
   loading: boolean;
   updateUserStreak: () => Promise<void>;
+  awardXp: (questionCount: number) => Promise<void>;
   showStreakAnimation: boolean;
   hideStreakAnimation: () => void;
   animationStreakCount: number;
@@ -24,10 +25,20 @@ const AuthContext = createContext<AuthContextType>({
     profile: null, 
     loading: true, 
     updateUserStreak: async () => {},
+    awardXp: async () => {},
     showStreakAnimation: false,
     hideStreakAnimation: () => {},
     animationStreakCount: 0,
 });
+
+function getXpForQuestions(count: number): number {
+  if (count >= 15) return 30;
+  if (count >= 10) return 30;
+  if (count >= 5) return 10;
+  // For revision quizzes with 7 questions
+  if (count === 7) return 10; 
+  return 0;
+}
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -106,8 +117,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
+  const awardXp = async (questionCount: number) => {
+    if (!user || !profile) return;
+    const xpToAward = getXpForQuestions(questionCount);
+    if (xpToAward === 0) return;
+
+    const userRef = doc(db, 'users', user.uid);
+    const today = new Date();
+    const lastReset = profile.lastXpReset ? new Date(profile.lastXpReset) : new Date(0);
+
+    const needsWeeklyReset = !isSameWeek(today, lastReset, { weekStartsOn: 1 }); // Monday start
+
+    if (needsWeeklyReset) {
+      await updateDoc(userRef, {
+        weeklyXp: xpToAward,
+        totalXp: increment(xpToAward),
+        lastXpReset: today.toISOString(),
+      });
+    } else {
+      await updateDoc(userRef, {
+        weeklyXp: increment(xpToAward),
+        totalXp: increment(xpToAward),
+      });
+    }
+  };
+  
   return (
-    <AuthContext.Provider value={{ user, profile, loading, updateUserStreak, showStreakAnimation, hideStreakAnimation, animationStreakCount }}>
+    <AuthContext.Provider value={{ user, profile, loading, updateUserStreak, awardXp, showStreakAnimation, hideStreakAnimation, animationStreakCount }}>
       {loading ? (
          <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

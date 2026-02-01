@@ -83,13 +83,26 @@
           "description": "The user's current study streak in days."
         },
         "highestStreak": {
-            "type": "number",
-            "description": "The user's all-time highest study streak."
+          "type": "number",
+          "description": "The user's all-time highest study streak."
         },
         "lastActivityDate": {
           "type": "string",
           "format": "date-time",
           "description": "The date of the user's last completed activity."
+        },
+        "totalXp": {
+            "type": "number",
+            "description": "The user's all-time total experience points."
+        },
+        "weeklyXp": {
+            "type": "number",
+            "description": "The user's experience points earned in the current week."
+        },
+        "lastXpReset": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the weekly XP was last reset."
         }
       },
       "required": ["uid", "email"]

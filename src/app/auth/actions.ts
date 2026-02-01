@@ -19,6 +19,9 @@ async function handleUserSetup(user: any) {
             currentStreak: 0,
             highestStreak: 0,
             lastActivityDate: null,
+            totalXp: 0,
+            weeklyXp: 0,
+            lastXpReset: new Date().toISOString(),
         });
     }
 }
@@ -54,7 +57,8 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    await handleUserSetup(userCredential.user);
   } catch (error: any) {
      if (error.code === 'auth/invalid-credential') {
         return { message: 'Invalid email or password. Please try again.' };

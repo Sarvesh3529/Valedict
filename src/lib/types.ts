@@ -36,4 +36,7 @@ export type UserProfile = {
   currentStreak?: number;
   highestStreak?: number;
   lastActivityDate?: string;
+  totalXp?: number;
+  weeklyXp?: number;
+  lastXpReset?: string;
 };

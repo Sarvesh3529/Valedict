@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, User, LogOut } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, User, LogOut, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import { logout } from '@/app/auth/actions';
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
 ];
 

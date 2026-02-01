@@ -46,21 +46,12 @@ export default function SignupPage() {
   const [state, formAction] = useActionState(signup, undefined);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
+  
+  async function handleUserSetup(user: any) {
+    const userRef = doc(db, 'users', user.uid);
+    const docSnap = await getDoc(userRef);
 
-  const handleGoogleSignIn = async () => {
-    setIsGooglePending(true);
-    setGoogleError(null);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Check if user document exists
-      const userRef = doc(db, 'users', user.uid);
-      const docSnap = await getDoc(userRef);
-      
-      // If user does not exist in Firestore, create a new document
-      if (!docSnap.exists()) {
+    if (!docSnap.exists()) {
         const displayName = user.displayName || user.email?.split('@')[0];
         await setDoc(userRef, {
             uid: user.uid,
@@ -70,9 +61,20 @@ export default function SignupPage() {
             currentStreak: 0,
             highestStreak: 0,
             lastActivityDate: null,
+            totalXp: 0,
+            weeklyXp: 0,
+            lastXpReset: new Date().toISOString(),
         });
-      }
-      
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsGooglePending(true);
+    setGoogleError(null);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      await handleUserSetup(result.user);
       router.push('/home');
     } catch (error: any) {
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
