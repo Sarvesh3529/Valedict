@@ -11,14 +11,25 @@ service cloud.firestore {
     }
 
     // Collection Rules
-    match /onboardingResponses/{anonId} {
+    match /onboardingResponses/{userId} {
       // READ: Only the owner can read their own response document.
-      allow get: if isOwner(anonId);
+      allow get: if isOwner(userId);
       allow list: if false;
 
       // WRITE: Owner can create and update, but not delete.
-      allow create: if isOwner(anonId);
-      allow update: if isOwner(anonId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    match /users/{userId} {
+      // READ: Any authenticated user can read a user's profile.
+      allow get: if isSignedIn();
+      allow list: if false; // List access is disabled for security/privacy
+
+      // WRITE: Only the owner can create or update their own profile.
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
       allow delete: if false;
     }
   }

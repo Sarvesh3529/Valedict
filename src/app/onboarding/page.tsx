@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CalendarIcon, Check, ChevronRight } from 'lucide-react';
+import { CalendarIcon, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { getAuth, onAuthStateChanged, signInAnonymously, type User } from 'firebase/auth';
-import { useFirebaseApp } from '@/firebase';
+import { useUser } from '@/firebase';
 import { onboardingQuestions, type OnboardingQuestion } from '@/lib/onboarding-questions';
 import { saveOnboardingResponse } from '@/firebase/onboarding';
 import { Button } from '@/components/ui/button';
@@ -29,81 +28,52 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const app = useFirebaseApp();
-  const [anonUser, setAnonUser] = useState<User | null>(null);
+  const { user, loading } = useUser();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isAnimating, setIsAnimating] = useState(false);
   const [date, setDate] = useState<Date>();
   
   useEffect(() => {
-    const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setAnonUser(user);
-        localStorage.setItem('anonymousUserId', user.uid);
-      } else {
-        signInAnonymously(auth).catch((error) => {
-          console.error("Anonymous sign-in failed:", error);
-        });
-      }
-    });
-    return () => unsubscribe();
-  }, [app]);
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [user, loading, router]);
   
   const handleAnswer = useCallback(async (question: OnboardingQuestion, answer: any) => {
-    if (isAnimating || !anonUser) return;
+    if (isAnimating || !user) return;
     setIsAnimating(true);
     
     const newResponses = { ...responses, [question.firestoreField]: answer };
     setResponses(newResponses);
 
-    await saveOnboardingResponse(anonUser.uid, { [question.firestoreField]: answer });
+    await saveOnboardingResponse(user.uid, { [question.firestoreField]: answer });
 
     setTimeout(() => {
-      if (currentQuestionIndex < onboardingQuestions.length) {
+      if (currentQuestionIndex < onboardingQuestions.length -1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-      }
-      setIsAnimating(false);
-    }, 400); // Animation duration
-  }, [isAnimating, anonUser, responses, currentQuestionIndex]);
-
-  useEffect(() => {
-    if (currentQuestionIndex >= onboardingQuestions.length) {
+        setIsAnimating(false);
+      } else {
+        // This is the last question, handle completion
         localStorage.setItem('onboardingComplete', 'true');
+        const grade = newResponses.grade;
+        const troublingSubjects = (newResponses.troublingSubjects || []) as string[];
 
-        const determineNextStep = () => {
-            const grade = responses.grade;
-            const troublingSubjects = (responses.troublingSubjects || []) as string[];
+        if (troublingSubjects.length > 0 && grade) {
+            const subjectsParam = troublingSubjects.join(',');
+            router.push(`/revision/start?subjects=${subjectsParam}&grade=${grade}`);
+        } else {
+            router.push('/home');
+        }
+      }
+    }, 400);
+  }, [isAnimating, user, responses, currentQuestionIndex, router]);
 
-            if (troublingSubjects.length > 0 && grade) {
-                const subjectsParam = troublingSubjects.join(',');
-                router.push(`/revision/start?subjects=${subjectsParam}&grade=${grade}`);
-            } else {
-                router.push('/home');
-            }
-        };
 
-        const timer = setTimeout(determineNextStep, 2000);
-        return () => clearTimeout(timer);
-    }
-  }, [currentQuestionIndex, responses, router]);
-
-  if (currentQuestionIndex >= onboardingQuestions.length) {
+  if (loading || !user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
-        >
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold mb-2">You're all set!</h1>
-          <p className="text-slate-400 mb-6">We’re personalizing your study plan... 🎯</p>
-        </motion.div>
+      <div className="flex h-screen w-full items-center justify-center bg-slate-900">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
   }
@@ -223,7 +193,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-900 text-white">
         <div className="w-full max-w-md mx-auto space-y-8">
           <ProgressBar current={currentQuestionIndex} total={onboardingQuestions.length} />
           <AnimatePresence mode="wait">

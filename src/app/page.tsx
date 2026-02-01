@@ -1,32 +1,121 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { useActionState, Suspense } from 'react';
+import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { ArrowRight, BrainCircuit } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
-export default function LandingPage() {
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { login, signInWithGoogle } from '@/app/auth/actions';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { BrainCircuit, Loader2 } from 'lucide-react';
+
+function GoogleSignInButton() {
+  const { pending } = useFormStatus();
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4 text-center">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
-      >
-        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-          <BrainCircuit className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-3xl font-bold mb-2">Welcome to ExamPrep AI</h1>
-        <p className="text-slate-400 mb-6">
-          Your personalized AI study partner. Let's get you started.
-        </p>
-        <Button asChild size="lg" className="w-full">
-          <Link href="/onboarding/start">
-            Get Started <ArrowRight className="w-5 h-5 ml-1"/>
-          </Link>
-        </Button>
-      </motion.div>
+    <Button variant="outline" className="w-full" type="submit" disabled={pending} formAction={signInWithGoogle}>
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Please wait
+        </>
+      ) : 'Sign in with Google'}
+    </Button>
+  )
+}
+
+function EmailSignInButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending} className="w-full">
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Please wait
+        </>
+        ) : 'Sign in'}
+    </Button>
+  )
+}
+
+
+function LoginForm() {
+  const [state, formAction] = useActionState(login, undefined);
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="mx-auto max-w-sm w-full">
+        <CardHeader className="text-center">
+          <BrainCircuit className="mx-auto h-10 w-10 text-primary mb-2"/>
+          <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
+          <CardDescription>Enter your credentials to access your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <form action={formAction} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" name="password" type="password" required />
+              </div>
+              <EmailSignInButton />
+              {state?.message && (
+                  <Alert variant="destructive">
+                      <AlertTitle>Login Failed</AlertTitle>
+                      <AlertDescription>{state.message}</AlertDescription>
+                  </Alert>
+              )}
+               {error === 'google-signin-failed' && (
+                  <Alert variant="destructive">
+                      <AlertTitle>Login Failed</AlertTitle>
+                      <AlertDescription>Could not sign in with Google. Please try again.</AlertDescription>
+                  </Alert>
+              )}
+            </form>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            <form>
+               <GoogleSignInButton />
+            </form>
+          </div>
+          <div className="mt-4 text-center text-sm">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="underline">
+              Sign up
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+        </Suspense>
+    )
 }

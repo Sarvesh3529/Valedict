@@ -5,9 +5,9 @@
       "description": "Stores responses from the pre-login onboarding flow.",
       "type": "object",
       "properties": {
-        "anonId": {
+        "userId": {
           "type": "string",
-          "description": "The anonymous user ID from Firebase Auth."
+          "description": "The user's ID from Firebase Auth."
         },
         "grade": {
           "type": "string",
@@ -53,18 +53,50 @@
           "description": "Timestamp of when the record was created."
         }
       },
-      "required": ["anonId", "createdAt"]
+      "required": ["userId", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user profile information.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for the user's profile picture."
+        }
+      },
+      "required": ["uid", "email"]
     }
   },
   "auth": {
-    "providers": ["anonymous"]
+    "providers": ["email-password", "google"]
   },
   "firestore": {
-    "/onboardingResponses/{anonId}": {
+    "/onboardingResponses/{userId}": {
       "schema": {
         "$ref": "#/backend/entities/onboardingResponse"
       },
       "description": "Stores individual user responses from the onboarding flow."
+    },
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/backend/entities/UserProfile"
+      },
+      "description": "Stores public user profile information."
     }
   }
 }
