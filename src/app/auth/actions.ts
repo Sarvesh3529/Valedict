@@ -15,6 +15,7 @@ async function handleUserSetup(user: any) {
         email: user.email,
         displayName: displayName,
         photoURL: user.photoURL,
+        streak: 0,
     }, { merge: true });
 }
 

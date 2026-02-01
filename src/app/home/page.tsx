@@ -8,10 +8,10 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Progress } from '@/components/ui/progress';
 import { subjects } from '@/lib/data';
 import * as Icons from 'lucide-react';
-import { Flame, Target, BrainCircuit, NotebookText, ArrowRight } from 'lucide-react';
+import { Flame, BrainCircuit, NotebookText, ArrowRight, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 // This is needed because of the dynamic icon loading
 const iconComponents: { [key: string]: React.ElementType } = {
@@ -22,11 +22,21 @@ const iconComponents: { [key: string]: React.ElementType } = {
 };
 
 export default function HomePage() {
+  const { profile, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <header className="mb-8">
         <h1 className="font-headline text-3xl md:text-4xl font-bold text-primary mb-2">
-          Welcome Back!
+          Welcome Back, {profile?.displayName?.split(' ')[0] || 'Student'}!
         </h1>
         <p className="text-lg text-muted-foreground">
           Let's make today a productive day.
@@ -34,26 +44,15 @@ export default function HomePage() {
       </header>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div className="mb-12">
         <Card className="flex flex-col justify-center">
           <CardHeader className="flex-row items-center gap-4 space-y-0">
             <Flame className="h-8 w-8 text-orange-500" />
             <CardTitle className="font-headline">Your Streak</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">5 <span className="text-xl font-normal text-muted-foreground">days</span></p>
-            <p className="text-sm text-muted-foreground mt-1">Keep it up to build a strong habit!</p>
-          </CardContent>
-        </Card>
-        <Card className="flex flex-col justify-center">
-          <CardHeader className="flex-row items-center gap-4 space-y-0">
-            <Target className="h-8 w-8 text-blue-500" />
-            <CardTitle className="font-headline">Daily Goal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-2">3/10 questions completed</p>
-            <Progress value={30} className="h-3" />
-             <p className="text-sm text-muted-foreground mt-2">Complete your goal to extend your streak.</p>
+            <p className="text-4xl font-bold">{profile?.streak || 0} <span className="text-xl font-normal text-muted-foreground">days</span></p>
+            <p className="text-sm text-muted-foreground mt-1">Complete a quiz each day to build your streak!</p>
           </CardContent>
         </Card>
       </div>

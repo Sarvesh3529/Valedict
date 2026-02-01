@@ -27,3 +27,12 @@ export type QuizResult = {
   userAnswer: number | null;
   isCorrect: boolean;
 };
+
+export type UserProfile = {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  streak?: number;
+  lastQuizDate?: string;
+};

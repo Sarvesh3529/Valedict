@@ -77,6 +77,15 @@
           "type": "string",
           "format": "uri",
           "description": "URL for the user's profile picture."
+        },
+        "streak": {
+            "type": "number",
+            "description": "The user's current study streak in days."
+        },
+        "lastQuizDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date of the user's last completed quiz."
         }
       },
       "required": ["uid", "email"]

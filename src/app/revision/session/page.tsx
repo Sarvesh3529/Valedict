@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { generateQuiz } from '@/lib/quiz-logic';
 import type { QuizQuestion, QuizResult } from '@/lib/types';
 import { subjects } from '@/lib/data';
+import { updateUserStreak } from '@/app/user/actions';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,7 @@ function RevisionSessionContent() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setIsFinished(true);
+    updateUserStreak();
   };
 
   const handleRestart = () => {

@@ -70,6 +70,7 @@ function LoginForm() {
           email: user.email,
           displayName: displayName,
           photoURL: user.photoURL,
+          streak: 0,
       }, { merge: true });
       
       router.push('/home');
