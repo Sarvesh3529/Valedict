@@ -31,22 +31,22 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-12">
+    <div className="container mx-auto max-w-2xl px-4 py-6 md:py-12">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-2xl text-primary">
+          <CardTitle className="font-headline text-xl md:text-2xl text-primary">
             Profile
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-6">
-          <Avatar className="h-24 w-24">
+          <Avatar className="h-20 w-20 md:h-24 md:w-24">
             <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User avatar'} />
             <AvatarFallback>
-              <UserIcon className="h-12 w-12" />
+              <UserIcon className="h-10 w-10 md:h-12 md:w-12" />
             </AvatarFallback>
           </Avatar>
           <div className="text-center">
-            <h2 className="text-xl font-semibold">{user.displayName || 'Anonymous User'}</h2>
+            <h2 className="text-lg md:text-xl font-semibold">{user.displayName || 'Anonymous User'}</h2>
             <p className="text-muted-foreground">{user.email}</p>
           </div>
           <form action={logout} className="w-full max-w-xs">

@@ -60,7 +60,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <div>
         <div className="flex justify-between items-center mb-2">
             <p className="text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
       </div>
 
       <div className="space-y-4">
-        <div className="text-xl font-semibold leading-relaxed">
+        <div className="text-lg md:text-xl font-semibold leading-relaxed">
           <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
             {currentQuestion.question}
           </ReactMarkdown>
@@ -85,10 +85,10 @@ export default function QuizView({ questions, onFinish }: QuizViewProps) {
           {currentQuestion.options.map((option, index) => (
             <div
               key={index}
-              className="flex items-center space-x-3 p-4 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors"
+              className="flex items-center space-x-3 p-3 md:p-4 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors"
             >
               <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-              <Label htmlFor={`option-${index}`} className="text-base font-normal cursor-pointer flex-1">
+              <Label htmlFor={`option-${index}`} className="text-sm md:text-base font-normal cursor-pointer flex-1">
                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                     {option}
                 </ReactMarkdown>

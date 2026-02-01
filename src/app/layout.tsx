@@ -42,7 +42,7 @@ export default function RootLayout({
           <AuthProvider>
             <div className="relative flex min-h-screen flex-col">
               <ConditionalHeader />
-              <main className="flex-1 pb-20 md:pb-0">{children}</main>
+              <main className="flex-1 pb-24 md:pb-0">{children}</main>
               <ConditionalFooter />
             </div>
             <Toaster />

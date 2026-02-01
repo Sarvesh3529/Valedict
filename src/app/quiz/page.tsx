@@ -105,14 +105,14 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12">
+    <div className="container mx-auto max-w-4xl px-4 py-6 md:py-12">
       <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="font-headline text-2xl text-primary text-center">
+          <CardTitle className="font-headline text-xl md:text-2xl text-primary text-center">
             {getTitle()}
           </CardTitle>
         </CardHeader>
-        <div className="p-6 md:p-8">
+        <div className="p-4 md:p-8">
           {quizState === 'setup' && userGrade && <QuizSetup onStart={handleStartQuiz} userGrade={userGrade} />}
           {quizState === 'active' && questions.length > 0 && (
             <QuizView questions={questions} onFinish={handleFinishQuiz} />

@@ -61,10 +61,10 @@ export default function DoubtSolverPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-12">
+    <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
       <Card>
         <CardHeader>
-          <CardTitle className="text-center font-headline text-2xl text-primary">
+          <CardTitle className="text-center font-headline text-xl md:text-2xl text-primary">
             AI Doubt Solver
           </CardTitle>
         </CardHeader>
@@ -114,7 +114,7 @@ export default function DoubtSolverPage() {
           {state.explanation && (
             <Card className="bg-primary/5">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-primary">
+                    <CardTitle className="flex items-center gap-2 text-lg md:text-xl text-primary">
                         <Sparkles />
                         AI Explanation
                     </CardTitle>

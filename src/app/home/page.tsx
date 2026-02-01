@@ -34,9 +34,9 @@ export default function HomePage() {
   }
   
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-6 md:py-12">
       <header className="mb-8">
-        <h1 className="font-headline text-3xl md:text-4xl font-bold text-primary mb-2">
+        <h1 className="font-headline text-2xl md:text-3xl font-bold text-primary mb-2">
           Welcome Back, {profile?.displayName?.split(' ')[0] || 'Student'}!
         </h1>
         <p className="text-lg text-muted-foreground">
@@ -57,10 +57,10 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold mb-4 font-headline">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link href="/doubt-solver" className="h-full">
-                <Card className="h-full bg-primary/10 hover:bg-primary/20 transition-colors flex flex-col justify-between p-6">
+                <Card className="h-full bg-primary/10 hover:bg-primary/20 transition-colors flex flex-col justify-between p-4 md:p-6">
                     <div>
-                        <BrainCircuit className="h-10 w-10 text-primary mb-4"/>
-                        <h3 className="text-xl font-bold font-headline mb-1">AI Doubt Solver</h3>
+                        <BrainCircuit className="h-8 w-8 md:h-10 md:w-10 text-primary mb-4"/>
+                        <h3 className="text-lg md:text-xl font-bold font-headline mb-1">AI Doubt Solver</h3>
                         <p className="text-muted-foreground">Stuck? Get an instant explanation.</p>
                     </div>
                     <div className="text-primary font-semibold flex items-center mt-4">
@@ -69,10 +69,10 @@ export default function HomePage() {
                 </Card>
             </Link>
             <Link href="/quiz" className="h-full">
-                 <Card className="h-full bg-accent/10 hover:bg-accent/20 transition-colors flex flex-col justify-between p-6">
+                 <Card className="h-full bg-accent/10 hover:bg-accent/20 transition-colors flex flex-col justify-between p-4 md:p-6">
                     <div>
-                        <NotebookText className="h-10 w-10 text-accent mb-4"/>
-                        <h3 className="text-xl font-bold font-headline mb-1">Custom Quiz</h3>
+                        <NotebookText className="h-8 w-8 md:h-10 md:w-10 text-accent mb-4"/>
+                        <h3 className="text-lg md:text-xl font-bold font-headline mb-1">Custom Quiz</h3>
                         <p className="text-muted-foreground">Test your knowledge on any chapter.</p>
                     </div>
                     <div className="text-accent font-semibold flex items-center mt-4">
@@ -86,13 +86,13 @@ export default function HomePage() {
       {/* Practice by Subject Section */}
       <div>
         <h2 className="text-2xl font-bold mb-4 font-headline">Practice by Subject</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {subjects.map((subject) => {
             const Icon = iconComponents[subject.iconName] || Icons.GraduationCap;
             return (
               <Card key={subject.id} className="flex flex-col">
                 <CardHeader className="flex-row items-center gap-4 space-y-0">
-                  {Icon && <Icon className="h-8 w-8 text-primary" />}
+                  <Icon className="h-7 w-7 text-primary" />
                   <CardTitle className="font-headline">{subject.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
@@ -100,7 +100,7 @@ export default function HomePage() {
                     Practice questions from all chapters in {subject.name}.
                   </p>
                 </CardContent>
-                <div className="p-6 pt-0">
+                <div className="p-4 md:p-6 pt-0">
                   <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
                     <Link href="/quiz">Start Practice</Link>
                   </Button>

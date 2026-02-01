@@ -58,16 +58,16 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <Card className="text-center">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">Your Score</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl font-bold">Your Score</CardTitle>
           <CardDescription>
             You answered {correctAnswers} out of {totalQuestions} questions correctly.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center">
-          <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[200px]">
+          <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[150px] md:h-[200px]">
             <PieChart>
               <ChartTooltip
                 cursor={false}
@@ -77,7 +77,8 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                 data={chartData}
                 dataKey="value"
                 nameKey="name"
-                innerRadius={60}
+                innerRadius={50}
+                outerRadius={70}
                 strokeWidth={5}
               >
                   {chartData.map((entry, index) => (
@@ -86,19 +87,19 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
               </Pie>
             </PieChart>
           </ChartContainer>
-           <p className="text-5xl font-bold mt-4">{score.toFixed(0)}%</p>
+           <p className="text-4xl md:text-5xl font-bold mt-4">{score.toFixed(0)}%</p>
         </CardContent>
       </Card>
       
 
       <div>
-        <h3 className="text-xl font-semibold mb-4">Review Your Answers</h3>
+        <h3 className="text-lg md:text-xl font-semibold mb-4">Review Your Answers</h3>
         <Accordion type="single" collapsible className="w-full space-y-2">
           {results.map((result, index) => (
             <AccordionItem value={`item-${index}`} key={index} className="border-b-0">
               <AccordionTrigger 
                 className={cn(
-                  'flex p-3 rounded-lg hover:no-underline',
+                  'flex p-3 rounded-lg hover:no-underline text-sm md:text-base',
                   result.isCorrect 
                     ? 'bg-accent/10 hover:bg-accent/20' 
                     : 'bg-destructive/10 hover:bg-destructive/20'
@@ -113,7 +114,7 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                   <span className="flex-1 text-foreground">Question {index + 1}</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 border border-border border-t-0 rounded-b-lg bg-card">
+              <AccordionContent className="p-3 md:p-4 border border-border border-t-0 rounded-b-lg bg-card">
                 <div className="text-foreground font-semibold mb-2">
                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                         {result.question.question}
