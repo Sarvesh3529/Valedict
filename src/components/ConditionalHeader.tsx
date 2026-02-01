@@ -7,7 +7,7 @@ export default function ConditionalHeader() {
   const pathname = usePathname();
   const { user, loading } = useUser();
 
-  const authRoutes = ['/login', '/signup'];
+  const authRoutes = ['/signup'];
   
   if (loading) {
     return null; // Don't show header while checking auth state
