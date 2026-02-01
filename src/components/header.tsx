@@ -27,7 +27,7 @@ export default function Header() {
     if (!user) {
       return (
         <Button asChild size="sm">
-          <Link href="/login">Sign In</Link>
+          <Link href="/">Sign In</Link>
         </Button>
       )
     }

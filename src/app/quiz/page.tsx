@@ -29,7 +29,7 @@ export default function QuizPage() {
   useEffect(() => {
     if (userLoading) return;
     if (!user) {
-      router.replace('/login');
+      router.replace('/');
       return;
     }
 

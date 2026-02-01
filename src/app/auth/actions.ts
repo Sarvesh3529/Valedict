@@ -75,7 +75,7 @@ export async function signInWithGoogle() {
         // This is a server action, returning a message won't work well on redirect.
         // For now, we redirect to login with an error, a better implementation
         // would handle this more gracefully on the client.
-        return redirect('/login?error=google-signin-failed');
+        return redirect('/?error=google-signin-failed');
     }
     redirect('/home');
 }
@@ -83,5 +83,5 @@ export async function signInWithGoogle() {
 export async function logout() {
     const { auth } = initializeFirebase();
     await auth.signOut();
-    redirect('/login');
+    redirect('/');
 }
