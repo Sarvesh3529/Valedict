@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { generateQuiz } from '@/lib/quiz-logic';
 import type { QuizQuestion, QuizResult } from '@/lib/types';
 import { subjects } from '@/lib/data';
-import { updateUserStreak } from '@/app/user/actions';
+import { useAuth } from '@/context/AuthContext';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import QuizResults from '@/components/quiz/quiz-results';
 function RevisionSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { updateStreak } = useAuth();
   const subjectIdsParam = searchParams.get('subjects');
   const grade = searchParams.get('grade');
 
@@ -41,7 +42,7 @@ function RevisionSessionContent() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setIsFinished(true);
-    updateUserStreak();
+    updateStreak();
   };
 
   const handleRestart = () => {

@@ -12,12 +12,11 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { updateUserStreak } from '@/app/user/actions';
 
 type QuizState = 'setup' | 'active' | 'results';
 
 export default function QuizPage() {
-  const { user, loading: userLoading } = useAuth();
+  const { user, loading: userLoading, updateStreak } = useAuth();
   const router = useRouter();
 
   const [quizState, setQuizState] = useState<QuizState>('setup');
@@ -76,7 +75,7 @@ export default function QuizPage() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setQuizState('results');
-    updateUserStreak();
+    updateStreak();
   };
 
   const handleRestart = () => {
