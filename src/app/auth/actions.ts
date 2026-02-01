@@ -1,7 +1,7 @@
 'use server';
 
 import { auth, db } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { redirect } from 'next/navigation';
 
@@ -59,21 +59,6 @@ export async function login(prevState: any, formData: FormData) {
     };
   }
   redirect('/home');
-}
-
-export async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    try {
-        const result = await signInWithPopup(auth, provider);
-        await handleUserSetup(result.user);
-    } catch (error: any) {
-        console.error("Google Sign-In Error:", error);
-        // This is a server action, returning a message won't work well on redirect.
-        // For now, we redirect to login with an error, a better implementation
-        // would handle this more gracefully on the client.
-        return redirect('/?error=google-signin-failed');
-    }
-    redirect('/home');
 }
 
 export async function logout() {

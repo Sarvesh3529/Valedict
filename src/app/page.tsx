@@ -1,23 +1,24 @@
 'use client';
 
-import { useActionState, Suspense } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useActionState, Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { login, signInWithGoogle } from '@/app/auth/actions';
+import { login } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
-function GoogleSignInButton() {
-  const { pending } = useFormStatus();
+function GoogleSignInButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
   return (
-    <Button variant="outline" className="w-full" type="submit" disabled={pending} formAction={signInWithGoogle}>
-      {pending ? (
+    <Button variant="outline" className="w-full" type="button" disabled={isPending} onClick={onClick}>
+      {isPending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Please wait
@@ -28,7 +29,9 @@ function GoogleSignInButton() {
 }
 
 function EmailSignInButton() {
-  const { pending } = useFormStatus();
+  // This hook is new in React 19 and replaces useFormStatus
+  const { pending } = useActionState(async () => {}, null);
+
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? (
@@ -43,9 +46,49 @@ function EmailSignInButton() {
 
 
 function LoginForm() {
+  const router = useRouter();
   const [state, formAction] = useActionState(login, undefined);
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+
+  const [googleError, setGoogleError] = useState<string | null>(null);
+  const [isGooglePending, setIsGooglePending] = useState(false);
+
+  const handleGoogleSignIn = async () => {
+    setIsGooglePending(true);
+    setGoogleError(null);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Handle user setup in Firestore
+      const userRef = doc(db, 'users', user.uid);
+      const displayName = user.displayName || user.email?.split('@')[0];
+      await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: displayName,
+          photoURL: user.photoURL,
+      }, { merge: true });
+      
+      router.push('/home');
+    } catch (error: any) {
+      console.error("Google Sign-In Error:", error);
+      // Map common Firebase errors to user-friendly messages
+      if (error.code === 'auth/popup-closed-by-user') {
+         setGoogleError("The sign-in window was closed. Please try again.");
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        // Do nothing, as another popup was likely opened.
+      }
+      else {
+         setGoogleError("Could not sign in with Google. Please try again.");
+      }
+    } finally {
+      setIsGooglePending(false);
+    }
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -79,12 +122,6 @@ function LoginForm() {
                       <AlertDescription>{state.message}</AlertDescription>
                   </Alert>
               )}
-               {error === 'google-signin-failed' && (
-                  <Alert variant="destructive">
-                      <AlertTitle>Login Failed</AlertTitle>
-                      <AlertDescription>Could not sign in with Google. Please try again.</AlertDescription>
-                  </Alert>
-              )}
             </form>
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -96,9 +133,13 @@ function LoginForm() {
                 </span>
               </div>
             </div>
-            <form>
-               <GoogleSignInButton />
-            </form>
+             <GoogleSignInButton onClick={handleGoogleSignIn} isPending={isGooglePending} />
+              {(error || googleError) && (
+                  <Alert variant="destructive">
+                      <AlertTitle>Login Failed</AlertTitle>
+                      <AlertDescription>{googleError || 'Could not sign in with Google. Please try again.'}</AlertDescription>
+                  </Alert>
+              )}
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
