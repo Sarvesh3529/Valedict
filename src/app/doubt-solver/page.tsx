@@ -15,6 +15,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -120,7 +121,7 @@ export default function DoubtSolverPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{state.explanation}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>{state.explanation}</ReactMarkdown>
                     </div>
                 </CardContent>
             </Card>
