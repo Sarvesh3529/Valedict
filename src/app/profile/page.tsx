@@ -45,9 +45,12 @@ export default function ProfilePage() {
               <UserIcon className="h-10 w-10 md:h-12 md:w-12" />
             </AvatarFallback>
           </Avatar>
-          <div className="text-center">
+          <div className="text-center space-y-1">
             <h2 className="text-lg md:text-xl font-semibold">{user.displayName || 'Anonymous User'}</h2>
             <p className="text-muted-foreground">{user.email}</p>
+            <p className="text-xs text-muted-foreground pt-2">
+              <span className="font-semibold">User ID:</span> {user.uid}
+            </p>
           </div>
           <form action={logout} className="w-full max-w-xs">
             <Button variant="destructive" className="w-full">Log Out</Button>
