@@ -9,6 +9,9 @@ import { doc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
 import { differenceInCalendarDays, isSameWeek } from 'date-fns';
 import StreakAnimation from '@/components/StreakAnimation';
 import XpAnimation from '@/components/XpAnimation';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
 type AuthContextType = {
   user: User | null;
@@ -116,18 +119,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (shouldUpdateDb) {
-      // Trigger animation if the streak has genuinely increased
       if (newStreak > currentStreak || (newStreak === 1 && currentStreak === 0)) {
         setAnimationStreakCount(newStreak);
         setShowStreakAnimation(true);
       }
 
-      // Update Firestore
-      await updateDoc(userRef, {
+      const updateData = {
         currentStreak: newStreak,
         highestStreak: newHighestStreak,
         lastActivityDate: today.toISOString(),
-      });
+      };
+
+      updateDoc(userRef, updateData)
+        .catch(async (serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: userRef.path,
+            operation: 'update',
+            requestResourceData: updateData,
+          } satisfies SecurityRuleContext);
+          errorEmitter.emit('permission-error', permissionError);
+        });
     }
   };
   
@@ -136,7 +147,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const xpToAward = getXpForQuestions(questionCount);
     if (xpToAward === 0) return;
 
-    // Trigger XP animation
     setAnimationXpCount(xpToAward);
     setShowXpAnimation(true);
 
@@ -146,18 +156,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const needsWeeklyReset = !isSameWeek(today, lastReset, { weekStartsOn: 1 }); // Monday start
 
+    let updateData: Record<string, any>;
+    let updateDataForError: Record<string, any>;
+
     if (needsWeeklyReset) {
-      await updateDoc(userRef, {
+      updateData = {
         weeklyXp: xpToAward,
         totalXp: increment(xpToAward),
         lastXpReset: today.toISOString(),
-      });
+      };
+      updateDataForError = {
+        weeklyXp: xpToAward,
+        totalXp: `increment(${xpToAward})`,
+        lastXpReset: today.toISOString(),
+      };
     } else {
-      await updateDoc(userRef, {
+      updateData = {
         weeklyXp: increment(xpToAward),
         totalXp: increment(xpToAward),
-      });
+      };
+       updateDataForError = {
+        weeklyXp: `increment(${xpToAward})`,
+        totalXp: `increment(${xpToAward})`,
+      };
     }
+
+    updateDoc(userRef, updateData)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: userRef.path,
+          operation: 'update',
+          requestResourceData: updateDataForError,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
   
   return (
@@ -180,6 +212,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
          </div>
       ) : (
         <>
+          <FirebaseErrorListener />
           {children}
           {showStreakAnimation && <StreakAnimation count={animationStreakCount} onComplete={hideStreakAnimation} />}
           {showXpAnimation && <XpAnimation xp={animationXpCount} onComplete={hideXpAnimation} />}

@@ -14,6 +14,8 @@ import { BrainCircuit, Loader2 } from 'lucide-react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
 function GoogleSignInButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
   return (
@@ -60,7 +62,7 @@ function LoginForm() {
 
     if (!docSnap.exists()) {
         const displayName = user.displayName || user.email?.split('@')[0];
-        await setDoc(userRef, {
+        const profileData = {
             uid: user.uid,
             email: user.email,
             displayName: displayName,
@@ -71,7 +73,16 @@ function LoginForm() {
             totalXp: 0,
             weeklyXp: 0,
             lastXpReset: new Date().toISOString(),
-        });
+        };
+        setDoc(userRef, profileData)
+          .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: userRef.path,
+              operation: 'create',
+              requestResourceData: profileData,
+            } satisfies SecurityRuleContext);
+            errorEmitter.emit('permission-error', permissionError);
+          });
     }
   }
 

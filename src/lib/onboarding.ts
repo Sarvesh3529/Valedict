@@ -1,9 +1,9 @@
 'use client';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
-// Note: We're not using the global error emitter here to avoid complexity
-// in the onboarding flow. A simple console.error is sufficient.
 
 export async function saveOnboardingResponse(userId: string, data: Record<string, any>) {
   if (!userId) {
@@ -11,17 +11,29 @@ export async function saveOnboardingResponse(userId: string, data: Record<string
     return;
   }
   
-  try {
-    const responseRef = doc(db, 'onboardingResponses', userId);
-    
-    await setDoc(responseRef, {
-      ...data,
-      userId: userId,
-      createdAt: serverTimestamp(), // Use server timestamp for creation
-      updatedAt: serverTimestamp(),
-    }, { merge: true });
+  const responseRef = doc(db, 'onboardingResponses', userId);
+  
+  const dataToSave = {
+    ...data,
+    userId: userId,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
 
-  } catch (error) {
-    console.error("Error saving onboarding response to Firestore:", error);
-  }
+  const dataForError = {
+    ...data,
+    userId: userId,
+    createdAt: 'serverTimestamp()',
+    updatedAt: 'serverTimestamp()',
+  };
+    
+  setDoc(responseRef, dataToSave, { merge: true })
+    .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: responseRef.path,
+          operation: 'update',
+          requestResourceData: dataForError,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
 }
