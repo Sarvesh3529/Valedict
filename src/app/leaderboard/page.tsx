@@ -104,7 +104,7 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
   return (
     <div className="space-y-4 pt-4">
       {users.map((u, index) => (
-        <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-secondary/50">
+        <div key={u.uid} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
           <div className="w-8 text-center flex-shrink-0">
              {renderRank(index)}
           </div>
@@ -112,7 +112,7 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
             <AvatarImage src={u.photoURL ?? ''} />
             <AvatarFallback>{u.displayName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
           </Avatar>
-          <p className="font-medium truncate flex-1">{u.displayName || 'Anonymous User'}</p>
+          <p className="font-medium flex-1 break-words">{u.displayName || 'Anonymous User'}</p>
           <p className="font-bold text-primary">{type === 'weekly' ? (u.weeklyXp || 0) : (u.totalXp || 0)} XP</p>
         </div>
       ))}
