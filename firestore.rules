@@ -23,9 +23,9 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      // READ: Any authenticated user can read a user's profile.
+      // READ: Any authenticated user can read a user's profile for the leaderboard.
       allow get: if isSignedIn();
-      allow list: if false; // List access is disabled for security/privacy
+      allow list: if isSignedIn(); 
 
       // WRITE: Only the owner can create or update their own profile.
       allow create: if isOwner(userId);
