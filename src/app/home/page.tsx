@@ -46,6 +46,7 @@ export default function HomePage() {
         <StreakDisplay 
             currentStreak={profile?.currentStreak || 0}
             highestStreak={profile?.highestStreak || 0}
+            lastActivityDate={profile?.lastActivityDate}
         />
       </div>
 
