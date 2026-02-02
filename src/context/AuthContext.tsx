@@ -8,6 +8,7 @@ import type { UserProfile } from '@/lib/types';
 import { doc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
 import { differenceInCalendarDays, isSameWeek } from 'date-fns';
 import StreakAnimation from '@/components/StreakAnimation';
+import XpAnimation from '@/components/XpAnimation';
 
 type AuthContextType = {
   user: User | null;
@@ -18,6 +19,9 @@ type AuthContextType = {
   showStreakAnimation: boolean;
   hideStreakAnimation: () => void;
   animationStreakCount: number;
+  showXpAnimation: boolean;
+  hideXpAnimation: () => void;
+  animationXpCount: number;
 };
 
 const AuthContext = createContext<AuthContextType>({ 
@@ -29,6 +33,9 @@ const AuthContext = createContext<AuthContextType>({
     showStreakAnimation: false,
     hideStreakAnimation: () => {},
     animationStreakCount: 0,
+    showXpAnimation: false,
+    hideXpAnimation: () => {},
+    animationXpCount: 0,
 });
 
 function getXpForQuestions(count: number): number {
@@ -44,10 +51,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Streak Animation State
   const [showStreakAnimation, setShowStreakAnimation] = useState(false);
   const [animationStreakCount, setAnimationStreakCount] = useState(0);
 
+  // XP Animation State
+  const [showXpAnimation, setShowXpAnimation] = useState(false);
+  const [animationXpCount, setAnimationXpCount] = useState(0);
+
   const hideStreakAnimation = () => setShowStreakAnimation(false);
+  const hideXpAnimation = () => setShowXpAnimation(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -122,6 +136,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const xpToAward = getXpForQuestions(questionCount);
     if (xpToAward === 0) return;
 
+    // Trigger XP animation
+    setAnimationXpCount(xpToAward);
+    setShowXpAnimation(true);
+
     const userRef = doc(db, 'users', user.uid);
     const today = new Date();
     const lastReset = profile.lastXpReset ? new Date(profile.lastXpReset) : new Date(0);
@@ -143,7 +161,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   
   return (
-    <AuthContext.Provider value={{ user, profile, loading, updateUserStreak, awardXp, showStreakAnimation, hideStreakAnimation, animationStreakCount }}>
+    <AuthContext.Provider value={{ 
+        user, 
+        profile, 
+        loading, 
+        updateUserStreak, 
+        awardXp, 
+        showStreakAnimation, 
+        hideStreakAnimation, 
+        animationStreakCount,
+        showXpAnimation,
+        hideXpAnimation,
+        animationXpCount
+    }}>
       {loading ? (
          <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -152,6 +182,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         <>
           {children}
           {showStreakAnimation && <StreakAnimation count={animationStreakCount} onComplete={hideStreakAnimation} />}
+          {showXpAnimation && <XpAnimation xp={animationXpCount} onComplete={hideXpAnimation} />}
         </>
       )}
     </AuthContext.Provider>
