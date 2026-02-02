@@ -106,6 +106,45 @@
         }
       },
       "required": ["uid", "email"]
+    },
+    "Quiz": {
+      "title": "Quiz",
+      "description": "Represents a quiz with a title and description.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the quiz."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the quiz."
+        }
+      },
+      "required": ["title"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "A single question within a quiz.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The question text."
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of possible answers."
+        },
+        "correctAnswerIndex": {
+          "type": "number",
+          "description": "The index of the correct answer in the options array."
+        }
+      },
+      "required": ["text", "options", "correctAnswerIndex"]
     }
   },
   "auth": {
@@ -123,6 +162,18 @@
         "$ref": "#/backend/entities/UserProfile"
       },
       "description": "Stores public user profile information."
+    },
+    "/quizzes/{quizId}": {
+      "schema": {
+        "$ref": "#/backend/entities/Quiz"
+      },
+      "description": "Stores quiz metadata."
+    },
+    "/quizzes/{quizId}/questions/{questionId}": {
+      "schema": {
+        "$ref": "#/backend/entities/Question"
+      },
+      "description": "Stores the questions for a specific quiz."
     }
   }
 }
