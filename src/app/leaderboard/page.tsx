@@ -12,6 +12,13 @@ import { useRouter } from 'next/navigation';
 
 type LeaderboardType = 'weekly' | 'all-time';
 
+const renderRank = (rank: number) => {
+  if (rank === 0) return <Crown className="h-6 w-6 text-yellow-400" />;
+  if (rank === 1) return <Crown className="h-6 w-6 text-gray-400" />;
+  if (rank === 2) return <Crown className="h-6 w-6 text-orange-400" />;
+  return <span className="font-bold text-lg">{rank + 1}</span>;
+};
+
 export default function LeaderboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -55,13 +62,6 @@ export default function LeaderboardPage() {
       </div>
     );
   }
-
-  const renderRank = (rank: number) => {
-    if (rank === 0) return <Crown className="h-6 w-6 text-yellow-400" />;
-    if (rank === 1) return <Crown className="h-6 w-6 text-gray-400" />;
-    if (rank === 2) return <Crown className="h-6 w-6 text-orange-400" />;
-    return <span className="font-bold text-lg">{rank + 1}</span>;
-  };
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
