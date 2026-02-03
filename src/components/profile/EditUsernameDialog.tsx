@@ -16,11 +16,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 interface EditUsernameDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  currentUsername: string;
 }
 
-export default function EditUsernameDialog({ isOpen, setIsOpen }: EditUsernameDialogProps) {
-  const { user, profile } = useAuth();
-  const [username, setUsername] = useState(profile?.displayName || '');
+export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername }: EditUsernameDialogProps) {
+  const { user } = useAuth();
+  const [username, setUsername] = useState(currentUsername);
   const [debouncedUsername] = useDebounce(username, 500);
   
   const [isChecking, setIsChecking] = useState(false);
@@ -30,7 +31,7 @@ export default function EditUsernameDialog({ isOpen, setIsOpen }: EditUsernameDi
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (debouncedUsername && debouncedUsername.toLowerCase() !== profile?.displayName?.toLowerCase()) {
+    if (debouncedUsername && debouncedUsername.toLowerCase() !== currentUsername.toLowerCase()) {
         if (debouncedUsername.length >= 3) {
             setIsChecking(true);
             checkUsernameAvailability(debouncedUsername).then(result => {
@@ -43,14 +44,14 @@ export default function EditUsernameDialog({ isOpen, setIsOpen }: EditUsernameDi
     } else {
       setAvailability(null);
     }
-  }, [debouncedUsername, profile?.displayName]);
+  }, [debouncedUsername, currentUsername]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!user || !profile) return;
+    if (!user) return;
 
-    if (username.toLowerCase() === profile.displayName?.toLowerCase()) {
+    if (username.toLowerCase() === currentUsername.toLowerCase()) {
         setIsOpen(false);
         return;
     }

@@ -70,7 +70,7 @@ export default function ProfilePage() {
                   <UserIcon className="h-10 w-10 md:h-12 md:w-12" />
                 </AvatarFallback>
               </Avatar>
-              <div className="space-y-1">
+              <div className="grid gap-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.displayName || 'Anonymous User'}</h2>
                   <Button variant="ghost" size="icon" onClick={() => setIsEditOpen(true)}>
@@ -95,7 +95,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
-      {isEditOpen && <EditUsernameDialog isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
+      {isEditOpen && <EditUsernameDialog isOpen={isEditOpen} setIsOpen={setIsEditOpen} currentUsername={profile.displayName || ''} />}
     </>
   );
 }
