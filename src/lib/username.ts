@@ -2,6 +2,9 @@
 
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+
 
 export async function checkUsernameAvailability(username: string): Promise<{ available: boolean, message: string }> {
   if (!username || username.length < 3) {
@@ -24,50 +27,55 @@ export async function checkUsernameAvailability(username: string): Promise<{ ava
     }
     return { available: true, message: 'Username is available!' };
   } catch (error) {
-    console.error('Error checking username:', error);
+    // This is a read operation. If it fails due to permissions, let's report it.
+    const permissionError = new FirestorePermissionError({
+        path: usersRef.path,
+        operation: 'list',
+    } satisfies SecurityRuleContext);
+    errorEmitter.emit('permission-error', permissionError);
     return { available: false, message: 'Error checking username.' };
   }
 }
 
-export async function setUsername(userId: string, username: string): Promise<{ success: boolean, message: string }> {
+export function setUsername(userId: string, username: string): void {
     if (!userId) {
-        return { success: false, message: 'User not found.' };
+        console.error('User not found for setUsername.');
+        return;
     }
-    const availability = await checkUsernameAvailability(username);
-    if (!availability.available) {
-        return { success: false, message: availability.message };
-    }
+    
+    const userRef = doc(db, 'users', userId);
+    const data = { displayName: username, usernameIsSet: true };
 
-    try {
-        const userRef = doc(db, 'users', userId);
-        await updateDoc(userRef, { displayName: username, usernameIsSet: true });
-        return { success: true, message: 'Username set!' };
-
-    } catch (error) {
-        console.error("Error setting username:", error);
-        return { success: false, message: 'An error occurred. Please try again.' };
-    }
+    // Fire-and-forget, with error handling chained via .catch()
+    updateDoc(userRef, data)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: userRef.path,
+          operation: 'update',
+          requestResourceData: data,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
 }
 
 
-export async function updateUserDisplayName(userId: string, newDisplayName: string): Promise<{ success: boolean; message: string }> {
+export function updateUserDisplayName(userId: string, newDisplayName: string): void {
   if (!userId) {
-    return { success: false, message: 'User not authenticated.' };
+    console.error('User not authenticated for updateUserDisplayName.');
+    return;
   }
 
-  const availability = await checkUsernameAvailability(newDisplayName);
-  if (!availability.available) {
-     return { success: false, message: availability.message };
-  }
+  const userRef = doc(db, 'users', userId);
+  const data = { displayName: newDisplayName };
 
-  try {
-    const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, {
-      displayName: newDisplayName,
+  // Fire-and-forget, with error handling chained via .catch()
+  updateDoc(userRef, data)
+    .catch(async (serverError) => {
+      const permissionError = new FirestorePermissionError({
+        path: userRef.path,
+        operation: 'update',
+        requestResourceData: data,
+      } satisfies SecurityRuleContext);
+      errorEmitter.emit('permission-error', permissionError);
     });
-    return { success: true, message: 'Username updated successfully.' };
-  } catch (error) {
-    console.error('Error updating username:', error);
-    return { success: false, message: 'An error occurred while updating the username.' };
-  }
 }

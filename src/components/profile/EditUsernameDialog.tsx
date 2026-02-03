@@ -62,14 +62,18 @@ export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername 
     }
 
     setIsPending(true);
-    const result = await updateUserDisplayName(user.uid, username);
-    if (result.success) {
+
+    // Call fire-and-forget function
+    updateUserDisplayName(user.uid, username);
+
+    // Optimistically update auth profile and close dialog
+    try {
       await updateProfile(user, { displayName: username });
       setIsOpen(false);
-    } else {
-      setError(result.message);
+    } catch (authError: any) {
+       setError(authError.message || 'Failed to update profile.');
+       setIsPending(false);
     }
-    setIsPending(false);
   };
 
   return (

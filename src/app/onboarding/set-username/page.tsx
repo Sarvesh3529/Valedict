@@ -27,11 +27,7 @@ export default function SetUsernamePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (loading) {
-        return;
-    }
-    if (!user) {
-        router.replace('/');
+    if (loading || !user) {
         return;
     }
 
@@ -55,12 +51,17 @@ export default function SetUsernamePage() {
     }
 
     setIsPending(true);
-    const result = await setUsername(user.uid, username);
-    if (result.success) {
+    
+    // Call the fire-and-forget function. It does not return a value.
+    setUsername(user.uid, username);
+
+    // Optimistically update the auth profile and navigate.
+    // If setUsername fails due to permissions, the FirebaseErrorListener will catch it.
+    try {
       await updateProfile(user, { displayName: username });
       router.push('/onboarding/start');
-    } else {
-      setError(result.message);
+    } catch (authError: any) {
+      setError(authError.message || 'Failed to update profile.');
       setIsPending(false);
     }
   };
@@ -100,8 +101,13 @@ export default function SetUsernamePage() {
                     {!isChecking && availability && !availability.available && <XCircle className="h-4 w-4 text-destructive" />}
                 </div>
               </div>
-              {availability && (
-                <p className={`text-sm ${availability.available ? 'text-green-500' : 'text-destructive'}`}>
+              {availability && !availability.available && (
+                <p className='text-sm text-destructive'>
+                  {availability.message}
+                </p>
+              )}
+               {availability && availability.available && (
+                <p className='text-sm text-green-500'>
                   {availability.message}
                 </p>
               )}
