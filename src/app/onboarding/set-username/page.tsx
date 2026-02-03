@@ -44,7 +44,7 @@ export default function SetUsernamePage() {
     } else {
       setAvailability(null);
     }
-  }, [debouncedUsername, user, loading, router]);
+  }, [debouncedUsername, user, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

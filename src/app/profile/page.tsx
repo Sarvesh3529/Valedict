@@ -77,6 +77,7 @@ export default function ProfilePage() {
                     <Pencil className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 </div>
+                 <p className="text-xs font-mono text-muted-foreground break-all">{user.uid}</p>
               </div>
             </div>
             
@@ -86,10 +87,6 @@ export default function ProfilePage() {
               <StatCard icon={Flame} label="Current Streak" value={`${profile.currentStreak || 0} days`} />
               <StatCard icon={Star} label="Total XP" value={profile.totalXp || 0} />
               <StatCard icon={CalendarDays} label="Joined On" value={joinDate} />
-               <div className="flex flex-col justify-center rounded-lg bg-secondary/50 p-4 col-span-1 sm:col-span-2">
-                  <p className="text-sm text-muted-foreground">User ID</p>
-                  <p className="text-sm font-mono break-all">{user.uid}</p>
-               </div>
             </div>
 
             <form action={logout} className="w-full pt-4">
