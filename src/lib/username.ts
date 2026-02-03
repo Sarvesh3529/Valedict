@@ -1,8 +1,7 @@
-'use server';
+'use client';
 
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
-import { revalidatePath } from 'next/cache';
 
 export async function checkUsernameAvailability(username: string): Promise<{ available: boolean, message: string }> {
   if (!username || username.length < 3) {
@@ -42,13 +41,33 @@ export async function setUsername(userId: string, username: string): Promise<{ s
     try {
         const userRef = doc(db, 'users', userId);
         await updateDoc(userRef, { displayName: username, usernameIsSet: true });
-        
-        revalidatePath('/home');
-        revalidatePath('/profile');
-
         return { success: true, message: 'Username set!' };
 
     } catch (error) {
+        console.error("Error setting username:", error);
         return { success: false, message: 'An error occurred. Please try again.' };
     }
+}
+
+
+export async function updateUserDisplayName(userId: string, newDisplayName: string): Promise<{ success: boolean; message: string }> {
+  if (!userId) {
+    return { success: false, message: 'User not authenticated.' };
+  }
+
+  const availability = await checkUsernameAvailability(newDisplayName);
+  if (!availability.available) {
+     return { success: false, message: availability.message };
+  }
+
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      displayName: newDisplayName,
+    });
+    return { success: true, message: 'Username updated successfully.' };
+  } catch (error) {
+    console.error('Error updating username:', error);
+    return { success: false, message: 'An error occurred while updating the username.' };
+  }
 }

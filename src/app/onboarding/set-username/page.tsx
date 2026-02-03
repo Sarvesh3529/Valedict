@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { checkUsernameAvailability, setUsername } from './actions';
+import { checkUsernameAvailability, setUsername } from '@/lib/username';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function SetUsernamePage() {

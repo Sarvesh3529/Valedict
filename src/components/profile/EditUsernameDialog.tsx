@@ -10,8 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { checkUsernameAvailability } from '@/app/onboarding/set-username/actions';
-import { updateUserDisplayName } from '@/app/profile/actions';
+import { checkUsernameAvailability, updateUserDisplayName } from '@/lib/username';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface EditUsernameDialogProps {
