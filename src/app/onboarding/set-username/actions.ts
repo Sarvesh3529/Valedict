@@ -25,6 +25,7 @@ export async function checkUsernameAvailability(username: string): Promise<{ ava
     }
     return { available: true, message: 'Username is available!' };
   } catch (error) {
+    console.error('Error checking username:', error);
     return { available: false, message: 'Error checking username.' };
   }
 }

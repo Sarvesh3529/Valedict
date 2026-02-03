@@ -15,7 +15,7 @@ import { checkUsernameAvailability, setUsername } from './actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function SetUsernamePage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [debouncedUsername] = useDebounce(username, 500);
@@ -27,6 +27,14 @@ export default function SetUsernamePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (loading) {
+        return;
+    }
+    if (!user) {
+        router.replace('/');
+        return;
+    }
+
     if (debouncedUsername.length >= 3) {
       setIsChecking(true);
       checkUsernameAvailability(debouncedUsername).then(result => {
@@ -36,7 +44,7 @@ export default function SetUsernamePage() {
     } else {
       setAvailability(null);
     }
-  }, [debouncedUsername]);
+  }, [debouncedUsername, user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +64,14 @@ export default function SetUsernamePage() {
       }
     });
   };
+
+  if (loading || !user) {
+      return (
+         <div className="flex items-center justify-center min-h-screen bg-background p-4">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+      )
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
