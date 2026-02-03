@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useAuth } from '@/context/AuthContext';
 import { updateProfile } from 'firebase/auth';
@@ -26,7 +26,7 @@ export default function EditUsernameDialog({ isOpen, setIsOpen }: EditUsernameDi
   const [isChecking, setIsChecking] = useState(false);
   const [availability, setAvailability] = useState<{ available: boolean; message: string } | null>(null);
   
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,15 +60,15 @@ export default function EditUsernameDialog({ isOpen, setIsOpen }: EditUsernameDi
         return;
     }
 
-    startTransition(async () => {
-      const result = await updateUserDisplayName(user.uid, username);
-      if (result.success) {
-        await updateProfile(user, { displayName: username });
-        setIsOpen(false);
-      } else {
-        setError(result.message);
-      }
-    });
+    setIsPending(true);
+    const result = await updateUserDisplayName(user.uid, username);
+    if (result.success) {
+      await updateProfile(user, { displayName: username });
+      setIsOpen(false);
+    } else {
+      setError(result.message);
+    }
+    setIsPending(false);
   };
 
   return (
