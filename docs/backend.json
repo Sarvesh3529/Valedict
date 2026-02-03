@@ -71,12 +71,16 @@
         },
         "displayName": {
           "type": "string",
-          "description": "The user's display name."
+          "description": "The user's unique, editable username."
         },
         "photoURL": {
           "type": "string",
           "format": "uri",
           "description": "URL for the user's profile picture."
+        },
+        "usernameIsSet": {
+            "type": "boolean",
+            "description": "True if the user has set their initial username."
         },
         "currentStreak": {
           "type": "number",

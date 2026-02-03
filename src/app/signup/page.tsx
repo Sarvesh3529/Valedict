@@ -11,10 +11,8 @@ import { signup } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import { auth } from '@/lib/firebase';
+import { setupNewUser } from '@/lib/user';
 
 function GoogleSignUpButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
   return (
@@ -49,43 +47,13 @@ export default function SignupPage() {
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
   
-  async function handleUserSetup(user: any) {
-    const userRef = doc(db, 'users', user.uid);
-    const docSnap = await getDoc(userRef);
-
-    if (!docSnap.exists()) {
-        const displayName = user.displayName || user.email?.split('@')[0];
-        const profileData = {
-            uid: user.uid,
-            email: user.email,
-            displayName: displayName,
-            photoURL: user.photoURL,
-            currentStreak: 0,
-            highestStreak: 0,
-            lastActivityDate: null,
-            totalXp: 0,
-            weeklyXp: 0,
-            lastXpReset: new Date().toISOString(),
-        };
-        setDoc(userRef, profileData)
-          .catch(async (serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: userRef.path,
-              operation: 'create',
-              requestResourceData: profileData,
-            } satisfies SecurityRuleContext);
-            errorEmitter.emit('permission-error', permissionError);
-          });
-    }
-  }
-
   const handleGoogleSignIn = async () => {
     setIsGooglePending(true);
     setGoogleError(null);
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      await handleUserSetup(result.user);
+      await setupNewUser(result.user);
       router.push('/home');
     } catch (error: any) {
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {

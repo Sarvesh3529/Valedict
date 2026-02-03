@@ -33,6 +33,7 @@ export type UserProfile = {
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
+  usernameIsSet?: boolean;
   currentStreak?: number;
   highestStreak?: number;
   lastActivityDate?: string;
