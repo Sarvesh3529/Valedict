@@ -121,22 +121,22 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
                     </ReactMarkdown>
                 </div>
                 <div className="space-y-2 text-sm">
-                  <p>
+                  <div>
                     Your answer:{' '}
                     <span className={cn('inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                         {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                       </ReactMarkdown>
                     </span>
-                  </p>
-                  <p>
+                  </div>
+                  <div>
                     Correct answer:{' '}
                     <span className="font-medium text-muted-foreground inline">
                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                             {result.question.options[result.question.correctAnswer]}
                         </ReactMarkdown>
                     </span>
-                  </p>
+                  </div>
                 </div>
                 <Alert className="mt-4 bg-secondary border-none">
                   <AlertTitle>Explanation</AlertTitle>
