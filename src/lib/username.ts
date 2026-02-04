@@ -37,28 +37,6 @@ export async function checkUsernameAvailability(username: string): Promise<{ ava
   }
 }
 
-export function setUsername(userId: string, username: string): void {
-    if (!userId) {
-        console.error('User not found for setUsername.');
-        return;
-    }
-    
-    const userRef = doc(db, 'users', userId);
-    const data = { displayName: username, usernameIsSet: true };
-
-    // Fire-and-forget, with error handling chained via .catch()
-    updateDoc(userRef, data)
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: userRef.path,
-          operation: 'update',
-          requestResourceData: data,
-        } satisfies SecurityRuleContext);
-        errorEmitter.emit('permission-error', permissionError);
-      });
-}
-
-
 export function updateUserDisplayName(userId: string, newDisplayName: string): void {
   if (!userId) {
     console.error('User not authenticated for updateUserDisplayName.');

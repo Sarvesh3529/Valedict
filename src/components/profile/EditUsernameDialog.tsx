@@ -25,7 +25,7 @@ export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername 
   const [debouncedUsername] = useDebounce(username, 500);
   
   const [isChecking, setIsChecking] = useState(false);
-  const [availability, setAvailability] = useState<{ available: boolean; message: string } | null>(null);
+  const [availability, setAvailability] = useState<{ available: boolean, message: string } | null>(null);
   
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,16 +63,18 @@ export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername 
 
     setIsPending(true);
 
-    // Call fire-and-forget function
-    updateUserDisplayName(user.uid, username);
-
-    // Optimistically update auth profile and close dialog
     try {
+      // Optimistically update auth profile
       await updateProfile(user, { displayName: username });
+      
+      // Call fire-and-forget function to update Firestore
+      updateUserDisplayName(user.uid, username);
+
       setIsOpen(false);
     } catch (authError: any) {
        setError(authError.message || 'Failed to update profile.');
-       setIsPending(false);
+    } finally {
+        setIsPending(false);
     }
   };
 

@@ -3,12 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, User as UserIcon, Flame, Star, CalendarDays } from "lucide-react";
+import { Loader2, User as UserIcon, Flame, Star, CalendarDays, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { logout } from "../auth/actions";
 import { Separator } from "@/components/ui/separator";
+import EditUsernameDialog from "@/components/profile/EditUsernameDialog";
 
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) {
   return (
@@ -27,6 +28,7 @@ function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label
 export default function ProfilePage() {
     const { user, profile, loading } = useAuth();
     const router = useRouter();
+    const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -69,7 +71,12 @@ export default function ProfilePage() {
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.displayName || 'Anonymous User'}</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.displayName || 'Anonymous User'}</h2>
+                  <Button variant="ghost" size="icon" onClick={() => setIsEditUsernameOpen(true)} className="h-8 w-8">
+                      <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
                 <p className="text-xs font-mono text-muted-foreground break-all">{user.uid}</p>
               </div>
             </div>
@@ -88,6 +95,13 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
+      {profile.displayName && (
+        <EditUsernameDialog 
+            isOpen={isEditUsernameOpen} 
+            setIsOpen={setIsEditUsernameOpen} 
+            currentUsername={profile.displayName}
+        />
+      )}
     </>
   );
 }
