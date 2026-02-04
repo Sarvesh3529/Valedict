@@ -15,7 +15,6 @@ export async function setupNewUser(user: any) {
             email: user.email,
             displayName: displayName,
             photoURL: user.photoURL,
-            usernameIsSet: false,
             currentStreak: 0,
             highestStreak: 0,
             lastActivityDate: null,

@@ -3,13 +3,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, User as UserIcon, Flame, Star, CalendarDays, Pencil } from "lucide-react";
+import { Loader2, User as UserIcon, Flame, Star, CalendarDays } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { logout } from "../auth/actions";
 import { Separator } from "@/components/ui/separator";
-import EditUsernameDialog from "@/components/profile/EditUsernameDialog";
 
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) {
   return (
@@ -28,7 +27,6 @@ function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label
 export default function ProfilePage() {
     const { user, profile, loading } = useAuth();
     const router = useRouter();
-    const [isEditOpen, setIsEditOpen] = useState(false);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -71,13 +69,8 @@ export default function ProfilePage() {
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.displayName || 'Anonymous User'}</h2>
-                  <Button variant="ghost" size="icon" onClick={() => setIsEditOpen(true)}>
-                    <Pencil className="h-5 w-5 text-muted-foreground" />
-                  </Button>
-                </div>
-                 <p className="text-xs font-mono text-muted-foreground break-all">{user.uid}</p>
+                <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.displayName || 'Anonymous User'}</h2>
+                <p className="text-xs font-mono text-muted-foreground break-all">{user.uid}</p>
               </div>
             </div>
             
@@ -95,7 +88,6 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
-      {isEditOpen && <EditUsernameDialog isOpen={isEditOpen} setIsOpen={setIsEditOpen} currentUsername={profile.displayName || ''} />}
     </>
   );
 }

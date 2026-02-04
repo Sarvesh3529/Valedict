@@ -13,8 +13,6 @@ import * as Icons from 'lucide-react';
 import { BrainCircuit, NotebookText, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import StreakDisplay from '@/components/StreakDisplay';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 // This is needed because of the dynamic icon loading
 const iconComponents: { [key: string]: React.ElementType } = {
@@ -26,16 +24,8 @@ const iconComponents: { [key: string]: React.ElementType } = {
 
 export default function HomePage() {
   const { profile, loading } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && profile && profile.usernameIsSet !== true) {
-      router.replace('/onboarding/set-username');
-    }
-  }, [profile, loading, router]);
-
-
-  if (loading || (profile && profile.usernameIsSet !== true)) {
+  if (loading || !profile) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

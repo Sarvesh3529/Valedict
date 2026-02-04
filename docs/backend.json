@@ -78,10 +78,6 @@
           "format": "uri",
           "description": "URL for the user's profile picture."
         },
-        "usernameIsSet": {
-            "type": "boolean",
-            "description": "True if the user has set their initial username."
-        },
         "currentStreak": {
           "type": "number",
           "description": "The user's current study streak in days."
