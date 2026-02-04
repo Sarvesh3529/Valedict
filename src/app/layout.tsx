@@ -8,8 +8,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 import ConditionalFooter from '@/components/ConditionalFooter';
 
 export const metadata: Metadata = {
-  title: 'ExamPrep AI',
-  description: 'An AI-powered exam preparation app for students.',
+  title: 'Valedict AI',
+  description: 'An AI-powered learning platform for students.',
 };
 
 export default function RootLayout({

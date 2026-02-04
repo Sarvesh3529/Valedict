@@ -77,7 +77,7 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between">
         <Link href="/home" className="flex items-center gap-2 font-bold">
           <BrainCircuit className="h-6 w-6 text-primary" />
-          <span className="font-headline text-lg hidden sm:inline-block">ExamPrep AI</span>
+          <span className="font-headline text-lg hidden sm:inline-block">Valedict AI</span>
         </Link>
 
         {!isMobile && (
