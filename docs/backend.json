@@ -103,6 +103,10 @@
             "type": "string",
             "format": "date-time",
             "description": "The timestamp when the weekly XP was last reset."
+        },
+        "onboardingComplete": {
+            "type": "boolean",
+            "description": "Indicates if the user has completed the onboarding flow."
         }
       },
       "required": ["uid", "email"]

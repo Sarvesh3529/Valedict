@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
@@ -21,6 +21,7 @@ export async function setupNewUser(user: any) {
             totalXp: 0,
             weeklyXp: 0,
             lastXpReset: new Date().toISOString(),
+            onboardingComplete: false,
         };
         
         await setDoc(userRef, profileData)
@@ -33,4 +34,19 @@ export async function setupNewUser(user: any) {
             errorEmitter.emit('permission-error', permissionError);
           });
     }
+}
+
+export function markOnboardingComplete(userId: string) {
+    if (!userId) return;
+    const userRef = doc(db, 'users', userId);
+    const data = { onboardingComplete: true };
+    updateDoc(userRef, data)
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: userRef.path,
+                operation: 'update',
+                requestResourceData: data,
+            } satisfies SecurityRuleContext);
+            errorEmitter.emit('permission-error', permissionError);
+        });
 }

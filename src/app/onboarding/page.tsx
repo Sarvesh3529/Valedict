@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { onboardingQuestions, type OnboardingQuestion } from '@/lib/onboarding-questions';
 import { saveOnboardingResponse } from '@/lib/onboarding';
+import { markOnboardingComplete } from '@/lib/user';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
@@ -28,7 +29,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isAnimating, setIsAnimating] = useState(false);
@@ -38,7 +39,10 @@ export default function OnboardingPage() {
     if (!loading && !user) {
       router.replace('/');
     }
-  }, [user, loading, router]);
+    if (!loading && profile && profile.onboardingComplete) {
+      router.replace('/home');
+    }
+  }, [user, profile, loading, router]);
   
   const handleAnswer = useCallback(async (question: OnboardingQuestion, answer: any) => {
     if (isAnimating || !user) return;
@@ -55,7 +59,7 @@ export default function OnboardingPage() {
         setIsAnimating(false);
       } else {
         // This is the last question, handle completion
-        localStorage.setItem('onboardingComplete', 'true');
+        markOnboardingComplete(user.uid);
         const grade = newResponses.grade;
         const troublingSubjects = (newResponses.troublingSubjects || []) as string[];
 
@@ -70,7 +74,7 @@ export default function OnboardingPage() {
   }, [isAnimating, user, responses, currentQuestionIndex, router]);
 
 
-  if (loading || !user) {
+  if (loading || !user || (profile && profile.onboardingComplete)) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-900">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
