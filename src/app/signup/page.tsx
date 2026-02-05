@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { BrainCircuit, Loader2 } from 'lucide-react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { setupNewUser } from '@/lib/user';
+import { useAuth } from '@/context/AuthContext';
 
 function GoogleSignUpButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
   return (
@@ -43,10 +44,17 @@ function EmailSignUpButton() {
 
 export default function SignupPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [state, formAction] = useActionState(signup, undefined);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
   
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/home');
+    }
+  }, [user, loading, router]);
+
   const handleGoogleSignIn = async () => {
     setIsGooglePending(true);
     setGoogleError(null);
@@ -59,13 +67,27 @@ export default function SignupPage() {
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
         // Silently ignore. The user intentionally closed the window.
       } else {
-         console.error("Google Sign-In Error:", error);
-         setGoogleError("Could not sign in with Google. Please try again.");
+         console.error("Google Sign-In Error:", error.code, error.message);
+         let friendlyMessage = "Could not sign in with Google. Please try again.";
+         if (error.code === 'auth/unauthorized-domain') {
+            friendlyMessage = "This domain is not authorized. Please add it to your Firebase project's Authentication settings.";
+         } else if (error.code === 'auth/api-key-not-valid') {
+            friendlyMessage = "Invalid Firebase API Key. Please check your .env file.";
+         }
+         setGoogleError(friendlyMessage);
       }
     } finally {
       setIsGooglePending(false);
     }
   };
+
+  if (loading || user) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
 
   return (

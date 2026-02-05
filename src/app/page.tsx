@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, Suspense, useState } from 'react';
+import { useActionState, Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -14,6 +14,7 @@ import { BrainCircuit, Loader2 } from 'lucide-react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { setupNewUser } from '@/lib/user';
+import { useAuth } from '@/context/AuthContext';
 
 function GoogleSignInButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
   return (
@@ -47,12 +48,20 @@ function EmailSignInButton() {
 
 function LoginForm() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [state, formAction] = useActionState(login, undefined);
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
 
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/home');
+    }
+  }, [user, loading, router]);
+
 
   const handleGoogleSignIn = async () => {
     setIsGooglePending(true);
@@ -70,7 +79,7 @@ function LoginForm() {
          let friendlyMessage = "Could not sign in with Google. Please try again.";
          if (error.code === 'auth/unauthorized-domain') {
             friendlyMessage = "This domain is not authorized. Please add 'localhost' to the authorized domains in your Firebase project's Authentication settings.";
-         } else if (error.code === 'auth/invalid-api-key') {
+         } else if (error.code === 'auth/api-key-not-valid') {
             friendlyMessage = "Invalid Firebase API Key. Please check your NEXT_PUBLIC_FIREBASE_API_KEY in the .env file.";
          }
          setGoogleError(friendlyMessage);
@@ -80,6 +89,13 @@ function LoginForm() {
     }
   };
 
+  if (loading || user) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -146,7 +162,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
             <LoginForm />
         </Suspense>
     )
