@@ -67,7 +67,13 @@ function LoginForm() {
         // Silently ignore. The user intentionally closed the window.
       } else {
          console.error("Google Sign-In Error:", error.code, error.message);
-         setGoogleError("Could not sign in with Google. Please check your configuration and try again.");
+         let friendlyMessage = "Could not sign in with Google. Please try again.";
+         if (error.code === 'auth/unauthorized-domain') {
+            friendlyMessage = "This domain is not authorized. Please add 'localhost' to the authorized domains in your Firebase project's Authentication settings.";
+         } else if (error.code === 'auth/invalid-api-key') {
+            friendlyMessage = "Invalid Firebase API Key. Please check your NEXT_PUBLIC_FIREBASE_API_KEY in the .env file.";
+         }
+         setGoogleError(friendlyMessage);
       }
     } finally {
       setIsGooglePending(false);
@@ -119,10 +125,10 @@ function LoginForm() {
               </div>
             </div>
              <GoogleSignInButton onClick={handleGoogleSignIn} isPending={isGooglePending} />
-              {(error || googleError) && (
+              {googleError && (
                   <Alert variant="destructive">
                       <AlertTitle>Login Failed</AlertTitle>
-                      <AlertDescription>{googleError || 'An unknown error occurred with Google Sign-In.'}</AlertDescription>
+                      <AlertDescription>{googleError}</AlertDescription>
                   </Alert>
               )}
           </div>
