@@ -66,8 +66,8 @@ function LoginForm() {
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
         // Silently ignore. The user intentionally closed the window.
       } else {
-         console.error("Google Sign-In Error:", error);
-         setGoogleError("Could not sign in with Google. Please try again.");
+         console.error("Google Sign-In Error:", error.code, error.message);
+         setGoogleError("Could not sign in with Google. Please check your configuration and try again.");
       }
     } finally {
       setIsGooglePending(false);
@@ -122,7 +122,7 @@ function LoginForm() {
               {(error || googleError) && (
                   <Alert variant="destructive">
                       <AlertTitle>Login Failed</AlertTitle>
-                      <AlertDescription>{googleError || 'Could not sign in with Google. Please try again.'}</AlertDescription>
+                      <AlertDescription>{googleError || 'An unknown error occurred with Google Sign-In.'}</AlertDescription>
                   </Alert>
               )}
           </div>
