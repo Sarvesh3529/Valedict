@@ -10,23 +10,11 @@ import { Label } from '@/components/ui/label';
 import { signup } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { setupNewUser } from '@/lib/user';
 import { useAuth } from '@/context/AuthContext';
 
-function GoogleSignUpButton({ onClick, isPending }: { onClick: () => void, isPending: boolean }) {
-  return (
-    <Button variant="outline" className="w-full" type="button" disabled={isPending} onClick={onClick}>
-      {isPending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Please wait
-        </>
-      ) : 'Sign up with Google'}
-    </Button>
-  )
-}
 
 function EmailSignUpButton() {
   const { pending } = useActionState(async () => {}, null);
@@ -46,8 +34,7 @@ export default function SignupPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [state, formAction] = useActionState(signup, undefined);
-  const [googleError, setGoogleError] = useState<string | null>(null);
-  const [isGooglePending, setIsGooglePending] = useState(false);
+  const [oneTapError, setOneTapError] = useState<string | null>(null);
   
   useEffect(() => {
     if (!loading && user) {
@@ -55,31 +42,59 @@ export default function SignupPage() {
     }
   }, [user, loading, router]);
 
-  const handleGoogleSignIn = async () => {
-    setIsGooglePending(true);
-    setGoogleError(null);
-    const provider = new GoogleAuthProvider();
+  const handleOneTapCallback = async (response: any) => {
+    setOneTapError(null);
     try {
-      const result = await signInWithPopup(auth, provider);
-      await setupNewUser(result.user);
-      router.push('/home');
+        const credential = GoogleAuthProvider.credential(response.credential);
+        const result = await signInWithCredential(auth, credential);
+        await setupNewUser(result.user);
+        // The onAuthStateChanged listener will handle the redirect via the other useEffect
     } catch (error: any) {
-      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-        // Silently ignore. The user intentionally closed the window.
-      } else {
-         console.error("Google Sign-In Error:", error.code, error.message);
-         let friendlyMessage = "Could not sign in with Google. Please try again.";
-         if (error.code === 'auth/unauthorized-domain') {
-            friendlyMessage = "This domain is not authorized. Please add it to your Firebase project's Authentication settings.";
-         } else if (error.code === 'auth/api-key-not-valid') {
-            friendlyMessage = "Invalid Firebase API Key. Please check your .env file.";
-         }
-         setGoogleError(friendlyMessage);
-      }
-    } finally {
-      setIsGooglePending(false);
+        console.error("Google One Tap Sign-In Error:", error.code, error.message);
+        let friendlyMessage = "Could not sign in with Google. Please try again.";
+        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            return; // Silently ignore.
+        } else if (error.code === 'auth/unauthorized-domain') {
+            friendlyMessage = "This domain is not authorized for Google Sign-In. Please add it in your Firebase project settings.";
+        } else if (error.code === 'auth/api-key-not-valid') {
+            friendlyMessage = "Invalid API Key for Google Sign-In. Please check your .env file.";
+        }
+        setOneTapError(friendlyMessage);
     }
   };
+
+  useEffect(() => {
+    if (loading || user) {
+      return; // Don't show One Tap if logged in or loading
+    }
+    
+    if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+      console.error("Google Client ID is not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID in your .env file.");
+      setOneTapError("Google Sign-In is not configured correctly.");
+      return;
+    }
+
+    // @ts-ignore
+    if (window.google) {
+      // @ts-ignore
+      window.google.accounts.id.initialize({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        callback: handleOneTapCallback,
+        auto_select: true, // Auto-select returning users
+        cancel_on_tap_outside: false,
+      });
+
+      // @ts-ignore
+      window.google.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log("One Tap prompt was not displayed or was skipped.");
+        }
+      });
+    } else {
+        console.log("Google GSI script not loaded yet.");
+    }
+  }, [loading, user]);
+
 
   if (loading || user) {
     return (
@@ -100,6 +115,12 @@ export default function SignupPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
+             {oneTapError && (
+                  <Alert variant="destructive">
+                      <AlertTitle>Google Sign-Up Failed</AlertTitle>
+                      <AlertDescription>{oneTapError}</AlertDescription>
+                  </Alert>
+              )}
              <form action={formAction} className="grid gap-4">
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -123,23 +144,6 @@ export default function SignupPage() {
                     </Alert>
                 )}
             </form>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-             <GoogleSignUpButton onClick={handleGoogleSignIn} isPending={isGooglePending} />
-              {googleError && (
-                  <Alert variant="destructive">
-                      <AlertTitle>Signup Failed</AlertTitle>
-                      <AlertDescription>{googleError}</AlertDescription>
-                  </Alert>
-              )}
           </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
