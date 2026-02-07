@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { subjects, chapters } from '@/lib/data';
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, Loader2, Star, BookPlay } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, Loader2, Star, BookOpen } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import StreakDisplay from '@/components/StreakDisplay';
 import { useEffect, useMemo } from 'react';
@@ -61,7 +61,7 @@ function ContinueLearningCard({ chapterId }: { chapterId: string }) {
     return (
          <Card className="h-full bg-accent/10 hover:bg-accent/20 transition-colors flex flex-col justify-between p-4 md:p-6">
             <div>
-                <BookPlay className="h-8 w-8 md:h-10 md:w-10 text-accent mb-4"/>
+                <BookOpen className="h-8 w-8 md:h-10 md:w-10 text-accent mb-4"/>
                 <p className="text-sm text-accent font-semibold">Continue Learning</p>
                 <h3 className="text-lg md:text-xl font-bold font-headline mb-1">{chapter.name}</h3>
             </div>
