@@ -78,7 +78,6 @@ function LoginForm() {
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       callback: handleGoogleSignIn,
       use_fedcm_for_prompt: true,
-      auto_select: true,
     });
 
     window.google.accounts.id.renderButton(
@@ -86,11 +85,13 @@ function LoginForm() {
       { theme: "outline", size: "large", type: "standard", text: "signin_with", width: "300" }
     );
     
-    window.google.accounts.id.prompt((notification: any) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        console.log("One Tap prompt was not displayed or was skipped.");
-      }
-    });
+    // The One Tap prompt is disabled because it can cause issues in iframe-based preview environments.
+    // window.google.accounts.id.prompt((notification: any) => {
+    //   if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+    //     console.log("One Tap prompt was not displayed or was skipped.");
+    //   }
+    // });
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user]);
 
