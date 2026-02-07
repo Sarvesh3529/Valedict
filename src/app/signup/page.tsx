@@ -37,7 +37,8 @@ export default function SignupPage() {
   const [googleError, setGoogleError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && user) {
+    if (loading) return;
+    if (user) {
       router.push('/home');
     }
   }, [user, loading, router]);
@@ -75,8 +76,8 @@ export default function SignupPage() {
     window.google.accounts.id.initialize({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       callback: handleGoogleSignIn,
+      use_fedcm_for_prompt: true,
       auto_select: true,
-      cancel_on_tap_outside: false,
     });
 
     window.google.accounts.id.renderButton(
