@@ -39,4 +39,7 @@ export type UserProfile = {
   totalXp?: number;
   weeklyXp?: number;
   lastXpReset?: string;
+  onboardingComplete?: boolean;
+  achievements?: string[];
+  lastPracticedChapterId?: string;
 };

@@ -22,6 +22,8 @@ export async function setupNewUser(user: any) {
             weeklyXp: 0,
             lastXpReset: new Date().toISOString(),
             onboardingComplete: false,
+            achievements: [],
+            lastPracticedChapterId: null,
         };
         
         await setDoc(userRef, profileData)

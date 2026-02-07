@@ -1,30 +1,56 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Crown, Loader2 } from 'lucide-react';
+import { Crown, Loader2, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 type LeaderboardType = 'weekly' | 'all-time';
 
-const renderRank = (rank: number) => {
-  if (rank === 0) return <Crown className="h-6 w-6 text-yellow-400" />;
-  if (rank === 1) return <Crown className="h-6 w-6 text-gray-400" />;
-  if (rank === 2) return <Crown className="h-6 w-6 text-orange-400" />;
-  return <span className="font-bold text-lg">{rank + 1}</span>;
+const renderRank = (rank: number, type: 'leaderboard' | 'user') => {
+  const size = type === 'leaderboard' ? 'h-6 w-6' : 'h-8 w-8';
+  if (rank === 0) return <Crown className={cn(size, "text-yellow-400 fill-yellow-400")} />;
+  if (rank === 1) return <Crown className={cn(size, "text-gray-400 fill-gray-400")} />;
+  if (rank === 2) return <Crown className={cn(size, "text-orange-400 fill-orange-400")} />;
+  return <span className={cn("font-bold", type === 'leaderboard' ? 'text-lg' : 'text-2xl')}>{rank + 1}</span>;
 };
 
+const CurrentUserCard = ({ user, profile, rank, type }: { user: any, profile: UserProfile, rank: number | null, type: LeaderboardType}) => {
+    return (
+        <Card className="mt-8 sticky bottom-24 md:bottom-4 border-primary/50 ring-2 ring-primary/50 shadow-lg">
+            <CardContent className="p-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 text-center flex-shrink-0">
+                       {rank !== null ? renderRank(rank, 'user') : <User className="h-8 w-8 mx-auto"/>}
+                    </div>
+                    <Avatar className="h-12 w-12">
+                        <AvatarImage src={user.photoURL ?? ''} />
+                        <AvatarFallback>{profile.displayName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <p className="font-bold text-lg flex-1 break-words">{profile.displayName || 'Anonymous User'}</p>
+                    <div className="text-right">
+                        <p className="font-bold text-xl text-primary">{type === 'weekly' ? (profile.weeklyXp || 0) : (profile.totalXp || 0)} XP</p>
+                        <p className="text-xs text-muted-foreground">{rank !== null ? `Rank #${rank + 1}` : 'Not Ranked'}</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
 export default function LeaderboardPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('weekly');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -33,7 +59,7 @@ export default function LeaderboardPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !profile) return;
 
     const fetchLeaderboard = async () => {
       setLoading(true);
@@ -47,15 +73,25 @@ export default function LeaderboardPage() {
       querySnapshot.forEach((doc) => {
         leaderboardUsers.push(doc.data() as UserProfile);
       });
-      
       setUsers(leaderboardUsers);
+
+      // Fetch current user's rank
+      const currentUserScore = profile[field] || 0;
+      if (currentUserScore > 0) {
+        const rankQuery = query(usersRef, where(field, '>', currentUserScore));
+        const rankSnapshot = await getCountFromServer(rankQuery);
+        setCurrentUserRank(rankSnapshot.data().count);
+      } else {
+        setCurrentUserRank(null);
+      }
+
       setLoading(false);
     };
 
     fetchLeaderboard();
-  }, [leaderboardType, user]);
+  }, [leaderboardType, user, profile]);
   
-  if (authLoading || !user) {
+  if (authLoading || !user || !profile) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -67,7 +103,8 @@ export default function LeaderboardPage() {
     <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-xl md:text-2xl text-primary">Leaderboard</CardTitle>
+          <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
+          <CardDescription>See who's at the top of the class!</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={leaderboardType} onValueChange={(value) => setLeaderboardType(value as LeaderboardType)} className="w-full">
@@ -79,34 +116,38 @@ export default function LeaderboardPage() {
               {loading ? (
                 <div className="flex justify-center p-8"><Loader2 className="animate-spin"/></div>
               ) : (
-                <UserList users={users} type="weekly" />
+                <UserList users={users} type="weekly" currentUserId={user.uid} />
               )}
             </TabsContent>
             <TabsContent value="all-time">
                {loading ? (
                 <div className="flex justify-center p-8"><Loader2 className="animate-spin"/></div>
               ) : (
-                <UserList users={users} type="all-time" />
+                <UserList users={users} type="all-time" currentUserId={user.uid} />
               )}
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
+      <CurrentUserCard user={user} profile={profile} rank={currentUserRank} type={leaderboardType} />
     </div>
   );
 }
 
-function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType }) {
+function UserList({ users, type, currentUserId }: { users: UserProfile[], type: LeaderboardType, currentUserId: string }) {
   if (users.length === 0) {
     return <p className="text-center text-muted-foreground p-8">The leaderboard is empty. Complete a quiz to get started!</p>
   }
 
   return (
-    <div className="space-y-4 pt-4">
+    <div className="space-y-2 pt-4">
       {users.map((u, index) => (
-        <div key={u.uid} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-          <div className="w-8 text-center flex-shrink-0">
-             {renderRank(index)}
+        <div key={u.uid} className={cn(
+            "flex items-center gap-4 p-3 rounded-lg bg-card transition-all",
+            u.uid === currentUserId && "bg-primary/10 ring-2 ring-primary/80"
+        )}>
+          <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
+             {renderRank(index, 'leaderboard')}
           </div>
           <Avatar>
             <AvatarImage src={u.photoURL ?? ''} />

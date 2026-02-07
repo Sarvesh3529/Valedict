@@ -9,21 +9,36 @@ import { generateQuiz } from '@/lib/quiz-logic';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 type QuizState = 'setup' | 'active' | 'results';
 
 export default function QuizPage() {
   const { user, loading: userLoading, updateUserStreak, awardXp } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [quizState, setQuizState] = useState<QuizState>('setup');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
   const [userGrade, setUserGrade] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Auto-start quiz if chapterId is in URL
+  useEffect(() => {
+    const chapterId = searchParams.get('chapter');
+    if (chapterId && userGrade) {
+        const generatedQuestions = generateQuiz([chapterId], 7, userGrade, 'all');
+        if (generatedQuestions.length > 0) {
+            setQuestions(generatedQuestions);
+            setQuizState('active');
+        }
+    }
+  }, [searchParams, userGrade]);
 
   useEffect(() => {
     if (userLoading) return;
@@ -39,12 +54,11 @@ export default function QuizPage() {
         if (docSnap.exists() && docSnap.data().grade) {
           setUserGrade(docSnap.data().grade);
         } else {
-          // If no grade, maybe redirect to onboarding? For now, default.
           setUserGrade('9');
         }
       } catch (error) {
         console.error("Error fetching user grade:", error);
-        setUserGrade('9'); // Default on error
+        setUserGrade('9');
       } finally {
         setLoading(false);
       }
@@ -77,12 +91,24 @@ export default function QuizPage() {
     setQuizState('results');
     updateUserStreak();
     awardXp(finalResults.length);
+
+    // Set last practiced chapter ID
+    if (user && finalResults.length > 0) {
+        const chapterId = finalResults[0].question.chapterId;
+        const userRef = doc(db, 'users', user.uid);
+        const data = { lastPracticedChapterId: chapterId };
+        updateDoc(userRef, data).catch(err => {
+            const permissionError = new FirestorePermissionError({ path: userRef.path, operation: 'update', requestResourceData: data });
+            errorEmitter.emit('permission-error', permissionError);
+        });
+    }
   };
 
   const handleRestart = () => {
     setQuizState('setup');
     setQuestions([]);
     setResults([]);
+    router.push('/quiz');
   };
 
   const getTitle = () => {

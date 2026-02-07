@@ -107,6 +107,17 @@
         "onboardingComplete": {
             "type": "boolean",
             "description": "Indicates if the user has completed the onboarding flow."
+        },
+        "achievements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of earned achievement IDs."
+        },
+        "lastPracticedChapterId": {
+          "type": "string",
+          "description": "The ID of the last chapter the user practiced."
         }
       },
       "required": ["uid", "email"]

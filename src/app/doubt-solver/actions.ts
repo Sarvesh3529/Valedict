@@ -18,10 +18,16 @@ const schema = z.object({
     ),
 });
 
+type FormState = {
+  userQuestion: { text?: string; image?: string } | null;
+  explanation: string;
+  error: string | null;
+}
+
 export async function solveDoubt(
-  prevState: { explanation: string; error: string | null },
+  prevState: FormState,
   formData: FormData
-) {
+): Promise<FormState> {
   const validatedFields = schema.safeParse({
     questionText: formData.get('questionText') as string,
     questionImage: formData.get('questionImage') as File,
@@ -29,6 +35,8 @@ export async function solveDoubt(
 
   if (!validatedFields.success) {
     return {
+      ...prevState,
+      userQuestion: null,
       explanation: '',
       error: validatedFields.error.flatten().fieldErrors.questionImage?.[0] ?? 'Invalid input.',
     };
@@ -37,7 +45,7 @@ export async function solveDoubt(
   const { questionText, questionImage } = validatedFields.data;
 
   if (!questionText && (!questionImage || questionImage.size === 0)) {
-    return { explanation: '', error: 'Please enter a question or upload an image.' };
+    return { ...prevState, userQuestion: null, explanation: '', error: 'Please enter a question or upload an image.' };
   }
   
   let imageAsDataUrl: string | undefined = undefined;
@@ -46,15 +54,17 @@ export async function solveDoubt(
     const buffer = Buffer.from(await questionImage.arrayBuffer());
     imageAsDataUrl = `data:${questionImage.type};base64,${buffer.toString('base64')}`;
   }
+  
+  const userQuestion = { text: questionText, image: imageAsDataUrl };
 
   try {
     const result = await aiDoubtSolver({
       questionText,
       questionImage: imageAsDataUrl,
     });
-    return { explanation: result.explanation, error: null };
+    return { userQuestion, explanation: result.explanation, error: null };
   } catch (error) {
     console.error(error);
-    return { explanation: '', error: 'An error occurred while getting the explanation. Please try again.' };
+    return { userQuestion, explanation: '', error: 'An error occurred while getting the explanation. Please try again.' };
   }
 }
