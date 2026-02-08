@@ -21,7 +21,7 @@ export async function signup(prevState: any, formData: FormData) {
         return { message: 'This email is already in use. Please sign in.' };
     }
     return {
-      message: error.message,
+      message: `Signup failed: ${error.message} (Code: ${error.code})`,
     };
   }
   redirect('/home');
@@ -43,7 +43,7 @@ export async function login(prevState: any, formData: FormData) {
         return { message: 'Invalid email or password. Please try again.' };
     }
     return {
-      message: 'An unknown error occurred. Please try again later.',
+      message: `Login failed: ${error.message} (Code: ${error.code})`,
     };
   }
   redirect('/home');
