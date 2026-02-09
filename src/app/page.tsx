@@ -11,9 +11,10 @@ import { login } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { setupNewUser } from '@/lib/user';
 
 function EmailSignInButton() {
   const { pending } = useActionState(async () => {}, null);
@@ -50,31 +51,25 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result) {
-          // This was a successful redirect from Google.
-          // The onAuthStateChanged listener in AuthContext will handle the user state.
-          toast({
-            title: "Signed In",
-            description: "Welcome back!",
-          });
-        }
-      }).catch((error) => {
-        // Handle Errors from the redirect.
-        console.error("Google Sign-In Redirect Error:", error);
-        toast({
-          variant: "destructive",
-          title: "Google Sign-In Failed",
-          description: error.message || "Could not sign in with Google. Please try again.",
-        });
-      });
-  }, [toast]);
-
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
+    try {
+        const result = await signInWithPopup(auth, provider);
+        await setupNewUser(result.user);
+        toast({
+            title: "Signed In",
+            description: "Welcome back!",
+        });
+    } catch (error: any) {
+        console.error("Google Sign-In Error:", error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+            toast({
+                variant: "destructive",
+                title: "Google Sign-In Failed",
+                description: error.message || "Could not sign in with Google. Please try again.",
+            });
+        }
+    }
   };
   
   if (loading || user) {
