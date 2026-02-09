@@ -15,7 +15,6 @@ import { GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersis
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { setupNewUser } from '@/lib/user';
-import Cookies from 'js-cookie';
 
 
 function EmailSignUpButton() {
@@ -54,16 +53,13 @@ export default function SignupPage() {
     try {
         await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
-        const token = await result.user.getIdToken();
-        
-        Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
-
+        // The AuthProvider's onAuthStateChanged will handle setting the cookie.
         await setupNewUser(result.user);
         router.push('/home');
 
     } catch (error: any) {
         if (error.code === 'auth/popup-closed-by-user') {
-            return;
+            return; // Ignore this error silently
         }
         toast({
             variant: "destructive",

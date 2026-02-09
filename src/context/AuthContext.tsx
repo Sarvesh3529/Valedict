@@ -68,26 +68,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const hideXpAnimation = () => setShowXpAnimation(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
+        const token = await authUser.getIdToken();
+        Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
         setUser(authUser);
+        
         const userRef = doc(db, 'users', authUser.uid);
         const unsubscribeProfile = onSnapshot(userRef, (doc) => {
           if (doc.exists()) {
             setProfile(doc.data() as UserProfile);
           }
-          // The middleware now handles redirects, so we can set loading to false
-          // even if the profile doc doesn't exist yet (e.g., for a new user).
           setLoading(false);
         });
         return () => unsubscribeProfile();
       } else {
-        // No user is signed in
+        Cookies.remove('firebase_token');
         setUser(null);
         setProfile(null);
         setLoading(false);
-        // Clean up cookie on client-side
-        Cookies.remove('firebase_token');
       }
     });
 
