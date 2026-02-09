@@ -61,14 +61,16 @@ export default function LoginPage() {
             description: "Welcome back!",
         });
     } catch (error: any) {
-        console.error("Google Sign-In Error:", error);
-        if (error.code !== 'auth/popup-closed-by-user') {
-            toast({
-                variant: "destructive",
-                title: "Google Sign-In Failed",
-                description: error.message || "Could not sign in with Google. Please try again.",
-            });
+        if (error.code === 'auth/popup-closed-by-user') {
+            // User closed the popup, this is not an error, so do nothing.
+            return;
         }
+        // Handle other real errors
+        toast({
+            variant: "destructive",
+            title: "Google Sign-In Failed",
+            description: error.message || "Could not sign in with Google. Please try again.",
+        });
     }
   };
   
