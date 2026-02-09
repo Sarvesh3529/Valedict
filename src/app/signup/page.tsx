@@ -11,7 +11,7 @@ import { signup } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { setupNewUser } from '@/lib/user';
@@ -57,6 +57,7 @@ export default function SignupPage() {
       prompt: 'select_account'
     });
     try {
+        await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
         await setupNewUser(result.user);
         toast({
