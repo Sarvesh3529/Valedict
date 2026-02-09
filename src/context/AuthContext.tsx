@@ -12,6 +12,7 @@ import XpAnimation from '@/components/XpAnimation';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import Cookies from 'js-cookie';
 
 type AuthContextType = {
   user: User | null;
@@ -74,19 +75,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const unsubscribeProfile = onSnapshot(userRef, (doc) => {
           if (doc.exists()) {
             setProfile(doc.data() as UserProfile);
-            setLoading(false);
           }
-          // If the document doesn't exist yet (e.g., for a new user),
-          // we keep `loading` as true. The `setupNewUser` function will create
-          // the document, which will trigger this listener again, find the doc,
-          // and then set `loading` to false.
+          // The middleware now handles redirects, so we can set loading to false
+          // even if the profile doc doesn't exist yet (e.g., for a new user).
+          setLoading(false);
         });
         return () => unsubscribeProfile();
       } else {
-        // No user is signed in, we can stop loading.
+        // No user is signed in
         setUser(null);
         setProfile(null);
         setLoading(false);
+        // Clean up cookie on client-side
+        Cookies.remove('firebase_token');
       }
     });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersis
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { setupNewUser } from '@/lib/user';
+import Cookies from 'js-cookie';
 
 function EmailSignInButton() {
   const { pending } = useActionState(async () => {}, null);
@@ -45,12 +46,6 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(login, undefined);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!loading && user) {
-      router.push('/home');
-    }
-  }, [user, loading, router]);
-
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
@@ -59,17 +54,16 @@ export default function LoginPage() {
     try {
         await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
+        const token = await result.user.getIdToken();
+
+        Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+
         await setupNewUser(result.user);
-        toast({
-            title: "Signed In",
-            description: "Welcome back!",
-        });
+        router.push('/home');
     } catch (error: any) {
         if (error.code === 'auth/popup-closed-by-user') {
-            // User closed the popup, this is not an error, so do nothing.
             return;
         }
-        // Handle other real errors
         toast({
             variant: "destructive",
             title: "Google Sign-In Failed",

@@ -4,6 +4,7 @@ import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { redirect } from 'next/navigation';
 import { setupNewUser } from '@/lib/user';
+import { cookies } from 'next/headers';
 
 export async function signup(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
@@ -15,6 +16,8 @@ export async function signup(prevState: any, formData: FormData) {
 
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const token = await userCredential.user.getIdToken();
+    cookies().set('firebase_token', token, { secure: true, sameSite: 'lax', httpOnly: true });
     await setupNewUser(userCredential.user);
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
@@ -37,6 +40,8 @@ export async function login(prevState: any, formData: FormData) {
 
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const token = await userCredential.user.getIdToken();
+    cookies().set('firebase_token', token, { secure: true, sameSite: 'lax', httpOnly: true });
     await setupNewUser(userCredential.user);
   } catch (error: any) {
      if (error.code === 'auth/invalid-credential') {
@@ -51,5 +56,6 @@ export async function login(prevState: any, formData: FormData) {
 
 export async function logout() {
     await auth.signOut();
+    cookies().delete('firebase_token');
     redirect('/');
 }
