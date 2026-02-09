@@ -67,18 +67,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const hideXpAnimation = () => setShowXpAnimation(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        const userRef = doc(db, 'users', user.uid);
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        setUser(authUser);
+        const userRef = doc(db, 'users', authUser.uid);
         const unsubscribeProfile = onSnapshot(userRef, (doc) => {
           if (doc.exists()) {
             setProfile(doc.data() as UserProfile);
+            setLoading(false);
           }
-          setLoading(false);
+          // If the document doesn't exist yet (e.g., for a new user),
+          // we keep `loading` as true. The `setupNewUser` function will create
+          // the document, which will trigger this listener again, find the doc,
+          // and then set `loading` to false.
         });
         return () => unsubscribeProfile();
       } else {
+        // No user is signed in, we can stop loading.
         setUser(null);
         setProfile(null);
         setLoading(false);
