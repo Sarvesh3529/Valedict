@@ -75,12 +75,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(authUser);
         
         const userRef = doc(db, 'users', authUser.uid);
-        const unsubscribeProfile = onSnapshot(userRef, (doc) => {
-          if (doc.exists()) {
-            setProfile(doc.data() as UserProfile);
+        const unsubscribeProfile = onSnapshot(userRef, 
+          (doc) => { // Success callback
+            if (doc.exists()) {
+              setProfile(doc.data() as UserProfile);
+            } else {
+              // This can happen briefly for a new user while their profile is being created.
+              setProfile(null);
+            }
+            setLoading(false);
+          },
+          (error) => { // Error callback
+            console.error("Error fetching user profile:", error);
+            // We failed to get the profile, but we should stop loading to avoid a hang.
+            setProfile(null);
+            setLoading(false);
           }
-          setLoading(false);
-        });
+        );
         return () => unsubscribeProfile();
       } else {
         Cookies.remove('firebase_token');
