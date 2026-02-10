@@ -14,6 +14,7 @@ import { useAuth } from '@/context/AuthContext';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
+import Cookies from 'js-cookie';
 
 
 function EmailSignUpButton() {
@@ -51,8 +52,10 @@ export default function SignupPage() {
       prompt: 'select_account'
     });
     try {
-        await signInWithPopup(auth, provider);
-        // Navigation and user setup are now handled by AuthProvider and the middleware.
+        const userCredential = await signInWithPopup(auth, provider);
+        const token = await userCredential.user.getIdToken();
+        Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+        router.push('/home');
     } catch (error: any) {
         if (error.code === 'auth/popup-closed-by-user') {
             return; // Ignore this error silently

@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
   
   // Streak Animation State
   const [showStreakAnimation, setShowStreakAnimation] = useState(false);
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
+      setAuthInitialized(true);
     });
     // Cleanup subscription on unmount
     return () => unsubscribe();
@@ -79,22 +81,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Effect 2: Manage profile, cookies, and loading state based on user object
   useEffect(() => {
+    if (!authInitialized) {
+      return;
+    }
+    
     // Case 1: User is logged out
     if (user === null) {
       Cookies.remove('firebase_token');
       setProfile(null);
       setLoading(false);
-      return; // Stop here
+      return;
     }
 
     // Case 2: User is logged in. Start session management.
     let unsubscribeProfile: (() => void) | undefined;
 
     const manageUserSession = async () => {
-      // Set the authentication cookie
-      const token = await user.getIdToken();
-      Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
-      
       // Ensure the user document exists in Firestore
       await setupNewUser(user);
 
@@ -116,7 +118,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     };
 
-    manageUserSession();
+    manageUserSession().catch((err) => {
+      console.error("Failed to manage user session:", err);
+      setLoading(false);
+    });
 
     // Cleanup function for this effect
     return () => {
@@ -124,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         unsubscribeProfile();
       }
     };
-  }, [user]); // This effect re-runs whenever the user object changes
+  }, [user, authInitialized]);
 
 
   const updateUserStreak = async () => {
