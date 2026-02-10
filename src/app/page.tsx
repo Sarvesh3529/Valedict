@@ -11,10 +11,9 @@ import { login } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { setupNewUser } from '@/lib/user';
 
 function EmailSignInButton() {
   const { pending } = useActionState(async () => {}, null);
@@ -58,11 +57,8 @@ export default function LoginPage() {
       prompt: 'select_account'
     });
     try {
-        await setPersistence(auth, browserLocalPersistence);
-        const result = await signInWithPopup(auth, provider);
-        // The AuthProvider's onAuthStateChanged will handle setting the cookie.
-        await setupNewUser(result.user);
-        router.push('/home');
+        await signInWithPopup(auth, provider);
+        // Navigation and user setup are now handled by AuthProvider and the middleware.
     } catch (error: any) {
         if (error.code === 'auth/popup-closed-by-user') {
             return; // Ignore this error silently

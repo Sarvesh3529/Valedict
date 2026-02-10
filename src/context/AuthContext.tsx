@@ -13,6 +13,7 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import Cookies from 'js-cookie';
+import { setupNewUser } from '@/lib/user';
 
 type AuthContextType = {
   user: User | null;
@@ -72,22 +73,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (authUser) {
         const token = await authUser.getIdToken();
         Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+        
+        // Ensure user profile is created before we start listening for it.
+        // This prevents race conditions on first login.
+        await setupNewUser(authUser); 
+
         setUser(authUser);
         
         const userRef = doc(db, 'users', authUser.uid);
         const unsubscribeProfile = onSnapshot(userRef, 
-          (doc) => { // Success callback
-            if (doc.exists()) {
-              setProfile(doc.data() as UserProfile);
+          (docSnap) => {
+            if (docSnap.exists()) {
+              setProfile(docSnap.data() as UserProfile);
             } else {
-              // This can happen briefly for a new user while their profile is being created.
-              setProfile(null);
+              setProfile(null); 
             }
-            setLoading(false);
+            setLoading(false); // Stop loading once we have a response from Firestore
           },
-          (error) => { // Error callback
-            console.error("Error fetching user profile:", error);
-            // We failed to get the profile, but we should stop loading to avoid a hang.
+          (error) => {
+            console.error("Error listening to user profile:", error);
             setProfile(null);
             setLoading(false);
           }
