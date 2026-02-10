@@ -38,18 +38,28 @@ export async function login(prevState: any, formData: FormData) {
     return { message: 'Email and password are required.' };
   }
 
+  const trimmedEmail = email.trim();
+  console.log('Attempting login with:', trimmedEmail);
+
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, password);
     const token = await userCredential.user.getIdToken();
     cookies().set('firebase_token', token, { secure: true, sameSite: 'lax', httpOnly: true });
     await setupNewUser(userCredential.user);
   } catch (error: any) {
-     if (error.code === 'auth/invalid-credential') {
-        return { message: 'Invalid email or password. Please try again.' };
+    console.error('Login Error Code:', error.code);
+    switch (error.code) {
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        return { message: 'Invalid email or password. Please check your credentials and try again.' };
+      case 'auth/invalid-email':
+        return { message: 'The email address is not formatted correctly.' };
+      case 'auth/internal-error':
+        return { message: 'An internal error occurred on the server. Please try again later.' };
+      default:
+        return { message: `Login failed: ${error.message} (Code: ${error.code})` };
     }
-    return {
-      message: `Login failed: ${error.message} (Code: ${error.code})`,
-    };
   }
   redirect('/home');
 }

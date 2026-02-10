@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -45,12 +45,20 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(login, undefined);
   const { toast } = useToast();
 
+  useEffect(() => {
+    console.log(
+      'Firebase API Key:',
+      process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Loaded' : 'Missing'
+    );
+  }, []);
+
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: 'select_account'
     });
     try {
+        await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
         // The AuthProvider's onAuthStateChanged will handle setting the cookie.
         await setupNewUser(result.user);
