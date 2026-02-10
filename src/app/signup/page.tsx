@@ -51,7 +51,6 @@ export default function SignupPage() {
       prompt: 'select_account'
     });
     try {
-        await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
         // The AuthProvider's onAuthStateChanged will handle setting the cookie.
         await setupNewUser(result.user);
