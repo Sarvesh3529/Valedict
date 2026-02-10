@@ -68,45 +68,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const hideStreakAnimation = () => setShowStreakAnimation(false);
   const hideXpAnimation = () => setShowXpAnimation(false);
 
+  // Effect 1: Listen for Firebase Auth user object changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-      if (authUser) {
-        const token = await authUser.getIdToken();
-        Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
-        
-        // Ensure user profile is created before we start listening for it.
-        // This prevents race conditions on first login.
-        await setupNewUser(authUser); 
-
-        setUser(authUser);
-        
-        const userRef = doc(db, 'users', authUser.uid);
-        const unsubscribeProfile = onSnapshot(userRef, 
-          (docSnap) => {
-            if (docSnap.exists()) {
-              setProfile(docSnap.data() as UserProfile);
-            } else {
-              setProfile(null); 
-            }
-            setLoading(false); // Stop loading once we have a response from Firestore
-          },
-          (error) => {
-            console.error("Error listening to user profile:", error);
-            setProfile(null);
-            setLoading(false);
-          }
-        );
-        return () => unsubscribeProfile();
-      } else {
-        Cookies.remove('firebase_token');
-        setUser(null);
-        setProfile(null);
-        setLoading(false);
-      }
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser);
     });
-
+    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+  // Effect 2: Manage profile, cookies, and loading state based on user object
+  useEffect(() => {
+    // Case 1: User is logged out
+    if (user === null) {
+      Cookies.remove('firebase_token');
+      setProfile(null);
+      setLoading(false);
+      return; // Stop here
+    }
+
+    // Case 2: User is logged in. Start session management.
+    let unsubscribeProfile: (() => void) | undefined;
+
+    const manageUserSession = async () => {
+      // Set the authentication cookie
+      const token = await user.getIdToken();
+      Cookies.set('firebase_token', token, { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+      
+      // Ensure the user document exists in Firestore
+      await setupNewUser(user);
+
+      // Now, listen for real-time updates to the profile
+      const userRef = doc(db, 'users', user.uid);
+      unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setProfile(docSnap.data() as UserProfile);
+        } else {
+          // This might happen if the document is deleted, handle gracefully
+          setProfile(null);
+        }
+        // Once we get the first snapshot (or lack thereof), we are done with initial loading
+        setLoading(false);
+      }, (error) => {
+        console.error("Error listening to user profile:", error);
+        setProfile(null);
+        setLoading(false); // Also stop loading on error
+      });
+    };
+
+    manageUserSession();
+
+    // Cleanup function for this effect
+    return () => {
+      if (unsubscribeProfile) {
+        unsubscribeProfile();
+      }
+    };
+  }, [user]); // This effect re-runs whenever the user object changes
+
 
   const updateUserStreak = async () => {
     if (!user || !profile) return;
