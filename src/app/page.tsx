@@ -49,7 +49,7 @@ export default function LoginPage() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
             // User is signed in, redirect to home.
-            router.push('/home');
+            window.location.href = '/home';
         }
     });
     // Cleanup subscription on unmount
@@ -64,6 +64,7 @@ export default function LoginPage() {
     });
     try {
         const result = await signInWithPopup(auth, provider);
+        console.log("SUCCESS:", result.user);
         const idToken = await result.user.getIdToken();
 
         const response = await fetch('/api/auth/session', {
@@ -82,6 +83,7 @@ export default function LoginPage() {
             });
         }
     } catch (error: any) {
+        console.error("AUTH ERROR:", error);
         if (error.code === 'auth/popup-closed-by-user') {
             return; // Ignore this error silently
         }

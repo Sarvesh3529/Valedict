@@ -51,6 +51,7 @@ export default function SignupPage() {
     });
     try {
         const result = await signInWithPopup(auth, provider);
+        console.log("SUCCESS:", result.user);
         const idToken = await result.user.getIdToken();
 
         const response = await fetch('/api/auth/session', {
@@ -69,6 +70,7 @@ export default function SignupPage() {
             });
         }
     } catch (error: any) {
+        console.error("AUTH ERROR:", error);
         if (error.code === 'auth/popup-closed-by-user') {
             return; // Ignore this error silently
         }
