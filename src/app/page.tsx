@@ -68,7 +68,7 @@ export default function LoginPage() {
         });
 
         if (response.ok) {
-            window.location.href = '/home';
+            router.push('/home');
         } else {
              toast({
                 variant: "destructive",

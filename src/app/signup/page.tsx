@@ -60,7 +60,7 @@ export default function SignupPage() {
         });
         
         if (response.ok) {
-            window.location.href = '/home';
+            router.push('/home');
         } else {
              toast({
                 variant: "destructive",
