@@ -11,7 +11,7 @@ import { login } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 
@@ -46,11 +46,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    console.log(
-      'Firebase API Key:',
-      process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Loaded' : 'Missing'
-    );
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in, redirect to home.
+            router.push('/home');
+        }
+    });
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [router]);
+
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
@@ -68,7 +73,7 @@ export default function LoginPage() {
         });
 
         if (response.ok) {
-            router.push('/home');
+            window.location.href = '/home';
         } else {
              toast({
                 variant: "destructive",
