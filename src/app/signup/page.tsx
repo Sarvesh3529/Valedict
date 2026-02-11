@@ -2,7 +2,6 @@
 
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -38,8 +37,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function SignupPage() {
-  const router = useRouter();
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [state, formAction] = useActionState(signup, undefined);
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
@@ -82,7 +80,7 @@ export default function SignupPage() {
     }
   };
   
-  if (loading || user) {
+  if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

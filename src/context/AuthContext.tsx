@@ -59,7 +59,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authInitialized, setAuthInitialized] = useState(false);
   
   // Streak Animation State
   const [showStreakAnimation, setShowStreakAnimation] = useState(false);
@@ -73,61 +72,60 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const hideXpAnimation = () => setShowXpAnimation(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      setUser(authUser);
-      setAuthInitialized(true);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!authInitialized) {
-      return;
-    }
-    
     let unsubscribeProfile: (() => void) | undefined;
 
-    const manageUserSession = async () => {
-      if (user) {
-        // User is detected, sync server session and load data
+    const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
+      if (unsubscribeProfile) {
+        unsubscribeProfile();
+      }
+
+      if (authUser) {
+        setUser(authUser);
         try {
-          const idToken = await user.getIdToken();
+          // Sync server session cookie
+          const idToken = await authUser.getIdToken();
           await fetch('/api/auth/session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idToken }),
           });
-          
-          await setupNewUser(user);
 
-          const userRef = doc(db, 'users', user.uid);
+          // Ensure user profile document exists before listening
+          await setupNewUser(authUser);
+
+          // Set up new profile listener
+          const userRef = doc(db, 'users', authUser.uid);
           unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
-            setProfile(docSnap.exists() ? (docSnap.data() as UserProfile) : null);
-            setLoading(false);
+            setProfile(docSnap.data() as UserProfile | null);
+            setLoading(false); // Done loading once profile is fetched
           }, (error) => {
-            console.error("Error listening to user profile:", error);
+            console.error("Profile listener error:", error);
             setLoading(false);
           });
+
         } catch (error) {
-          console.error("Error managing user session:", error);
+          console.error("Auth session sync or profile setup error:", error);
+          setUser(null);
+          setProfile(null);
           setLoading(false);
         }
       } else {
         // User is logged out
+        setUser(null);
         setProfile(null);
+        // Clear server session cookie
         await fetch('/api/auth/logout', { method: 'POST' });
-        setLoading(false);
+        setLoading(false); // Done loading
       }
-    };
-
-    manageUserSession();
+    });
 
     return () => {
+      unsubscribeAuth();
       if (unsubscribeProfile) {
         unsubscribeProfile();
       }
     };
-  }, [user, authInitialized]);
+  }, []);
 
   const signOut = async () => {
     try {

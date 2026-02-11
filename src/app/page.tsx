@@ -1,8 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,7 @@ import { login } from '@/app/auth/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BrainCircuit, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 
@@ -39,23 +38,10 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [state, formAction] = useActionState(login, undefined);
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // User is signed in, redirect to home.
-            window.location.href = '/home';
-        }
-    });
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [router]);
-
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
@@ -95,7 +81,7 @@ export default function LoginPage() {
     }
   };
   
-  if (loading || user) {
+  if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
