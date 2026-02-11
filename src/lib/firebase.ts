@@ -29,4 +29,10 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Temporary debug access
+if (typeof window !== "undefined") {
+  // @ts-ignore
+  window.auth = auth;
+}
+
 export { app, auth, db };
