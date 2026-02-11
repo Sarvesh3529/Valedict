@@ -5,6 +5,18 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import { redirect } from 'next/navigation';
 import { setupNewUser } from '@/lib/user';
 import { cookies } from 'next/headers';
+import { adminAuth } from '@/lib/firebase-admin';
+
+async function setSessionCookie(idToken: string) {
+    const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days in milliseconds
+    cookies().set('firebase_token', idToken, {
+      maxAge: expiresIn / 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+}
 
 export async function signup(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
@@ -18,17 +30,8 @@ export async function signup(prevState: any, formData: FormData) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
     
-    // This is a server action, but we need to set the cookie for the server-side middleware
-    // We will use the API route for consistency with the Google sign-in
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: token })
-    });
-
-    if (!response.ok) {
-        throw new Error('Failed to set session cookie via API route.');
-    }
+    // Set cookie directly in the server action
+    await setSessionCookie(token);
 
     await setupNewUser(userCredential.user);
   } catch (error: any) {
@@ -57,15 +60,8 @@ export async function login(prevState: any, formData: FormData) {
     const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, password);
     const token = await userCredential.user.getIdToken();
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: token })
-    });
-    
-    if (!response.ok) {
-         throw new Error('Failed to set session cookie via API route.');
-    }
+    // Set cookie directly in the server action
+    await setSessionCookie(token);
 
     // The setupNewUser call might be redundant if the user already exists, but it includes a check.
     await setupNewUser(userCredential.user);
@@ -88,6 +84,6 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
-    await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/logout`, { method: 'POST' });
+    cookies().delete('firebase_token');
     redirect('/');
 }
