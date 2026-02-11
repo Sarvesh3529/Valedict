@@ -85,35 +85,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     
-    if (user === null) {
-      setProfile(null);
-      setLoading(false);
-      return;
-    }
-
     let unsubscribeProfile: (() => void) | undefined;
 
     const manageUserSession = async () => {
-      await setupNewUser(user);
-      const userRef = doc(db, 'users', user.uid);
-      unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
-        } else {
-          setProfile(null);
+      if (user) {
+        // User is detected, sync server session and load data
+        try {
+          const idToken = await user.getIdToken();
+          await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+          });
+          
+          await setupNewUser(user);
+
+          const userRef = doc(db, 'users', user.uid);
+          unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
+            setProfile(docSnap.exists() ? (docSnap.data() as UserProfile) : null);
+            setLoading(false);
+          }, (error) => {
+            console.error("Error listening to user profile:", error);
+            setLoading(false);
+          });
+        } catch (error) {
+          console.error("Error managing user session:", error);
+          setLoading(false);
         }
-        setLoading(false);
-      }, (error) => {
-        console.error("Error listening to user profile:", error);
+      } else {
+        // User is logged out
         setProfile(null);
+        await fetch('/api/auth/logout', { method: 'POST' });
         setLoading(false);
-      });
+      }
     };
 
-    manageUserSession().catch((err) => {
-      console.error("Failed to manage user session:", err);
-      setLoading(false);
-    });
+    manageUserSession();
 
     return () => {
       if (unsubscribeProfile) {
@@ -124,8 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await auth.signOut(); // Sign out from client
-      await fetch('/api/auth/logout', { method: 'POST' }); // Clear server session
+      await auth.signOut();
       router.push('/');
     } catch (error) {
       console.error("Error signing out: ", error);
