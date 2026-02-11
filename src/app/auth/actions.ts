@@ -17,7 +17,16 @@ export async function signup(prevState: any, formData: FormData) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
-    cookies().set('firebase_token', token, { secure: true, sameSite: 'lax', httpOnly: true });
+    
+    const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
+    cookies().set('firebase_token', token, { 
+        maxAge: expiresIn / 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+     });
+
     await setupNewUser(userCredential.user);
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
@@ -44,7 +53,16 @@ export async function login(prevState: any, formData: FormData) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, password);
     const token = await userCredential.user.getIdToken();
-    cookies().set('firebase_token', token, { secure: true, sameSite: 'lax', httpOnly: true });
+    
+    const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
+    cookies().set('firebase_token', token, { 
+        maxAge: expiresIn / 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+    });
+
     await setupNewUser(userCredential.user);
   } catch (error: any) {
     console.error('Login Error Code:', error.code);
@@ -62,10 +80,4 @@ export async function login(prevState: any, formData: FormData) {
     }
   }
   redirect('/home');
-}
-
-export async function logout() {
-    await auth.signOut();
-    cookies().delete('firebase_token');
-    redirect('/');
 }

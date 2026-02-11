@@ -12,13 +12,14 @@ import XpAnimation from '@/components/XpAnimation';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
-import Cookies from 'js-cookie';
 import { setupNewUser } from '@/lib/user';
+import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  signOut: () => Promise<void>;
   updateUserStreak: () => Promise<void>;
   awardXp: (questionCount: number) => Promise<void>;
   showStreakAnimation: boolean;
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null, 
     profile: null, 
     loading: true, 
+    signOut: async () => {},
     updateUserStreak: async () => {},
     awardXp: async () => {},
     showStreakAnimation: false,
@@ -53,6 +55,7 @@ function getXpForQuestions(count: number): number {
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,52 +72,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const hideStreakAnimation = () => setShowStreakAnimation(false);
   const hideXpAnimation = () => setShowXpAnimation(false);
 
-  // Effect 1: Listen for Firebase Auth user object changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
       setAuthInitialized(true);
     });
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
-  // Effect 2: Manage profile, cookies, and loading state based on user object
   useEffect(() => {
     if (!authInitialized) {
       return;
     }
     
-    // Case 1: User is logged out
     if (user === null) {
-      Cookies.remove('firebase_token');
       setProfile(null);
       setLoading(false);
       return;
     }
 
-    // Case 2: User is logged in. Start session management.
     let unsubscribeProfile: (() => void) | undefined;
 
     const manageUserSession = async () => {
-      // Ensure the user document exists in Firestore
       await setupNewUser(user);
-
-      // Now, listen for real-time updates to the profile
       const userRef = doc(db, 'users', user.uid);
       unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
         if (docSnap.exists()) {
           setProfile(docSnap.data() as UserProfile);
         } else {
-          // This might happen if the document is deleted, handle gracefully
           setProfile(null);
         }
-        // Once we get the first snapshot (or lack thereof), we are done with initial loading
         setLoading(false);
       }, (error) => {
         console.error("Error listening to user profile:", error);
         setProfile(null);
-        setLoading(false); // Also stop loading on error
+        setLoading(false);
       });
     };
 
@@ -123,7 +115,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    // Cleanup function for this effect
     return () => {
       if (unsubscribeProfile) {
         unsubscribeProfile();
@@ -131,6 +122,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [user, authInitialized]);
 
+  const signOut = async () => {
+    try {
+      await auth.signOut(); // Sign out from client
+      await fetch('/api/auth/logout', { method: 'POST' }); // Clear server session
+      router.push('/');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
 
   const updateUserStreak = async () => {
     if (!user || !profile) return;
@@ -241,6 +241,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user, 
         profile, 
         loading, 
+        signOut,
         updateUserStreak, 
         awardXp, 
         showStreakAnimation, 

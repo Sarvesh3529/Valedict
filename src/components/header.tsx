@@ -10,7 +10,6 @@ import { ThemeToggle } from './theme-toggle';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { logout } from '@/app/auth/actions';
 
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
@@ -22,7 +21,7 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   const UserNav = () => {
     if (!user) {
@@ -59,14 +58,10 @@ export default function Header() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <form action={logout}>
-            <DropdownMenuItem asChild>
-               <button type="submit" className="w-full text-left flex items-center">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </button>
-            </DropdownMenuItem>
-          </form>
+          <DropdownMenuItem onSelect={signOut} className="cursor-pointer">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     )
