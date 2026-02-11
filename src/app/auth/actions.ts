@@ -18,14 +18,17 @@ export async function signup(prevState: any, formData: FormData) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
     
-    const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
-    cookies().set('firebase_token', token, { 
-        maxAge: expiresIn / 1000,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-     });
+    // This is a server action, but we need to set the cookie for the server-side middleware
+    // We will use the API route for consistency with the Google sign-in
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: token })
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to set session cookie via API route.');
+    }
 
     await setupNewUser(userCredential.user);
   } catch (error: any) {
@@ -54,15 +57,17 @@ export async function login(prevState: any, formData: FormData) {
     const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, password);
     const token = await userCredential.user.getIdToken();
     
-    const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
-    cookies().set('firebase_token', token, { 
-        maxAge: expiresIn / 1000,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: token })
     });
+    
+    if (!response.ok) {
+         throw new Error('Failed to set session cookie via API route.');
+    }
 
+    // The setupNewUser call might be redundant if the user already exists, but it includes a check.
     await setupNewUser(userCredential.user);
   } catch (error: any) {
     console.error('Login Error Code:', error.code);
@@ -80,4 +85,9 @@ export async function login(prevState: any, formData: FormData) {
     }
   }
   redirect('/home');
+}
+
+export async function logout() {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/logout`, { method: 'POST' });
+    redirect('/');
 }
