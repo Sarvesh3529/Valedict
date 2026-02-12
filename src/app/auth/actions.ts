@@ -1,11 +1,11 @@
 'use server';
 
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { redirect } from 'next/navigation';
-import { setupNewUser } from '@/lib/user';
 import { cookies } from 'next/headers';
-import { adminAuth } from '@/lib/firebase-admin';
+import { checkUsernameAvailability } from '@/lib/username';
+import { doc, setDoc } from 'firebase/firestore';
 
 async function setSessionCookie(idToken: string) {
     const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days in milliseconds
@@ -18,66 +18,87 @@ async function setSessionCookie(idToken: string) {
     });
 }
 
-export async function signup(prevState: any, formData: FormData) {
-  const email = formData.get('email') as string;
+export async function signupWithUsername(prevState: any, formData: FormData) {
+  const username = formData.get('username') as string;
   const password = formData.get('password') as string;
 
-  if (!email || !password) {
-    return { message: 'Email and password are required.' };
+  if (!username || !password) {
+    return { message: 'Username and password are required.' };
   }
+  if (password.length < 6) {
+    return { message: 'Password must be at least 6 characters long.' };
+  }
+
+  // Server-side check for username availability
+  const availability = await checkUsernameAvailability(username);
+  if (!availability.available) {
+    return { message: availability.message };
+  }
+  
+  const email = `${username.toLowerCase()}@valedict.ai`;
 
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const token = await userCredential.user.getIdToken();
+    const user = userCredential.user;
     
-    // Set cookie directly in the server action
+    // Update auth profile and create firestore document
+    await updateProfile(user, { displayName: username });
+    
+    const userRef = doc(db, 'users', user.uid);
+    const profileData = {
+        uid: user.uid,
+        email: user.email,
+        displayName: username,
+        photoURL: user.photoURL,
+        currentStreak: 0,
+        highestStreak: 0,
+        lastActivityDate: null,
+        totalXp: 0,
+        weeklyXp: 0,
+        lastXpReset: new Date().toISOString(),
+        onboardingComplete: false,
+        achievements: [],
+        lastPracticedChapterId: null,
+    };
+    await setDoc(userRef, profileData);
+
+    const token = await user.getIdToken();
     await setSessionCookie(token);
 
-    await setupNewUser(userCredential.user);
   } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
-        return { message: 'This email is already in use. Please sign in.' };
+        return { message: 'This username is already in use. Please choose another.' };
     }
     return {
-      message: `Signup failed: ${error.message} (Code: ${error.code})`,
+      message: `Signup failed: ${error.message}`,
     };
   }
-  redirect('/onboarding/set-username');
+  redirect('/home');
 }
 
-export async function login(prevState: any, formData: FormData) {
-  const email = formData.get('email') as string;
+export async function loginWithUsername(prevState: any, formData: FormData) {
+  const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   
-  if (!email || !password) {
-    return { message: 'Email and password are required.' };
+  if (!username || !password) {
+    return { message: 'Username and password are required.' };
   }
-
-  const trimmedEmail = email.trim();
-  console.log('Attempting login with:', trimmedEmail);
+  
+  const email = `${username.toLowerCase()}@valedict.ai`;
 
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
-    
-    // Set cookie directly in the server action
     await setSessionCookie(token);
-
-    // The setupNewUser call might be redundant if the user already exists, but it includes a check.
-    await setupNewUser(userCredential.user);
   } catch (error: any) {
     console.error('Login Error Code:', error.code);
     switch (error.code) {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
-        return { message: 'Invalid email or password. Please check your credentials and try again.' };
-      case 'auth/invalid-email':
-        return { message: 'The email address is not formatted correctly.' };
-      case 'auth/internal-error':
-        return { message: 'An internal error occurred on the server. Please try again later.' };
+        return { message: 'Invalid username or password.' };
       default:
-        return { message: `Login failed: ${error.message} (Code: ${error.code})` };
+        return { message: `Login failed: ${error.message}` };
     }
   }
   redirect('/home');
