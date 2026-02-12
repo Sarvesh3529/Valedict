@@ -1,11 +1,11 @@
 'use client';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from 'react';
 import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { UserProfile } from '@/lib/types';
-import { doc, onSnapshot, updateDoc, increment } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { differenceInCalendarDays, isSameWeek } from 'date-fns';
 import StreakAnimation from '@/components/StreakAnimation';
 import XpAnimation from '@/components/XpAnimation';
@@ -70,65 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const hideStreakAnimation = () => setShowStreakAnimation(false);
   const hideXpAnimation = () => setShowXpAnimation(false);
 
-  useEffect(() => {
-    let unsubscribeProfile: (() => void) | undefined;
-
-    const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
-      if (unsubscribeProfile) {
-        unsubscribeProfile();
-      }
-
-      if (authUser) {
-        setUser(authUser);
-        // Set up new profile listener
-        const userRef = doc(db, 'users', authUser.uid);
-        unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
-            if (docSnap.exists()) {
-                setProfile(docSnap.data() as UserProfile);
-            } else {
-                // This happens on first login, before the user doc is created.
-                // We create a temporary default profile to prevent the app from
-                // getting stuck in a loading state. The real profile will
-                // arrive once the server action completes.
-                console.warn("User document not found for UID:", authUser.uid, ". Creating temporary profile.");
-                const tempProfile: UserProfile = {
-                    uid: authUser.uid,
-                    email: authUser.email,
-                    displayName: authUser.displayName,
-                    photoURL: authUser.photoURL,
-                    onboardingComplete: false,
-                    currentStreak: 0,
-                    highestStreak: 0,
-                    totalXp: 0,
-                    weeklyXp: 0,
-                };
-                setProfile(tempProfile);
-            }
-            setLoading(false);
-        }, (error) => {
-            console.error("Profile listener error:", error);
-            // If we can't read the profile (e.g., due to security rules), log out.
-            signOut();
-            setLoading(false);
-        });
-
-      } else {
-        // User is logged out
-        setUser(null);
-        setProfile(null);
-        setLoading(false); 
-      }
-    });
-
-    return () => {
-      unsubscribeAuth();
-      if (unsubscribeProfile) {
-        unsubscribeProfile();
-      }
-    };
-  }, []);
-
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       await auth.signOut();
       await fetch('/api/auth/logout', { method: 'POST' }); // Clear server cookie
@@ -136,9 +78,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error signing out: ", error);
     }
-  };
+  }, [router]);
 
-  const updateUserStreak = async () => {
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        setUser(authUser);
+        const userRef = doc(db, 'users', authUser.uid);
+        try {
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as UserProfile);
+          } else {
+            console.warn("User document not found for UID:", authUser.uid, ". Creating temporary profile.");
+            const tempProfile: UserProfile = {
+                uid: authUser.uid,
+                email: authUser.email,
+                displayName: authUser.displayName,
+                photoURL: authUser.photoURL,
+                onboardingComplete: false,
+                currentStreak: 0,
+                highestStreak: 0,
+                totalXp: 0,
+                weeklyXp: 0,
+            };
+            setProfile(tempProfile);
+          }
+        } catch (error: any) {
+            console.error("Error fetching user profile:", error);
+             if (error.code === 'permission-denied') {
+                const permissionError = new FirestorePermissionError({
+                path: userRef.path,
+                operation: 'get',
+                } satisfies SecurityRuleContext);
+                errorEmitter.emit('permission-error', permissionError);
+            }
+            await signOut();
+        } finally {
+            setLoading(false);
+        }
+      } else {
+        setUser(null);
+        setProfile(null);
+        setLoading(false); 
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, [signOut]);
+
+  const updateUserStreak = useCallback(async () => {
     if (!user || !profile) return;
     
     const userRef = doc(db, 'users', user.uid);
@@ -154,10 +143,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     let shouldUpdateDb = false;
 
-    if (diff !== 0) { // Only run if last activity wasn't today
-      if (diff === 1) { // Consecutive day
+    if (diff !== 0) { 
+      if (diff === 1) { 
         newStreak = currentStreak + 1;
-      } else { // First time or broken streak
+      } else { 
         newStreak = 1;
       }
       
@@ -179,6 +168,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         highestStreak: newHighestStreak,
         lastActivityDate: today.toISOString(),
       };
+      
+      setProfile(p => p ? { ...p, ...updateData } : null);
 
       updateDoc(userRef, updateData)
         .catch(async (serverError) => {
@@ -190,9 +181,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           errorEmitter.emit('permission-error', permissionError);
         });
     }
-  };
+  }, [user, profile]);
   
-  const awardXp = async (questionCount: number) => {
+  const awardXp = useCallback(async (questionCount: number) => {
     if (!user || !profile) return;
     const xpToAward = getXpForQuestions(questionCount);
     if (xpToAward === 0) return;
@@ -204,7 +195,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const today = new Date();
     const lastReset = profile.lastXpReset ? new Date(profile.lastXpReset) : new Date(0);
 
-    const needsWeeklyReset = !isSameWeek(today, lastReset, { weekStartsOn: 1 }); // Monday start
+    const needsWeeklyReset = !isSameWeek(today, lastReset, { weekStartsOn: 1 });
+
+    const currentWeeklyXp = profile.weeklyXp || 0;
+    const currentTotalXp = profile.totalXp || 0;
+
+    const newWeeklyXp = needsWeeklyReset ? xpToAward : currentWeeklyXp + xpToAward;
+    const newTotalXp = currentTotalXp + xpToAward;
+
+    setProfile(p => p ? { 
+        ...p, 
+        weeklyXp: newWeeklyXp,
+        totalXp: newTotalXp,
+        ...(needsWeeklyReset && { lastXpReset: today.toISOString() })
+    } : null);
 
     let updateData: Record<string, any>;
     let updateDataForError: Record<string, any>;
@@ -215,7 +219,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         totalXp: increment(xpToAward),
         lastXpReset: today.toISOString(),
       };
-      updateDataForError = {
+       updateDataForError = {
         weeklyXp: xpToAward,
         totalXp: `increment(${xpToAward})`,
         lastXpReset: today.toISOString(),
@@ -240,10 +244,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } satisfies SecurityRuleContext);
         errorEmitter.emit('permission-error', permissionError);
       });
-  };
+  }, [user, profile]);
   
-  return (
-    <AuthContext.Provider value={{ 
+  const value = { 
         user, 
         profile, 
         loading, 
@@ -256,7 +259,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         showXpAnimation,
         hideXpAnimation,
         animationXpCount
-    }}>
+    };
+
+  return (
+    <AuthContext.Provider value={value}>
       {loading ? (
          <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
