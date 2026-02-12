@@ -79,13 +79,13 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!loading && profile) {
-        if (profile.onboardingComplete === false) {
+        if (!profile.onboardingComplete) {
             router.push('/onboarding/start');
         }
     }
   }, [loading, profile, router]);
 
-  if (loading || !profile || profile.onboardingComplete === false) {
+  if (loading || !profile || !profile.onboardingComplete) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
