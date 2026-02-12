@@ -31,7 +31,8 @@ export type QuizResult = {
 export type UserProfile = {
   uid: string;
   email: string | null;
-  displayName: string | null;
+  displayName: string | null; // This is the unique, user-chosen username
+  realName?: string | null; // This is the user's actual name, e.g., from Google
   photoURL: string | null;
   currentStreak?: number;
   highestStreak?: number;

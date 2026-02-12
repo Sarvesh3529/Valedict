@@ -2,18 +2,22 @@ import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import { type User } from 'firebase/auth';
 
-export async function setupNewUser(user: any) {
+export async function setupNewUser(user: User) {
     if (!user) return;
     const userRef = doc(db, 'users', user.uid);
     const docSnap = await getDoc(userRef);
 
     if (!docSnap.exists()) {
-        const displayName = user.displayName || user.email?.split('@')[0] || 'Student';
+        // For both email and Google signups, displayName is initially null
+        // to force the user to the set-username page.
+        // The user's real name from Google is stored for potential future use.
         const profileData = {
             uid: user.uid,
             email: user.email,
-            displayName: displayName,
+            displayName: null,
+            realName: user.displayName || null,
             photoURL: user.photoURL,
             currentStreak: 0,
             highestStreak: 0,

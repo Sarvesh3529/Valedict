@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { redirect } from 'next/navigation';
 import { setupNewUser } from '@/lib/user';
 import { cookies } from 'next/headers';
@@ -42,7 +42,7 @@ export async function signup(prevState: any, formData: FormData) {
       message: `Signup failed: ${error.message} (Code: ${error.code})`,
     };
   }
-  redirect('/home');
+  redirect('/onboarding/set-username');
 }
 
 export async function login(prevState: any, formData: FormData) {
