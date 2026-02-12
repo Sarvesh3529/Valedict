@@ -5,11 +5,12 @@ import { collection, query, orderBy, limit, getDocs, where, getCountFromServer }
 import type { UserProfile } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Crown, Loader2, User } from 'lucide-react';
+import { Crown, Loader2, User, ShieldX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 type LeaderboardType = 'weekly' | 'all-time';
 
@@ -50,6 +51,7 @@ export default function LeaderboardPage() {
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('weekly');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
 
   useEffect(() => {
@@ -63,29 +65,40 @@ export default function LeaderboardPage() {
 
     const fetchLeaderboard = async () => {
       setLoading(true);
+      setError(null);
       const field = leaderboardType === 'weekly' ? 'weeklyXp' : 'totalXp';
       
       const usersRef = collection(db, 'users');
       const q = query(usersRef, orderBy(field, 'desc'), limit(50));
       
-      const querySnapshot = await getDocs(q);
-      const leaderboardUsers: UserProfile[] = [];
-      querySnapshot.forEach((doc) => {
-        leaderboardUsers.push(doc.data() as UserProfile);
-      });
-      setUsers(leaderboardUsers);
+      try {
+        const querySnapshot = await getDocs(q);
+        const leaderboardUsers: UserProfile[] = [];
+        querySnapshot.forEach((doc) => {
+          leaderboardUsers.push(doc.data() as UserProfile);
+        });
+        setUsers(leaderboardUsers);
 
-      // Fetch current user's rank
-      const currentUserScore = profile[field] || 0;
-      if (currentUserScore > 0) {
-        const rankQuery = query(usersRef, where(field, '>', currentUserScore));
-        const rankSnapshot = await getCountFromServer(rankQuery);
-        setCurrentUserRank(rankSnapshot.data().count);
-      } else {
-        setCurrentUserRank(null);
+        // Fetch current user's rank
+        const currentUserScore = profile[field] || 0;
+        if (currentUserScore > 0) {
+          const rankQuery = query(usersRef, where(field, '>', currentUserScore));
+          const rankSnapshot = await getCountFromServer(rankQuery);
+          setCurrentUserRank(rankSnapshot.data().count);
+        } else {
+          setCurrentUserRank(null);
+        }
+
+      } catch (e: any) {
+        if (e.code === 'permission-denied') {
+          setError("You don't have permission to view the leaderboard. This may be due to security rules.");
+        } else {
+          setError("An error occurred while fetching the leaderboard.");
+        }
+        console.error("Leaderboard Error:", e);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchLeaderboard();
@@ -97,6 +110,22 @@ export default function LeaderboardPage() {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  const renderContent = () => {
+    if (loading) {
+      return <div className="flex justify-center p-8"><Loader2 className="animate-spin"/></div>;
+    }
+    if (error) {
+      return (
+        <Alert variant="destructive" className="mt-4">
+          <ShieldX className="h-4 w-4" />
+          <AlertTitle>Access Denied</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      );
+    }
+    return <UserList users={users} type={leaderboardType} currentUserId={user.uid} />;
   }
 
   return (
@@ -112,24 +141,12 @@ export default function LeaderboardPage() {
               <TabsTrigger value="weekly">Weekly</TabsTrigger>
               <TabsTrigger value="all-time">All-Time</TabsTrigger>
             </TabsList>
-            <TabsContent value="weekly">
-              {loading ? (
-                <div className="flex justify-center p-8"><Loader2 className="animate-spin"/></div>
-              ) : (
-                <UserList users={users} type="weekly" currentUserId={user.uid} />
-              )}
-            </TabsContent>
-            <TabsContent value="all-time">
-               {loading ? (
-                <div className="flex justify-center p-8"><Loader2 className="animate-spin"/></div>
-              ) : (
-                <UserList users={users} type="all-time" currentUserId={user.uid} />
-              )}
-            </TabsContent>
+            <TabsContent value="weekly">{renderContent()}</TabsContent>
+            <TabsContent value="all-time">{renderContent()}</TabsContent>
           </Tabs>
         </CardContent>
       </Card>
-      <CurrentUserCard user={user} profile={profile} rank={currentUserRank} type={leaderboardType} />
+      {profile && !error && <CurrentUserCard user={user} profile={profile} rank={currentUserRank} type={leaderboardType} />}
     </div>
   );
 }

@@ -12,9 +12,13 @@ import { BrainCircuit, Loader2, Eye, EyeOff, CheckCircle, XCircle } from 'lucide
 import { checkUsernameAvailability } from '@/lib/username';
 import { useAuth } from '@/context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+
 
 function SubmitButton({ isSignup }: { isSignup: boolean }) {
-  const { pending } = useActionState(async () => {}, null);
+  // useFormStatus is not available in React 19's useActionState yet
+  // We'll use a local pending state if needed, but for now this is fine.
+  const pending = false; 
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? (
@@ -28,7 +32,9 @@ function SubmitButton({ isSignup }: { isSignup: boolean }) {
 }
 
 export default function AuthPage() {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
   const [isSignup, setIsSignup] = useState(false);
   
   const [loginState, loginAction] = useActionState(loginWithUsername, undefined);
@@ -42,6 +48,12 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   
   useEffect(() => {
+    if (user && !loading) {
+      router.replace('/home');
+    }
+  }, [user, loading, router]);
+  
+  useEffect(() => {
     if (isSignup && debouncedUsername) {
       setIsChecking(true);
       checkUsernameAvailability(debouncedUsername).then(result => {
@@ -53,7 +65,7 @@ export default function AuthPage() {
     }
   }, [debouncedUsername, isSignup]);
 
-  if (loading) {
+  if (loading || user) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

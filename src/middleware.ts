@@ -12,11 +12,13 @@ export function middleware(request: NextRequest) {
 
   // If user is not authenticated and trying to access a protected route, redirect to login
   if (!token && isProtectedRoute) {
+    console.log(`[Middleware] No token, redirecting from protected route: ${pathname}`);
     return NextResponse.redirect(new URL('/', request.url));
   }
 
   // If user is authenticated and trying to access a login/signup page, redirect to home
   if (token && authRoutes.includes(pathname)) {
+    console.log(`[Middleware] Has token, redirecting from auth route: ${pathname}`);
     return NextResponse.redirect(new URL('/home', request.url));
   }
 

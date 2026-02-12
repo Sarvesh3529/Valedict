@@ -12,7 +12,6 @@ import XpAnimation from '@/components/XpAnimation';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
-import { setupNewUser } from '@/lib/user';
 import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
@@ -81,41 +80,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (authUser) {
         setUser(authUser);
-        try {
-          // Sync server session cookie
-          const idToken = await authUser.getIdToken();
-          await fetch('/api/auth/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken }),
-          });
-
-          // Ensure user profile document exists before listening
-          await setupNewUser(authUser);
-
-          // Set up new profile listener
-          const userRef = doc(db, 'users', authUser.uid);
-          unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
-            setProfile(docSnap.data() as UserProfile | null);
-            setLoading(false); // Done loading once profile is fetched
-          }, (error) => {
-            console.error("Profile listener error:", error);
+        // Set up new profile listener
+        const userRef = doc(db, 'users', authUser.uid);
+        unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setProfile(docSnap.data() as UserProfile | null);
+            } else {
+                // This might happen if signup fails to create the doc.
+                // The signup action is the primary source for doc creation.
+                console.warn("User document not found for UID:", authUser.uid);
+                setProfile(null);
+            }
             setLoading(false);
-          });
+        }, (error) => {
+            console.error("Profile listener error:", error);
+            // If we can't read the profile (e.g., due to security rules), log out.
+            signOut();
+            setLoading(false);
+        });
 
-        } catch (error) {
-          console.error("Auth session sync or profile setup error:", error);
-          setUser(null);
-          setProfile(null);
-          setLoading(false);
-        }
       } else {
         // User is logged out
         setUser(null);
         setProfile(null);
-        // Clear server session cookie
-        await fetch('/api/auth/logout', { method: 'POST' });
-        setLoading(false); // Done loading
+        setLoading(false); 
       }
     });
 
@@ -130,6 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       await auth.signOut();
+      await fetch('/api/auth/logout', { method: 'POST' }); // Clear server cookie
       router.push('/');
     } catch (error) {
       console.error("Error signing out: ", error);

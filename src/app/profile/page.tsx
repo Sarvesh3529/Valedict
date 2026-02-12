@@ -49,7 +49,7 @@ function AchievementBadge({ achievement }: { achievement: Achievement }) {
 }
 
 export default function ProfilePage() {
-    const { user, profile, loading } = useAuth();
+    const { user, profile, loading, signOut } = useAuth();
     const router = useRouter();
     const [isEditUsernameOpen, setIsEditUsernameOpen] = useState(false);
 
@@ -96,7 +96,7 @@ export default function ProfilePage() {
           <CardContent className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <Avatar className="h-24 w-24 border-4 border-primary">
-                <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User avatar'} />
+                <AvatarImage src={profile.photoURL ?? ''} alt={profile.displayName ?? 'User avatar'} />
                 <AvatarFallback className="text-3xl">
                   {profile.displayName?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
@@ -108,7 +108,7 @@ export default function ProfilePage() {
                       <Pencil className="h-4 w-4" />
                   </Button>
                 </div>
-                 <p className="text-muted-foreground">{user.email}</p>
+                 <p className="text-muted-foreground">{profile.email}</p>
                 <p className="text-xs font-mono text-muted-foreground break-all pt-2">UID: {user.uid}</p>
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function ProfilePage() {
                 <CardTitle className="font-headline text-2xl text-destructive">Account Actions</CardTitle>
             </CardHeader>
             <CardContent>
-                <form action={logout} className="w-full">
+                <form action={logout}>
                   <Button variant="destructive" className="w-full">Log Out</Button>
                 </form>
             </CardContent>

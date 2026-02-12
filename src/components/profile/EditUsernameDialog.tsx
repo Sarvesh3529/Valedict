@@ -12,6 +12,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { checkUsernameAvailability, updateUserDisplayName } from '@/lib/username';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface EditUsernameDialogProps {
   isOpen: boolean;
@@ -56,7 +60,7 @@ export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername 
         return;
     }
     
-    if (!availability?.available) {
+    if (availability && !availability.available) {
         setError(availability?.message || 'Username is not available.');
         return;
     }
@@ -64,11 +68,18 @@ export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername 
     setIsPending(true);
 
     try {
-      // Optimistically update auth profile
+      // 1. Update the Auth user's displayName
       await updateProfile(user, { displayName: username });
       
-      // Call fire-and-forget function to update Firestore
-      updateUserDisplayName(user.uid, username);
+      // 2. Update the displayName in the Firestore 'users' document
+      const userRef = doc(db, 'users', user.uid);
+      const data = { displayName: username };
+      await updateDoc(userRef, data).catch(err => {
+         const permissionError = new FirestorePermissionError({ path: userRef.path, operation: 'update', requestResourceData: data });
+         errorEmitter.emit('permission-error', permissionError);
+         // throw the original error to be caught below
+         throw err;
+      })
 
       setIsOpen(false);
     } catch (authError: any) {

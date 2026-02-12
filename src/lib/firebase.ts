@@ -9,7 +9,6 @@ const firebaseConfig: FirebaseOptions = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  // Measurement ID is optional and used for Google Analytics
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
@@ -20,7 +19,7 @@ if (
   !firebaseConfig.projectId
 ) {
   throw new Error(
-    "Missing Firebase configuration. Please check your .env file and ensure all NEXT_PUBLIC_FIREBASE_* variables are set."
+    "Missing Firebase configuration. Please check your .env.local file and ensure all NEXT_PUBLIC_FIREBASE_* variables are set."
   );
 }
 
@@ -34,5 +33,6 @@ if (typeof window !== "undefined") {
   // @ts-ignore
   window.auth = auth;
 }
+
 
 export { app, auth, db };

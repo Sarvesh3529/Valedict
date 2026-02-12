@@ -7,22 +7,20 @@ export default function ConditionalHeader() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
 
-  const authRoutes = ['/signup'];
+  const authRoutes = ['/'];
   
   if (loading) {
     return null; // Don't show header while checking auth state
   }
-
-  if (!user && !authRoutes.includes(pathname) && pathname !== '/') {
-     // In case middleware fails or for client-side transitions
-     // We might still want to show a header on public pages though.
-     // For now, let's hide it if not logged in and not on an auth page.
-     return null;
-  }
-
-  if (authRoutes.includes(pathname) || pathname === '/') {
+  
+  if (authRoutes.includes(pathname)) {
     return null;
   }
 
-  return <Header />;
+  // Only show header if user is logged in
+  if (user) {
+    return <Header />;
+  }
+
+  return null;
 }
