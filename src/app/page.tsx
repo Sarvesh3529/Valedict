@@ -16,8 +16,6 @@ import { useRouter } from 'next/navigation';
 
 
 function SubmitButton({ isSignup }: { isSignup: boolean }) {
-  // useFormStatus is not available in React 19's useActionState yet
-  // We'll use a local pending state if needed, but for now this is fine.
   const pending = false; 
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -74,17 +72,18 @@ export default function AuthPage() {
   }
   
   const state = isSignup ? signupState : loginState;
+  const action = isSignup ? signupAction : loginAction;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
           <BrainCircuit className="mx-auto h-10 w-10 text-primary mb-2" />
-          <CardTitle className="text-2xl font-headline">{isSignup ? 'Create your Account' : 'Welcome Back'}</CardTitle>
-          <CardDescription>{isSignup ? 'Your personalized AI study partner awaits.' : 'Sign in to continue your learning journey.'}</CardDescription>
+          <CardTitle className="text-2xl font-headline">{isSignup ? 'Create an Account' : 'Welcome Back'}</CardTitle>
+          <CardDescription>{isSignup ? 'Choose a unique username to get started.' : 'Sign in to continue your learning journey.'}</CardDescription>
         </CardHeader>
         <CardContent>
-            <form action={isSignup ? signupAction : loginAction} className="grid gap-4">
+            <form action={action} className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
                 <div className="relative">
@@ -142,6 +141,7 @@ export default function AuthPage() {
                       <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
                   </Button>
                 </div>
+                 {isSignup && <p className="text-xs text-muted-foreground">Password must be at least 6 characters long.</p>}
               </div>
               <SubmitButton isSignup={isSignup} />
               {state?.message && (
@@ -153,7 +153,11 @@ export default function AuthPage() {
             </form>
           <div className="mt-4 text-center text-sm">
             {isSignup ? "Already have an account? " : "Don't have an account? "}
-            <Button variant="link" className="p-0 h-auto" onClick={() => setIsSignup(!isSignup)}>
+            <Button variant="link" className="p-0 h-auto" onClick={() => {
+                setIsSignup(!isSignup);
+                setAvailability(null);
+                setUsername('');
+            }}>
               {isSignup ? 'Sign In' : 'Sign Up'}
             </Button>
           </div>

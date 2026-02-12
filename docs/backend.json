@@ -118,9 +118,26 @@
         "lastPracticedChapterId": {
           "type": "string",
           "description": "The ID of the last chapter the user practiced."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the user profile was created."
         }
       },
-      "required": ["uid", "email"]
+      "required": ["uid", "email", "displayName", "createdAt"]
+    },
+    "usernameLock": {
+      "title": "Username Lock",
+      "description": "Stores a mapping from a lowercase username to a user ID to enforce uniqueness.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's ID from Firebase Auth."
+        }
+      },
+      "required": ["uid"]
     },
     "Quiz": {
       "title": "Quiz",
@@ -163,7 +180,7 @@
     }
   },
   "auth": {
-    "providers": ["email-password", "google"]
+    "providers": ["email-password"]
   },
   "firestore": {
     "/onboardingResponses/{userId}": {
@@ -177,6 +194,12 @@
         "$ref": "#/backend/entities/UserProfile"
       },
       "description": "Stores public user profile information."
+    },
+    "/usernames/{username}": {
+      "schema": {
+        "$ref": "#/backend/entities/usernameLock"
+      },
+      "description": "Used to ensure usernames are unique. The document ID is the lowercase username."
     },
     "/quizzes/{quizId}": {
       "schema": {
