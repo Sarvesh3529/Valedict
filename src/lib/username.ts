@@ -23,8 +23,15 @@ export async function checkUsernameAvailability(username: string): Promise<{ ava
       return { available: false, message: 'This username is already taken.' };
     }
     return { available: true, message: 'Username is available!' };
-  } catch (error) {
-    console.error("Error checking username availability:", error);
-    return { available: false, message: 'Error checking username. Please try again.' };
+  } catch (error: any) {
+    console.error("--- DETAILED USERNAME CHECK ERROR ---");
+    console.error("Message:", error.message);
+    if(error.code) {
+      console.error("Firebase Error Code:", error.code);
+    }
+    console.error("This error likely means the server cannot connect to Firebase. Check your .env file's FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY variables. Also ensure Firestore is enabled in your Firebase project.");
+    console.error("--- END DETAILED ERROR ---");
+
+    return { available: false, message: 'Error checking username. Please check server logs for details.' };
   }
 }
