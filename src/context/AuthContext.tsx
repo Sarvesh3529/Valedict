@@ -84,12 +84,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userRef = doc(db, 'users', authUser.uid);
         unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
             if (docSnap.exists()) {
-                setProfile(docSnap.data() as UserProfile | null);
+                setProfile(docSnap.data() as UserProfile);
             } else {
-                // This might happen if signup fails to create the doc.
-                // The signup action is the primary source for doc creation.
-                console.warn("User document not found for UID:", authUser.uid);
-                setProfile(null);
+                // This happens on first login, before the user doc is created.
+                // We create a temporary default profile to prevent the app from
+                // getting stuck in a loading state. The real profile will
+                // arrive once the server action completes.
+                console.warn("User document not found for UID:", authUser.uid, ". Creating temporary profile.");
+                const tempProfile: UserProfile = {
+                    uid: authUser.uid,
+                    email: authUser.email,
+                    displayName: authUser.displayName,
+                    photoURL: authUser.photoURL,
+                    onboardingComplete: false,
+                    currentStreak: 0,
+                    highestStreak: 0,
+                    totalXp: 0,
+                    weeklyXp: 0,
+                };
+                setProfile(tempProfile);
             }
             setLoading(false);
         }, (error) => {
