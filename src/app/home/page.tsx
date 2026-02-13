@@ -95,9 +95,14 @@ export default function HomePage() {
   
   if (!profile) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="ml-4">Waiting for profile data...</p>
+      <div className="container mx-auto flex h-[calc(100vh-8rem)] flex-col items-center justify-center gap-4 px-4 text-center">
+        <h2 className="text-2xl font-bold">Could Not Load Profile</h2>
+        <p className="text-muted-foreground">
+          There was an issue fetching your data. This can happen for new accounts if the profile creation is delayed.
+        </p>
+        <Button asChild>
+            <Link href="/profile">Complete Your Profile</Link>
+        </Button>
       </div>
     );
   }

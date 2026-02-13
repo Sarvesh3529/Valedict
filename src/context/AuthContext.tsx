@@ -5,7 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { UserProfile } from '@/lib/types';
-import { doc, onSnapshot, updateDoc, increment, getDoc, Timestamp } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, increment, getDoc, Timestamp, setDoc, serverTimestamp } from 'firebase/firestore';
 import { differenceInCalendarDays, isSameWeek } from 'date-fns';
 import StreakAnimation from '@/components/StreakAnimation';
 import XpAnimation from '@/components/XpAnimation';
@@ -80,58 +80,70 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [router]);
 
-  // Handle user authentication state
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
-      setUser(authUser);
-      setLoading(false);
-    });
-    return () => unsubscribeAuth();
-  }, []);
+    let unsubscribeProfile = () => {};
 
-  // Handle profile fetching via a realtime listener
-  useEffect(() => {
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      const unsubscribeProfile = onSnapshot(userRef, 
-        (docSnap) => {
-          if (docSnap.exists()) {
-            setProfile(docSnap.data() as UserProfile);
-          } else {
-            // This handles new users whose doc hasn't been created yet.
-            // It prevents the app from getting stuck on "Waiting for profile data".
-            console.warn("User document not found for UID:", user.uid, ". Using temporary profile.");
-            const tempProfile: UserProfile = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                onboardingComplete: false,
-                currentStreak: 0,
-                highestStreak: 0,
-                totalXp: 0,
-                weeklyXp: 0,
-            };
-            setProfile(tempProfile);
-          }
-        },
-        (error) => {
-          console.error("Profile snapshot error:", error);
-          if (error.code === 'permission-denied') {
-            const permissionError = new FirestorePermissionError({
-              path: userRef.path,
-              operation: 'get',
-            } satisfies SecurityRuleContext);
-            errorEmitter.emit('permission-error', permissionError);
-          }
-          setProfile(null);
+    const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
+        // Clean up previous profile listener on auth state change
+        unsubscribeProfile();
+
+        if (authUser) {
+            setUser(authUser);
+            const userRef = doc(db, "users", authUser.uid);
+
+            unsubscribeProfile = onSnapshot(userRef,
+                (docSnap) => {
+                    if (docSnap.exists()) {
+                        setProfile(docSnap.data() as UserProfile);
+                        setLoading(false);
+                    } else {
+                        console.warn("User document not found for UID:", authUser.uid, ". Attempting to create it.");
+                        const username = authUser.email?.split('@')[0] || `user_${authUser.uid.substring(0, 5)}`;
+                        
+                        const profileDataForFirestore = {
+                            uid: authUser.uid,
+                            email: authUser.email,
+                            displayName: username,
+                            photoURL: null,
+                            currentStreak: 0,
+                            highestStreak: 0,
+                            lastActivityDate: null,
+                            totalXp: 0,
+                            weeklyXp: 0,
+                            lastXpReset: new Date().toISOString(),
+                            onboardingComplete: false,
+                            achievements: [],
+                            lastPracticedChapterId: null,
+                            createdAt: serverTimestamp(),
+                        };
+
+                        setDoc(userRef, profileDataForFirestore)
+                            .catch(error => {
+                                console.error("Error force-creating user profile:", error);
+                                setProfile(null);
+                                setLoading(false); // Stop loading even on failure
+                            });
+                    }
+                },
+                (error) => {
+                    console.error("Profile snapshot error:", error);
+                    setProfile(null);
+                    setLoading(false); // Stop loading on error
+                }
+            );
+        } else {
+            // User is signed out
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
         }
-      );
-      return () => unsubscribeProfile();
-    } else {
-      // If there is no user, there's no profile.
-      setProfile(null);
-    }
-  }, [user]);
+    });
+
+    return () => {
+        unsubscribeAuth();
+        unsubscribeProfile();
+    };
+}, []);
 
   const updateUserStreak = useCallback(async () => {
     if (!user || !profile) return;
@@ -174,9 +186,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         lastActivityDate: today.toISOString(),
       };
       
-      // Optimistically update local state
-      // setProfile(p => p ? { ...p, ...updateData } : null);
-
       updateDoc(userRef, updateData)
         .catch(async (serverError) => {
           const permissionError = new FirestorePermissionError({
