@@ -5,7 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import type { UserProfile } from '@/lib/types';
-import { doc, onSnapshot, updateDoc, increment, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, increment, getDoc, Timestamp } from 'firebase/firestore';
 import { differenceInCalendarDays, isSameWeek } from 'date-fns';
 import StreakAnimation from '@/components/StreakAnimation';
 import XpAnimation from '@/components/XpAnimation';
@@ -80,22 +80,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [router]);
 
+  // Handle user authentication state
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
-      if (authUser) {
-        setUser(authUser);
-        const userRef = doc(db, 'users', authUser.uid);
-        try {
-          const docSnap = await getDoc(userRef);
+    const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser);
+      setLoading(false);
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  // Handle profile fetching via a realtime listener
+  useEffect(() => {
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      const unsubscribeProfile = onSnapshot(userRef, 
+        (docSnap) => {
           if (docSnap.exists()) {
             setProfile(docSnap.data() as UserProfile);
           } else {
-            console.warn("User document not found for UID:", authUser.uid, ". Creating temporary profile.");
+            // This handles new users whose doc hasn't been created yet.
+            // It prevents the app from getting stuck on "Waiting for profile data".
+            console.warn("User document not found for UID:", user.uid, ". Using temporary profile.");
             const tempProfile: UserProfile = {
-                uid: authUser.uid,
-                email: authUser.email,
-                displayName: authUser.displayName,
-                photoURL: authUser.photoURL,
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
                 onboardingComplete: false,
                 currentStreak: 0,
                 highestStreak: 0,
@@ -104,28 +113,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             };
             setProfile(tempProfile);
           }
-        } catch (error: any) {
-            console.error("Error fetching user profile:", error);
-             if (error.code === 'permission-denied') {
-                const permissionError = new FirestorePermissionError({
-                path: userRef.path,
-                operation: 'get',
-                } satisfies SecurityRuleContext);
-                errorEmitter.emit('permission-error', permissionError);
-            }
-            await signOut();
-        } finally {
-            setLoading(false);
+        },
+        (error) => {
+          console.error("Profile snapshot error:", error);
+          if (error.code === 'permission-denied') {
+            const permissionError = new FirestorePermissionError({
+              path: userRef.path,
+              operation: 'get',
+            } satisfies SecurityRuleContext);
+            errorEmitter.emit('permission-error', permissionError);
+          }
+          setProfile(null);
         }
-      } else {
-        setUser(null);
-        setProfile(null);
-        setLoading(false); 
-      }
-    });
-
-    return () => unsubscribeAuth();
-  }, [signOut]);
+      );
+      return () => unsubscribeProfile();
+    } else {
+      // If there is no user, there's no profile.
+      setProfile(null);
+    }
+  }, [user]);
 
   const updateUserStreak = useCallback(async () => {
     if (!user || !profile) return;
@@ -135,12 +141,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { lastActivityDate, currentStreak = 0, highestStreak = 0 } = profile;
     const today = new Date();
     
-    let newStreak = currentStreak;
-    let newHighestStreak = highestStreak;
-    
     const lastDate = lastActivityDate ? new Date(lastActivityDate) : null;
     const diff = lastDate ? differenceInCalendarDays(today, lastDate) : -1;
 
+    let newStreak = currentStreak;
+    let newHighestStreak = highestStreak;
     let shouldUpdateDb = false;
 
     if (diff !== 0) { 
@@ -169,7 +174,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         lastActivityDate: today.toISOString(),
       };
       
-      setProfile(p => p ? { ...p, ...updateData } : null);
+      // Optimistically update local state
+      // setProfile(p => p ? { ...p, ...updateData } : null);
 
       updateDoc(userRef, updateData)
         .catch(async (serverError) => {
@@ -196,19 +202,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const lastReset = profile.lastXpReset ? new Date(profile.lastXpReset) : new Date(0);
 
     const needsWeeklyReset = !isSameWeek(today, lastReset, { weekStartsOn: 1 });
-
-    const currentWeeklyXp = profile.weeklyXp || 0;
-    const currentTotalXp = profile.totalXp || 0;
-
-    const newWeeklyXp = needsWeeklyReset ? xpToAward : currentWeeklyXp + xpToAward;
-    const newTotalXp = currentTotalXp + xpToAward;
-
-    setProfile(p => p ? { 
-        ...p, 
-        weeklyXp: newWeeklyXp,
-        totalXp: newTotalXp,
-        ...(needsWeeklyReset && { lastXpReset: today.toISOString() })
-    } : null);
 
     let updateData: Record<string, any>;
     let updateDataForError: Record<string, any>;
