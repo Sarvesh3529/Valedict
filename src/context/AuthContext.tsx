@@ -84,8 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let unsubscribeProfile = () => {};
 
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
-        // Clean up previous profile listener on auth state change
-        unsubscribeProfile();
+        unsubscribeProfile(); // Clean up previous profile listener on auth state change
 
         if (authUser) {
             setUser(authUser);
@@ -95,35 +94,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 (docSnap) => {
                     if (docSnap.exists()) {
                         setProfile(docSnap.data() as UserProfile);
-                        setLoading(false);
                     } else {
-                        console.warn("User document not found for UID:", authUser.uid, ". Attempting to create it.");
-                        const username = authUser.email?.split('@')[0] || `user_${authUser.uid.substring(0, 5)}`;
-                        
-                        const profileDataForFirestore = {
-                            uid: authUser.uid,
-                            email: authUser.email,
-                            displayName: username,
-                            photoURL: null,
-                            currentStreak: 0,
-                            highestStreak: 0,
-                            lastActivityDate: null,
-                            totalXp: 0,
-                            weeklyXp: 0,
-                            lastXpReset: new Date().toISOString(),
-                            onboardingComplete: false,
-                            achievements: [],
-                            lastPracticedChapterId: null,
-                            createdAt: serverTimestamp(),
-                        };
-
-                        setDoc(userRef, profileDataForFirestore)
-                            .catch(error => {
-                                console.error("Error force-creating user profile:", error);
-                                setProfile(null);
-                                setLoading(false); // Stop loading even on failure
-                            });
+                        // This can happen for a new user if the server-action
+                        // to create the profile is slightly delayed.
+                        console.warn(`Profile for UID ${authUser.uid} not found. Awaiting creation...`);
+                        setProfile(null);
                     }
+                    setLoading(false); // Stop loading once we have an answer (even if it's "not found")
                 },
                 (error) => {
                     console.error("Profile snapshot error:", error);
@@ -143,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         unsubscribeAuth();
         unsubscribeProfile();
     };
-}, []);
+  }, []);
 
   const updateUserStreak = useCallback(async () => {
     if (!user || !profile) return;
