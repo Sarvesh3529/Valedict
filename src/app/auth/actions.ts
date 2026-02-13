@@ -1,10 +1,12 @@
 'use server';
 
 import { auth, db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 
 async function setSessionCookie(idToken: string) {
     const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
@@ -29,7 +31,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
   if (!/^[a-zA-Z0-9_]+$/.test(username)) return { message: 'Username can only contain letters, numbers, and underscores.'};
 
   try {
-    // 1. Check if username is already taken in 'usernames' collection
+    // 1. Check if username is already taken in 'usernames' collection (using client SDK is fine for public read)
     const usernameDocRef = doc(db, 'usernames', usernameLower);
     const usernameDoc = await getDoc(usernameDocRef);
     if (usernameDoc.exists()) {
@@ -44,8 +46,8 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
     // 3. Update the Auth profile's displayName
     await updateProfile(user, { displayName: username });
     
-    // 4. Create the user profile document in the 'users' collection
-    const userDocRef = doc(db, 'users', user.uid);
+    // 4. Create the user profile document in 'users' using the Admin SDK
+    const userDocRefAdmin = adminDb.collection('users').doc(user.uid);
     const profileData = {
         uid: user.uid,
         email: user.email, // The dummy email
@@ -60,12 +62,13 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
         onboardingComplete: false,
         achievements: [],
         lastPracticedChapterId: null,
-        createdAt: serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
     };
-    await setDoc(userDocRef, profileData);
+    await userDocRefAdmin.set(profileData);
 
-    // 5. Create the username lock document in the 'usernames' collection
-    await setDoc(usernameDocRef, { uid: user.uid });
+    // 5. Create the username lock document in 'usernames' using the Admin SDK
+    const usernameLockDocRefAdmin = adminDb.collection('usernames').doc(usernameLower);
+    await usernameLockDocRefAdmin.set({ uid: user.uid });
 
     // 6. Set the session cookie and redirect
     const token = await user.getIdToken();
