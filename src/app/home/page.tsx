@@ -77,13 +77,13 @@ export default function HomePage() {
   const { profile, loading } = useAuth();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (!loading && profile) {
-  //       if (!profile.onboardingComplete) {
-  //           router.push('/onboarding/start');
-  //       }
-  //   }
-  // }, [loading, profile, router]);
+  useEffect(() => {
+    if (!loading && profile) {
+        if (!profile.onboardingComplete) {
+            router.push('/onboarding/start');
+        }
+    }
+  }, [loading, profile, router]);
 
   if (loading) {
     return (
