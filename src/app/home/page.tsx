@@ -77,18 +77,27 @@ export default function HomePage() {
   const { profile, loading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && profile) {
-        if (!profile.onboardingComplete) {
-            router.push('/onboarding/start');
-        }
-    }
-  }, [loading, profile, router]);
+  // useEffect(() => {
+  //   if (!loading && profile) {
+  //       if (!profile.onboardingComplete) {
+  //           router.push('/onboarding/start');
+  //       }
+  //   }
+  // }, [loading, profile, router]);
 
-  if (loading || !profile || !profile.onboardingComplete) {
+  if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (!profile) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-4">Waiting for profile data...</p>
       </div>
     );
   }
