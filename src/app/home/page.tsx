@@ -74,7 +74,7 @@ function ContinueLearningCard({ chapterId }: { chapterId: string }) {
 
 
 export default function HomePage() {
-  const { profile, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -94,6 +94,24 @@ export default function HomePage() {
   }
   
   if (!profile) {
+    // Check if the user object from Auth exists and if creation time is very recent.
+    // This helps differentiate a new user (where profile creation is slightly delayed)
+    // from a genuine error case.
+    const creationTime = user?.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : 0;
+    const lastSignInTime = user?.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).getTime() : 0;
+    const isNewUser = Math.abs(creationTime - lastSignInTime) < 5000; // 5-second threshold
+
+    if (user && isNewUser) {
+        return (
+             <div className="flex h-screen w-full flex-col items-center justify-center gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <h2 className="text-xl font-semibold">Setting up your account...</h2>
+                <p className="text-muted-foreground">Just a moment while we prepare your dashboard.</p>
+            </div>
+        );
+    }
+    
+    // For existing users where the profile is unexpectedly missing.
     return (
       <div className="container mx-auto flex h-[calc(100vh-8rem)] flex-col items-center justify-center gap-4 px-4 text-center">
         <h2 className="text-2xl font-bold">Could Not Load Profile</h2>
