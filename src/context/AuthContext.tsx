@@ -96,28 +96,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         setProfile(docSnap.data() as UserProfile);
                         setLoading(false);
                     } else {
+                        // This case handles new users where the profile doc might not exist yet.
+                        // We will attempt to auto-provision it.
                         console.log(`Profile for UID ${authUser.uid} not found. Auto-provisioning...`);
-                        const newProfileData = {
+                        const newProfileData: UserProfile = {
                             uid: authUser.uid,
                             email: authUser.email,
-                            displayName: authUser.displayName,
+                            displayName: authUser.displayName || authUser.email?.split('@')[0] || 'New User',
                             photoURL: authUser.photoURL,
                             onboardingComplete: false,
                             currentStreak: 0,
                             highestStreak: 0,
-                            lastActivityDate: null,
                             totalXp: 0,
                             weeklyXp: 0,
                             lastXpReset: new Date().toISOString(),
                             achievements: [],
-                            lastPracticedChapterId: null,
-                            createdAt: serverTimestamp()
+                            lastPracticedChapterId: undefined,
                         };
                         
                         try {
+                            // Immediately create the doc so the app can proceed
                             await setDoc(userRef, newProfileData);
                             // The onSnapshot listener will fire again with the new data, 
-                            // and the `if (docSnap.exists())` block will handle setting the profile and loading state.
+                            // setting the profile and loading state correctly.
                         } catch (error: any) {
                              console.error("Failed to auto-provision user profile:", error);
                              const permissionError = new FirestorePermissionError({
@@ -126,8 +127,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                                 requestResourceData: newProfileData,
                               } satisfies SecurityRuleContext);
                             errorEmitter.emit('permission-error', permissionError);
-                            setProfile(null);
-                            setLoading(false); // Stop loading if creation fails
+                            setProfile(null); // Stop loading if creation fails
+                            setLoading(false);
                         }
                     }
                 },

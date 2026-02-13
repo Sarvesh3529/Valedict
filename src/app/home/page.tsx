@@ -79,7 +79,8 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!loading && profile) {
-        if (!profile.onboardingComplete) {
+        // The onboardingComplete field could be missing, so check for explicit false.
+        if (profile.onboardingComplete === false) {
             router.push('/onboarding/start');
         }
     }
@@ -94,16 +95,14 @@ export default function HomePage() {
   }
   
   if (!profile) {
-    // The auto-provisioning in AuthContext should prevent this state for logged-in users.
-    // This now serves as a fallback for genuine data fetching/creation errors.
     return (
       <div className="container mx-auto flex h-[calc(100vh-8rem)] flex-col items-center justify-center gap-4 px-4 text-center">
         <h2 className="text-2xl font-bold">Could Not Load Profile</h2>
         <p className="text-muted-foreground">
-          There was an issue fetching your data. Please try refreshing the page or complete your profile if the problem persists.
+          There was an issue fetching your data. Please try refreshing the page.
         </p>
         <Button asChild>
-            <Link href="/profile">Complete Your Profile</Link>
+            <Link href="/profile">Go to Profile</Link>
         </Button>
       </div>
     );
