@@ -89,14 +89,24 @@ export default function HomePage() {
     }
     
     // If we have a user, but onboarding is not complete, redirect.
-    if (!profile || profile.onboardingComplete === false) {
+    if (profile && profile.onboardingComplete === false) {
         router.push('/onboarding/start');
     }
   }, [loading, user, profile, router]);
 
   // Show a loader while we determine the user's state and where to route them.
-  if (loading || !user || !profile || profile.onboardingComplete === false) {
+  if (loading || !user || !profile) {
     return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  // A race condition can occur where the profile is loaded but the redirect hasn't happened yet.
+  // This second check prevents the main page content from flashing before the redirect.
+  if (profile.onboardingComplete === false) {
+     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
