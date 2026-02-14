@@ -92,7 +92,7 @@ export default function AuthPage() {
           <CardDescription>{isSignup ? 'Choose a unique username to get started.' : 'Sign in to continue your learning journey.'}</CardDescription>
         </CardHeader>
         <CardContent>
-            <form action={action} className="grid gap-4">
+            <form key={isSignup ? 'signup' : 'login'} action={action} className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
                 <div className="relative">
