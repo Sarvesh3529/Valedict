@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useState, useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useDebounce } from 'use-debounce';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +17,7 @@ import { useRouter } from 'next/navigation';
 
 
 function SubmitButton({ isSignup }: { isSignup: boolean }) {
-  const pending = false; 
+  const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? (
