@@ -37,27 +37,13 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
     // 2. Update the Auth profile's displayName
     await updateProfile(user, { displayName: username });
 
-    // 3. Create user profile document in Firestore
-    const userDocRef = adminDb.collection('users').doc(user.uid);
-    const profileData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        onboardingComplete: false,
-        currentStreak: 0,
-        highestStreak: 0,
-        totalXp: 0,
-        weeklyXp: 0,
-        createdAt: new Date().toISOString(),
-    };
-    await userDocRef.set(profileData);
-    
-    // 4. Set the session cookie
+    // 3. Set the session cookie
     const token = await user.getIdToken();
     await setSessionCookie(token);
 
-    return { message: '', success: true };
+    // 4. Redirect to onboarding - no database write here.
+    redirect('/onboarding/start');
+
   } catch (error: any) {
     console.error("SIGNUP ERROR:", error);
     // auth/email-already-in-use is the error code for a duplicate username in our setup
@@ -85,7 +71,7 @@ export async function loginWithUsername(prevState: any, formData: FormData) {
     const userCredential = await signInWithEmailAndPassword(auth, dummyEmail, password);
     const token = await userCredential.user.getIdToken();
     await setSessionCookie(token);
-    return { message: '', success: true };
+    redirect('/home');
   } catch (error: any) {
     console.error('Login Error Code:', error.code);
     switch (error.code) {
