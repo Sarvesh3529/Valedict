@@ -79,19 +79,23 @@ export default function HomePage() {
 
   useEffect(() => {
     if (loading) {
-        return; // Wait until auth state is confirmed
+      return; // Wait until auth state is confirmed
+    }
+
+    // If auth is done and there's no user, they should be on the login page.
+    if (!user) {
+      router.push('/');
+      return;
     }
     
-    // If loading is done, check for profile.
-    // If no profile or onboarding is not complete, redirect.
+    // If we have a user, but onboarding is not complete, redirect.
     if (!profile || profile.onboardingComplete === false) {
         router.push('/onboarding/start');
     }
-  }, [loading, profile, router]);
+  }, [loading, user, profile, router]);
 
   // Show a loader while we determine the user's state and where to route them.
-  // This covers the initial load and the brief moment before redirection occurs.
-  if (loading || !profile || profile.onboardingComplete === false) {
+  if (loading || !user || !profile || profile.onboardingComplete === false) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
