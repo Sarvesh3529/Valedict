@@ -4,6 +4,7 @@ import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import { adminDb } from '@/lib/firebase-admin';
 
 async function setSessionCookie(idToken: string) {
     const expiresIn = 60 * 60 * 24 * 7 * 1000; // 7 days
@@ -22,10 +23,10 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
   const usernameLower = username.toLowerCase();
 
   // Basic server-side validation
-  if (!username || !password) return { message: 'Username and password are required.' };
-  if (password.length < 6) return { message: 'Password must be at least 6 characters long.' };
-  if (username.length < 3) return { message: 'Username must be at least 3 characters.' };
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) return { message: 'Username can only contain letters, numbers, and underscores.'};
+  if (!username || !password) return { message: 'Username and password are required.', success: false };
+  if (password.length < 6) return { message: 'Password must be at least 6 characters long.', success: false };
+  if (username.length < 3) return { message: 'Username must be at least 3 characters.', success: false };
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) return { message: 'Username can only contain letters, numbers, and underscores.', success: false };
 
   try {
     // 1. Create user in Firebase Auth with a dummy email
@@ -35,22 +36,39 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
     
     // 2. Update the Auth profile's displayName
     await updateProfile(user, { displayName: username });
+
+    // 3. Create user profile document in Firestore
+    const userDocRef = adminDb.collection('users').doc(user.uid);
+    const profileData = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        onboardingComplete: false,
+        currentStreak: 0,
+        highestStreak: 0,
+        totalXp: 0,
+        weeklyXp: 0,
+        createdAt: new Date().toISOString(),
+    };
+    await userDocRef.set(profileData);
     
-    // 3. Set the session cookie and redirect
+    // 4. Set the session cookie
     const token = await user.getIdToken();
     await setSessionCookie(token);
 
+    return { message: '', success: true };
   } catch (error: any) {
     console.error("SIGNUP ERROR:", error);
     // auth/email-already-in-use is the error code for a duplicate username in our setup
     if (error.code === 'auth/email-already-in-use') {
-        return { message: 'This username is already taken. Please choose another.' };
+        return { message: 'This username is already taken. Please choose another.', success: false };
     }
     return {
       message: `Signup failed: ${error.message}`,
+      success: false,
     };
   }
-  redirect('/home');
 }
 
 export async function loginWithUsername(prevState: any, formData: FormData) {
@@ -58,7 +76,7 @@ export async function loginWithUsername(prevState: any, formData: FormData) {
   const password = formData.get('password') as string;
   
   if (!username || !password) {
-    return { message: 'Username and password are required.' };
+    return { message: 'Username and password are required.', success: false };
   }
   
   const dummyEmail = `${username.toLowerCase()}@myapp.local`;
@@ -67,18 +85,18 @@ export async function loginWithUsername(prevState: any, formData: FormData) {
     const userCredential = await signInWithEmailAndPassword(auth, dummyEmail, password);
     const token = await userCredential.user.getIdToken();
     await setSessionCookie(token);
+    return { message: '', success: true };
   } catch (error: any) {
     console.error('Login Error Code:', error.code);
     switch (error.code) {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
-        return { message: 'Invalid username or password.' };
+        return { message: 'Invalid username or password.', success: false };
       default:
-        return { message: `Login failed: An unexpected error occurred.` };
+        return { message: `Login failed: An unexpected error occurred.`, success: false };
     }
   }
-  redirect('/home');
 }
 
 export async function logout() {
