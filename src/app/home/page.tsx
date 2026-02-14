@@ -78,15 +78,20 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && profile) {
-        // The onboardingComplete field could be missing, so check for explicit false.
-        if (profile.onboardingComplete === false) {
-            router.push('/onboarding/start');
-        }
+    if (loading) {
+        return; // Wait until auth state is confirmed
+    }
+    
+    // If loading is done, check for profile.
+    // If no profile or onboarding is not complete, redirect.
+    if (!profile || profile.onboardingComplete === false) {
+        router.push('/onboarding/start');
     }
   }, [loading, profile, router]);
 
-  if (loading) {
+  // Show a loader while we determine the user's state and where to route them.
+  // This covers the initial load and the brief moment before redirection occurs.
+  if (loading || !profile || profile.onboardingComplete === false) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -94,20 +99,7 @@ export default function HomePage() {
     );
   }
   
-  if (!profile) {
-    return (
-      <div className="container mx-auto flex h-[calc(100vh-8rem)] flex-col items-center justify-center gap-4 px-4 text-center">
-        <h2 className="text-2xl font-bold">Could Not Load Profile</h2>
-        <p className="text-muted-foreground">
-          There was an issue fetching your data. Please try refreshing the page.
-        </p>
-        <Button asChild>
-            <Link href="/profile">Go to Profile</Link>
-        </Button>
-      </div>
-    );
-  }
-  
+  // If we reach here, it means the user has a profile and has completed onboarding.
   return (
     <div className="container mx-auto px-4 py-6 md:py-12">
       <header className="mb-8">
