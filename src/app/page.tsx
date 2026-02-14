@@ -36,8 +36,8 @@ export default function AuthPage() {
 
   const [isSignup, setIsSignup] = useState(false);
   
-  const [loginState, loginAction] = useActionState(loginWithUsername, { message: '', success: false });
-  const [signupState, signupAction] = useActionState(signupWithUsername, { message: '', success: false });
+  const [loginState, loginAction] = useActionState(loginWithUsername, { message: '', success: false, redirectTo: null });
+  const [signupState, signupAction] = useActionState(signupWithUsername, { message: '', success: false, redirectTo: null });
 
   const [username, setUsername] = useState('');
   const [debouncedUsername] = useDebounce(username, 500);
@@ -46,6 +46,9 @@ export default function AuthPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   
+  const state = isSignup ? signupState : loginState;
+  const action = isSignup ? signupAction : loginAction;
+
   // This effect handles redirecting if the user is already logged in when they visit the page
   useEffect(() => {
     if (user && !loading) {
@@ -53,6 +56,13 @@ export default function AuthPage() {
     }
   }, [user, loading, router]);
   
+  // This effect handles redirecting on successful login/signup
+  useEffect(() => {
+    if (state.success && state.redirectTo) {
+        router.push(state.redirectTo);
+    }
+  }, [state, router]);
+
   useEffect(() => {
     if (isSignup && debouncedUsername) {
       setIsChecking(true);
@@ -73,9 +83,6 @@ export default function AuthPage() {
     );
   }
   
-  const state = isSignup ? signupState : loginState;
-  const action = isSignup ? signupAction : loginAction;
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="mx-auto max-w-sm w-full">
@@ -146,7 +153,7 @@ export default function AuthPage() {
                  {isSignup && <p className="text-xs text-muted-foreground">Password must be at least 6 characters long.</p>}
               </div>
               <SubmitButton isSignup={isSignup} />
-              {state?.message && (
+              {state?.message && !state.success && (
                 <Alert variant="destructive">
                   <AlertTitle>{isSignup ? 'Signup Failed' : 'Login Failed'}</AlertTitle>
                   <AlertDescription>{state.message}</AlertDescription>

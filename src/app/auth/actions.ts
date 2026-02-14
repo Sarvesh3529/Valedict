@@ -17,7 +17,7 @@ async function setSessionCookie(idToken: string) {
     });
 }
 
-export async function signupWithUsername(prevState: any, formData: FormData) {
+export async function signupWithUsername(prevState: any, formData: FormData): Promise<{message: string, success: boolean, redirectTo?: string | null}> {
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   const usernameLower = username.toLowerCase();
@@ -41,8 +41,8 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
     const token = await user.getIdToken();
     await setSessionCookie(token);
 
-    // 4. Redirect to onboarding - no database write here.
-    redirect('/onboarding/start');
+    // 4. Return success state for client-side redirect
+    return { message: 'Signup successful!', success: true, redirectTo: '/onboarding/start' };
 
   } catch (error: any) {
     console.error("SIGNUP ERROR:", error);
@@ -57,7 +57,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
   }
 }
 
-export async function loginWithUsername(prevState: any, formData: FormData) {
+export async function loginWithUsername(prevState: any, formData: FormData): Promise<{message: string, success: boolean, redirectTo?: string | null}> {
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   
@@ -71,7 +71,7 @@ export async function loginWithUsername(prevState: any, formData: FormData) {
     const userCredential = await signInWithEmailAndPassword(auth, dummyEmail, password);
     const token = await userCredential.user.getIdToken();
     await setSessionCookie(token);
-    redirect('/home');
+    return { message: 'Login successful!', success: true, redirectTo: '/home' };
   } catch (error: any) {
     console.error('Login Error Code:', error.code);
     switch (error.code) {
