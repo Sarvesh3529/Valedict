@@ -2,7 +2,6 @@
 
 import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { adminDb } from '@/lib/firebase-admin';
 
@@ -87,5 +86,10 @@ export async function loginWithUsername(prevState: any, formData: FormData): Pro
 
 export async function logout() {
     cookies().delete('firebase_token');
+    // Note: This redirect will be caught by middleware if it's on a protected route,
+    // sending the user to '/' which is the desired outcome.
+    // However, to be more explicit and handle all cases, a client-side redirect after logout is often better.
+    // For now, this server-side redirect is simple and effective.
+    const { redirect } = await import('next/navigation');
     redirect('/');
 }
