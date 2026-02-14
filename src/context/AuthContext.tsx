@@ -91,45 +91,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userRef = doc(db, "users", authUser.uid);
 
             unsubscribeProfile = onSnapshot(userRef,
-                async (docSnap) => {
+                (docSnap) => {
                     if (docSnap.exists()) {
                         setProfile(docSnap.data() as UserProfile);
                         setLoading(false);
                     } else {
-                        // This case handles new users where the profile doc might not exist yet.
-                        // We will attempt to auto-provision it.
-                        console.log(`Profile for UID ${authUser.uid} not found. Auto-provisioning...`);
-                        const newProfileData: UserProfile = {
+                        // Profile not found in DB. Create a temporary local profile with zeroed-out values.
+                        console.log(`Profile for UID ${authUser.uid} not found. Creating a temporary local profile.`);
+                        const localProfile: UserProfile = {
                             uid: authUser.uid,
                             email: authUser.email,
-                            displayName: authUser.displayName || authUser.email?.split('@')[0] || 'New User',
+                            displayName: authUser.displayName,
                             photoURL: authUser.photoURL,
-                            onboardingComplete: false,
                             currentStreak: 0,
                             highestStreak: 0,
+                            lastActivityDate: undefined,
                             totalXp: 0,
                             weeklyXp: 0,
                             lastXpReset: new Date().toISOString(),
+                            onboardingComplete: false,
                             achievements: [],
                             lastPracticedChapterId: undefined,
                         };
-                        
-                        try {
-                            // Immediately create the doc so the app can proceed
-                            await setDoc(userRef, newProfileData);
-                            // The onSnapshot listener will fire again with the new data, 
-                            // setting the profile and loading state correctly.
-                        } catch (error: any) {
-                             console.error("Failed to auto-provision user profile:", error);
-                             const permissionError = new FirestorePermissionError({
-                                path: userRef.path,
-                                operation: 'create',
-                                requestResourceData: newProfileData,
-                              } satisfies SecurityRuleContext);
-                            errorEmitter.emit('permission-error', permissionError);
-                            setProfile(null); // Stop loading if creation fails
-                            setLoading(false);
-                        }
+                        setProfile(localProfile);
+                        setLoading(false);
                     }
                 },
                 (error) => {
