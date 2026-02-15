@@ -1,58 +1,26 @@
-'use client';
+'use server';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { cookies } from 'next/headers';
+import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import { redirect } from 'next/navigation';
+import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
-import { subjects, chapters } from '@/lib/data';
-import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, Loader2, BookOpen } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import StreakDisplay from '@/components/StreakDisplay';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
-// This is needed because of the dynamic icon loading
+// UI components
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import * as Icons from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, BookOpen } from 'lucide-react';
+import StreakDisplay from '@/components/StreakDisplay';
+import { subjects, chapters } from '@/lib/data';
+import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
+
 const iconComponents: { [key: string]: React.ElementType } = {
   Calculator: Icons.Calculator,
   Zap: Icons.Zap,
   FlaskConical: Icons.FlaskConical,
   Leaf: Icons.Leaf,
 };
-
-function WeeklyProgressChart({ weeklyXp }: { weeklyXp: number }) {
-    const weeklyGoal = 500;
-    const progress = Math.min((weeklyXp / weeklyGoal) * 100, 100);
-    const data = [{ name: 'Weekly XP', xp: weeklyXp, goal: weeklyGoal }];
-
-    return (
-         <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">Weekly Progress</CardTitle>
-                <CardDescription>You've earned {weeklyXp} XP this week. Keep it up!</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={100}>
-                    <BarChart data={data} layout="vertical" margin={{ left: -20}}>
-                        <XAxis type="number" hide domain={[0, weeklyGoal]}/>
-                        <YAxis type="category" dataKey="name" hide />
-                        <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} background={{ fill: 'hsl(var(--secondary))', radius: 4 }} />
-                    </BarChart>
-                </ResponsiveContainer>
-                <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                    <span>0 XP</span>
-                    <span>Goal: {weeklyGoal} XP</span>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
 
 function ContinueLearningCard({ chapterId }: { chapterId: string }) {
     const chapter = chapters.find(c => c.id === chapterId);
@@ -72,43 +40,40 @@ function ContinueLearningCard({ chapterId }: { chapterId: string }) {
     )
 }
 
-export default function HomePage() {
-  const { user, profile, loading } = useAuth();
-  const router = useRouter();
+export default async function HomePage() {
+  const cookieStore = cookies();
+  const token = cookieStore.get('firebase_token')?.value;
 
-  useEffect(() => {
-    if (loading) {
-      return; // Wait until auth state is confirmed
-    }
-
-    if (!user) {
-      router.push('/');
-      return;
-    }
-    
-    // @ts-ignore
-    if (profile && profile.onboardingComplete === false) {
-        router.push('/onboarding/start');
-    }
-  }, [loading, user, profile, router]);
-
-  if (loading || !user || !profile) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (!token) {
+    redirect('/');
   }
-  
-  // @ts-ignore
+
+  let decodedToken;
+  try {
+    decodedToken = await adminAuth.verifyIdToken(token);
+  } catch (error) {
+    // Invalid token, delete cookie and redirect
+    cookieStore.delete('firebase_token');
+    redirect('/');
+  }
+
+  const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
+
+  if (!userDoc.exists) {
+    // This can happen if signup fails after auth user creation but before DB write.
+    // Or if user is deleted from DB but not Auth.
+    cookieStore.delete('firebase_token');
+    redirect('/');
+  }
+
+  const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
+
   if (profile.onboardingComplete === false) {
-     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    redirect('/onboarding/start');
   }
   
+  const lastActiveDate = profile.lastactive?.toDate().toISOString();
+
   return (
     <div className="container mx-auto px-4 py-6 md:py-12">
       <header className="mb-8">
@@ -180,24 +145,19 @@ export default function HomePage() {
 
         {/* Right sidebar */}
         <div className="space-y-8">
-             {/* @ts-ignore */}
             {profile.lastPracticedChapterId && (
-                 // @ts-ignore
                 <Link href={`/quiz?chapter=${profile.lastPracticedChapterId}`}>
-                     {/* @ts-ignore */}
                     <ContinueLearningCard chapterId={profile.lastPracticedChapterId} />
                 </Link>
             )}
             <StreakDisplay 
                 currentStreak={profile?.streak || 0}
                 highestStreak={profile?.streak || 0} // highestStreak not in model
-                 // @ts-ignore
-                lastActivityDate={profile?.lastactive?.toDate().toISOString()}
+                lastActivityDate={lastActiveDate}
             />
             <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
       </div>
-
     </div>
   );
 }

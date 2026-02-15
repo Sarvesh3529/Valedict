@@ -7,6 +7,7 @@ export type UserProfile = {
   joinedat: any; // Firestore Timestamp
   lastactive: any; // Firestore Timestamp
   onboardingComplete: boolean;
+  lastPracticedChapterId?: string;
 };
 
 export type Subject = {

@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useActionState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,12 +10,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { signupWithUsername, loginWithUsername } from './auth/actions';
 
-function SubmitButton({ isSignup }: { isSignup: boolean }) {
-  const { pending } = useFormStatus();
-
+function SubmitButton({ isSignup, isPending }: { isSignup: boolean, isPending: boolean }) {
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? (
+    <Button type="submit" className="w-full" disabled={isPending}>
+      {isPending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Please wait
@@ -33,17 +30,27 @@ function SubmitButton({ isSignup }: { isSignup: boolean }) {
 export default function AuthPage() {
   const router = useRouter();
   const [isSignup, setIsSignup] = useState(false);
-  
-  const [signupState, signupAction] = useActionState(signupWithUsername, { message: null, success: false, redirectTo: null });
-  const [loginState, loginAction] = useActionState(loginWithUsername, { message: null, success: false, redirectTo: null });
+  const [isPending, setIsPending] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  const state = isSignup ? signupState : loginState;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsPending(true);
+    setMessage(null);
 
-  useEffect(() => {
-    if (state.success && state.redirectTo) {
-      router.push(state.redirectTo);
+    const formData = new FormData(event.currentTarget);
+    const action = isSignup ? signupWithUsername : loginWithUsername;
+
+    const result = await action({ message: null, success: false }, formData);
+
+    if (result.success && result.redirectTo) {
+      router.push(result.redirectTo);
+      router.refresh();
+    } else {
+      setMessage(result.message);
+      setIsPending(false);
     }
-  }, [state, router]);
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -56,23 +63,25 @@ export default function AuthPage() {
           <CardDescription>{isSignup ? 'Enter your details to get started.' : 'Sign in to continue your learning.'}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form key={isSignup ? 'signup' : 'login'} action={isSignup ? signupAction : loginAction} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" name="username" placeholder="e.g., studious_student" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required />
-            </div>
-            
-            {state?.message && !state.success && (
-              <Alert variant="destructive">
-                <AlertDescription>{state.message}</AlertDescription>
-              </Alert>
-            )}
+          <form onSubmit={handleSubmit} key={isSignup ? 'signup' : 'login'}>
+            <div className="space-y-4">
+                <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input id="username" name="username" placeholder="e.g., studious_student" required />
+                </div>
+                <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" name="password" type="password" required />
+                </div>
+                
+                {message && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{message}</AlertDescription>
+                  </Alert>
+                )}
 
-            <SubmitButton isSignup={isSignup} />
+                <SubmitButton isSignup={isSignup} isPending={isPending}/>
+            </div>
           </form>
           <div className="mt-4 text-center text-sm">
             {isSignup ? 'Already have an account?' : "Don't have an account?"}
