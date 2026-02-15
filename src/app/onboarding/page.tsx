@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CalendarIcon, Check, ChevronRight, Loader2 } from 'lucide-react';
+import { CalendarIcon, Check, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { onboardingQuestions, type OnboardingQuestion } from '@/lib/onboarding-questions';
-import { saveOnboardingResponse } from '@/lib/onboarding';
-import { markOnboardingComplete } from '@/lib/user';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
@@ -29,29 +26,17 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, profile, loading } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isAnimating, setIsAnimating] = useState(false);
   const [date, setDate] = useState<Date>();
   
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/');
-    }
-    if (!loading && profile && profile.onboardingComplete) {
-      router.replace('/home');
-    }
-  }, [user, profile, loading, router]);
-  
   const handleAnswer = useCallback(async (question: OnboardingQuestion, answer: any) => {
-    if (isAnimating || !user) return;
+    if (isAnimating) return;
     setIsAnimating(true);
     
     const newResponses = { ...responses, [question.firestoreField]: answer };
     setResponses(newResponses);
-
-    await saveOnboardingResponse(user.uid, { [question.firestoreField]: answer });
 
     setTimeout(() => {
       if (currentQuestionIndex < onboardingQuestions.length -1) {
@@ -59,7 +44,6 @@ export default function OnboardingPage() {
         setIsAnimating(false);
       } else {
         // This is the last question, handle completion
-        markOnboardingComplete(user.uid);
         const grade = newResponses.grade;
         const troublingSubjects = (newResponses.troublingSubjects || []) as string[];
 
@@ -67,20 +51,11 @@ export default function OnboardingPage() {
             const subjectsParam = troublingSubjects.join(',');
             router.push(`/revision/start?subjects=${subjectsParam}&grade=${grade}`);
         } else {
-            router.push('/home');
+            router.push('/');
         }
       }
     }, 400);
-  }, [isAnimating, user, responses, currentQuestionIndex, router]);
-
-
-  if (loading || !user || (profile && profile.onboardingComplete)) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-900">
-        <Loader2 className="h-8 w-8 animate-spin text-white" />
-      </div>
-    );
-  }
+  }, [isAnimating, responses, currentQuestionIndex, router]);
 
   const question = onboardingQuestions[currentQuestionIndex];
 

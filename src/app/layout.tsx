@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { AuthProvider } from '@/context/AuthContext';
-import ConditionalHeader from '@/components/ConditionalHeader';
+import Header from '@/components/header';
 import { ThemeProvider } from '@/components/theme-provider';
-import ConditionalFooter from '@/components/ConditionalFooter';
+import BottomNav from '@/components/BottomNav';
 
 export const metadata: Metadata = {
   title: 'Valedict AI',
@@ -39,14 +38,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
             <div className="relative flex min-h-screen flex-col">
-              <ConditionalHeader />
+              <Header />
               <main className="flex-1 pb-24 md:pb-0">{children}</main>
-              <ConditionalFooter />
+              <BottomNav />
             </div>
             <Toaster />
-          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -2,18 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, User, LogOut, Trophy } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
-import { useAuth } from '@/context/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { logout } from '@/app/auth/actions';
 
 const navLinks = [
-  { href: '/home', label: 'Home', icon: Home },
+  { href: '/', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
@@ -22,60 +18,11 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const { user, profile } = useAuth();
-
-  const UserNav = () => {
-    if (!user || !profile) {
-      return (
-        <Button asChild size="sm">
-          <Link href="/">Sign In</Link>
-        </Button>
-      )
-    }
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-            <Avatar className="h-9 w-9">
-              <AvatarImage src={profile.photoURL ?? ''} alt={profile.displayName ?? ''} />
-              <AvatarFallback>{profile.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end" forceMount>
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{profile.displayName || 'User'}</p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {profile.email}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/profile">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <form action={logout}>
-            <DropdownMenuItem asChild>
-                <button type="submit" className="w-full cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                </button>
-            </DropdownMenuItem>
-          </form>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/home" className="flex items-center gap-2 font-bold">
+        <Link href="/" className="flex items-center gap-2 font-bold">
           <BrainCircuit className="h-6 w-6 text-primary" />
           <span className="font-headline text-lg hidden sm:inline-block">Valedict AI</span>
         </Link>
@@ -105,7 +52,6 @@ export default function Header() {
         
         <div className="flex items-center gap-2">
             <ThemeToggle />
-            <UserNav />
         </div>
       </div>
     </header>

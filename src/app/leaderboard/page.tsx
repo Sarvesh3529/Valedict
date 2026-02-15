@@ -1,93 +1,57 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
-import type { UserProfile } from '@/lib/types';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import type { QuizQuestion } from '@/lib/types'; // UserProfile is removed, this might be unused. I'll change it.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Crown, Loader2, User, ShieldX } from 'lucide-react';
+import { Crown, Loader2, ShieldX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
+// Simplified User Type since UserProfile is gone
+type LeaderboardUser = {
+  uid: string;
+  displayName: string | null;
+  photoURL: string | null;
+  weeklyXp?: number;
+  totalXp?: number;
+}
+
 type LeaderboardType = 'weekly' | 'all-time';
 
-const renderRank = (rank: number, type: 'leaderboard' | 'user') => {
-  const size = type === 'leaderboard' ? 'h-6 w-6' : 'h-8 w-8';
+const renderRank = (rank: number) => {
+  const size = 'h-6 w-6';
   if (rank === 0) return <Crown className={cn(size, "text-yellow-400 fill-yellow-400")} />;
   if (rank === 1) return <Crown className={cn(size, "text-gray-400 fill-gray-400")} />;
   if (rank === 2) return <Crown className={cn(size, "text-orange-400 fill-orange-400")} />;
-  return <span className={cn("font-bold", type === 'leaderboard' ? 'text-lg' : 'text-2xl')}>{rank + 1}</span>;
+  return <span className="font-bold text-lg">{rank + 1}</span>;
 };
 
-const CurrentUserCard = ({ user, profile, rank, type }: { user: any, profile: UserProfile, rank: number | null, type: LeaderboardType}) => {
-    return (
-        <Card className="mt-8 sticky bottom-24 md:bottom-4 border-primary/50 ring-2 ring-primary/50 shadow-lg">
-            <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 text-center flex-shrink-0">
-                       {rank !== null ? renderRank(rank, 'user') : <User className="h-8 w-8 mx-auto"/>}
-                    </div>
-                    <Avatar className="h-12 w-12">
-                        <AvatarImage src={user.photoURL ?? ''} />
-                        <AvatarFallback>{profile.displayName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-                    </Avatar>
-                    <p className="font-bold text-lg flex-1 break-words">{profile.displayName || 'Anonymous User'}</p>
-                    <div className="text-right">
-                        <p className="font-bold text-xl text-primary">{type === 'weekly' ? (profile.weeklyXp || 0) : (profile.totalXp || 0)} XP</p>
-                        <p className="text-xs text-muted-foreground">{rank !== null ? `Rank #${rank + 1}` : 'Not Ranked'}</p>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
 export default function LeaderboardPage() {
-  const { user, profile, loading: authLoading } = useAuth();
-  const router = useRouter();
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('weekly');
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace('/');
-    }
-  }, [user, authLoading, router]);
-
-  useEffect(() => {
-    if (!user || !profile) return;
-
     const fetchLeaderboard = async () => {
       setLoading(true);
       setError(null);
       const field = leaderboardType === 'weekly' ? 'weeklyXp' : 'totalXp';
       
+      // Public access to users collection is needed for this to work now.
       const usersRef = collection(db, 'users');
       const q = query(usersRef, orderBy(field, 'desc'), limit(50));
       
       try {
         const querySnapshot = await getDocs(q);
-        const leaderboardUsers: UserProfile[] = [];
+        const leaderboardUsers: LeaderboardUser[] = [];
         querySnapshot.forEach((doc) => {
-          leaderboardUsers.push(doc.data() as UserProfile);
+          leaderboardUsers.push(doc.data() as LeaderboardUser);
         });
         setUsers(leaderboardUsers);
-
-        // Fetch current user's rank
-        const currentUserScore = profile[field] || 0;
-        if (currentUserScore > 0) {
-          const rankQuery = query(usersRef, where(field, '>', currentUserScore));
-          const rankSnapshot = await getCountFromServer(rankQuery);
-          setCurrentUserRank(rankSnapshot.data().count);
-        } else {
-          setCurrentUserRank(null);
-        }
 
       } catch (e: any) {
         if (e.code === 'permission-denied') {
@@ -102,15 +66,8 @@ export default function LeaderboardPage() {
     };
 
     fetchLeaderboard();
-  }, [leaderboardType, user, profile]);
+  }, [leaderboardType]);
   
-  if (authLoading || !user || !profile) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   const renderContent = () => {
     if (loading) {
@@ -125,7 +82,7 @@ export default function LeaderboardPage() {
         </Alert>
       );
     }
-    return <UserList users={users} type={leaderboardType} currentUserId={user.uid} />;
+    return <UserList users={users} type={leaderboardType} />;
   }
 
   return (
@@ -146,12 +103,11 @@ export default function LeaderboardPage() {
           </Tabs>
         </CardContent>
       </Card>
-      {profile && !error && <CurrentUserCard user={user} profile={profile} rank={currentUserRank} type={leaderboardType} />}
     </div>
   );
 }
 
-function UserList({ users, type, currentUserId }: { users: UserProfile[], type: LeaderboardType, currentUserId: string }) {
+function UserList({ users, type }: { users: LeaderboardUser[], type: LeaderboardType}) {
   if (users.length === 0) {
     return <p className="text-center text-muted-foreground p-8">The leaderboard is empty. Complete a quiz to get started!</p>
   }
@@ -159,12 +115,9 @@ function UserList({ users, type, currentUserId }: { users: UserProfile[], type: 
   return (
     <div className="space-y-2 pt-4">
       {users.map((u, index) => (
-        <div key={u.uid} className={cn(
-            "flex items-center gap-4 p-3 rounded-lg bg-card transition-all",
-            u.uid === currentUserId && "bg-primary/10 ring-2 ring-primary/80"
-        )}>
+        <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card transition-all">
           <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
-             {renderRank(index, 'leaderboard')}
+             {renderRank(index)}
           </div>
           <Avatar>
             <AvatarImage src={u.photoURL ?? ''} />

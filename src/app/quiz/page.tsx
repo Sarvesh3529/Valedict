@@ -7,65 +7,35 @@ import QuizView from '@/components/quiz/quiz-view';
 import QuizResults from '@/components/quiz/quiz-results';
 import { generateQuiz } from '@/lib/quiz-logic';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/context/AuthContext';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 type QuizState = 'setup' | 'active' | 'results';
 
 export default function QuizPage() {
-  const { user, loading: userLoading, updateUserStreak, awardXp } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [quizState, setQuizState] = useState<QuizState>('setup');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
-  const [userGrade, setUserGrade] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const userGrade = '9'; // Hardcoded grade since auth is removed
+  const [loading, setLoading] = useState(false);
 
   // Auto-start quiz if chapterId is in URL
   useEffect(() => {
     const chapterId = searchParams.get('chapter');
     if (chapterId && userGrade) {
+        setLoading(true);
         const generatedQuestions = generateQuiz([chapterId], 7, userGrade, 'all');
         if (generatedQuestions.length > 0) {
             setQuestions(generatedQuestions);
             setQuizState('active');
         }
+        setLoading(false);
     }
   }, [searchParams, userGrade]);
 
-  useEffect(() => {
-    if (userLoading) return;
-    if (!user) {
-      router.replace('/');
-      return;
-    }
-    
-    const fetchGrade = async () => {
-      const docRef = doc(db, 'onboardingResponses', user.uid);
-      try {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().grade) {
-          setUserGrade(docSnap.data().grade);
-        } else {
-          setUserGrade('9');
-        }
-      } catch (error) {
-        console.error("Error fetching user grade:", error);
-        setUserGrade('9');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchGrade();
-  }, [user, userLoading, router]);
 
   const handleStartQuiz = (
     chapterIds: string[],
@@ -89,19 +59,6 @@ export default function QuizPage() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setQuizState('results');
-    updateUserStreak();
-    awardXp(finalResults.length);
-
-    // Set last practiced chapter ID
-    if (user && finalResults.length > 0) {
-        const chapterId = finalResults[0].question.chapterId;
-        const userRef = doc(db, 'users', user.uid);
-        const data = { lastPracticedChapterId: chapterId };
-        updateDoc(userRef, data).catch(err => {
-            const permissionError = new FirestorePermissionError({ path: userRef.path, operation: 'update', requestResourceData: data });
-            errorEmitter.emit('permission-error', permissionError);
-        });
-    }
   };
 
   const handleRestart = () => {
@@ -122,7 +79,7 @@ export default function QuizPage() {
     }
   };
   
-  if (userLoading || loading) {
+  if (loading) {
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />

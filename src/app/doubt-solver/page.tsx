@@ -17,7 +17,6 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuth } from '@/context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 
 function TypingIndicator() {
@@ -41,7 +40,6 @@ function SubmitButton() {
 }
 
 export default function DoubtSolverPage() {
-  const { user } = useAuth();
   const [state, formAction, isPending] = useActionState(solveDoubt, { userQuestion: null, explanation: '', error: null });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState<string>('');
@@ -111,7 +109,6 @@ export default function DoubtSolverPage() {
                                     {state.userQuestion.image && <Image src={state.userQuestion.image} alt="Your question" width={200} height={150} className="rounded-md"/>}
                                 </div>
                                 <Avatar className="h-9 w-9">
-                                    <AvatarImage src={user?.photoURL ?? ''} />
                                     <AvatarFallback><User /></AvatarFallback>
                                 </Avatar>
                             </div>

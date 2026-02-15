@@ -3,28 +3,9 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, FileQuestion, Loader2 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { ArrowRight, FileQuestion } from 'lucide-react';
 
 export default function OnboardingStartPage() {
-  const { profile, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && profile && profile.onboardingComplete) {
-      router.replace('/home');
-    }
-  }, [loading, profile, router]);
-
-  if (loading || (profile && profile.onboardingComplete)) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-900">
-        <Loader2 className="h-8 w-8 animate-spin text-white" />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">

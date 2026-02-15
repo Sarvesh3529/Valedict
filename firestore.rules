@@ -1,43 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper Functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    // Collection Rules
-    match /onboardingResponses/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false;
-      allow create, update: if isOwner(userId);
-      allow delete: if false;
-    }
-
-    match /users/{userId} {
-      // READ: Only the owner can read their own profile.
-      // This rule breaks features like leaderboards.
-      allow get: if isOwner(userId);
-      allow list: if false;
-
-      // WRITE: Only the owner can create or update their own profile.
-      allow create, update: if isOwner(userId);
-      allow delete: if false;
-    }
-    
-    match /usernames/{username} {
-        // Allow anyone to read to check for username availability.
-        allow read: if true;
-        // Only an authenticated user can create their own username lock document.
-        allow create: if isSignedIn() && request.auth.uid == request.resource.data.uid;
-        // Nobody can update or delete a username lock once created.
-        allow update, delete: if false;
-    }
-
     match /quizzes/{document=**} {
       allow read: if true;
       allow write: if false;

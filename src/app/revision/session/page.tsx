@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { generateQuiz } from '@/lib/quiz-logic';
 import type { QuizQuestion, QuizResult } from '@/lib/types';
 import { subjects } from '@/lib/data';
-import { useAuth } from '@/context/AuthContext';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,6 @@ import QuizResults from '@/components/quiz/quiz-results';
 function RevisionSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { updateUserStreak, awardXp } = useAuth();
   const subjectIdsParam = searchParams.get('subjects');
   const grade = searchParams.get('grade');
 
@@ -42,13 +40,11 @@ function RevisionSessionContent() {
   const handleFinishQuiz = (finalResults: QuizResult[]) => {
     setResults(finalResults);
     setIsFinished(true);
-    updateUserStreak();
-    awardXp(finalResults.length);
   };
 
   const handleRestart = () => {
     // For a revision session, restarting should take you to the main dashboard
-    router.push('/home');
+    router.push('/');
   };
 
   if (!subjectIdsParam || !grade) {
@@ -60,7 +56,7 @@ function RevisionSessionContent() {
                 <CardDescription>Required subject or grade information is missing.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Button onClick={() => router.push('/home')}>Go to Dashboard</Button>
+                <Button onClick={() => router.push('/')}>Go to Dashboard</Button>
             </CardContent>
         </Card>
       </div>
@@ -79,7 +75,7 @@ function RevisionSessionContent() {
                 <CardDescription>Finding the best questions for you. This might take a moment.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Button onClick={() => router.push('/home')}>Go to Dashboard</Button>
+                <Button onClick={() => router.push('/')}>Go to Dashboard</Button>
             </CardContent>
         </Card>
       </div>

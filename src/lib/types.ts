@@ -27,19 +27,3 @@ export type QuizResult = {
   userAnswer: number | null;
   isCorrect: boolean;
 };
-
-export type UserProfile = {
-  uid: string;
-  email: string | null;
-  displayName: string | null; // This is the unique, user-chosen username
-  photoURL: string | null;
-  currentStreak?: number;
-  highestStreak?: number;
-  lastActivityDate?: string;
-  totalXp?: number;
-  weeklyXp?: number;
-  lastXpReset?: string;
-  onboardingComplete?: boolean;
-  achievements?: string[];
-  lastPracticedChapterId?: string;
-};

@@ -2,24 +2,23 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, NotebookText, BrainCircuit, User, Trophy } from 'lucide-react';
+import { Home, NotebookText, Trophy } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
 
 const navLinks = [
-  { href: '/home', label: 'Home', icon: Home },
+  { href: '/', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/leaderboard', label: 'Rank', icon: Trophy },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/doubt-solver', label: 'Doubt Solver', icon: NotebookText },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const { user } = useAuth();
 
-  if (!isMobile || !user) {
+  const hideOnRoutes = ['/onboarding', '/revision'];
+  if (!isMobile || hideOnRoutes.some(route => pathname.startsWith(route))) {
     return null;
   }
 

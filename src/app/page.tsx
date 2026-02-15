@@ -1,177 +1,112 @@
 'use client';
 
-import { useActionState, useState, useEffect } from 'react';
-import { useFormStatus } from 'react-dom';
-import { useDebounce } from 'use-debounce';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { loginWithUsername, signupWithUsername } from '@/app/auth/actions';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BrainCircuit, Loader2, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
-import { checkUsernameAvailability } from '@/lib/username';
-import { useAuth } from '@/context/AuthContext';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { subjects, chapters } from '@/lib/data';
+import * as Icons from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight } from 'lucide-react';
 
+// This is needed because of the dynamic icon loading
+const iconComponents: { [key: string]: React.ElementType } = {
+  Calculator: Icons.Calculator,
+  Zap: Icons.Zap,
+  FlaskConical: Icons.FlaskConical,
+  Leaf: Icons.Leaf,
+};
 
-function SubmitButton({ isSignup }: { isSignup: boolean }) {
-  const { pending } = useFormStatus();
+export default function HomePage() {
+  
   return (
-    <Button type="submit" disabled={pending} className="w-full">
-      {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Please wait
-        </>
-      ) : isSignup ? 'Create Account' : 'Sign In'}
-    </Button>
-  );
-}
+    <div className="container mx-auto px-4 py-6 md:py-12">
+      <header className="mb-8">
+        <h1 className="font-headline text-3xl md:text-4xl font-bold text-primary mb-2">
+          Welcome, Student!
+        </h1>
+        <p className="text-muted-foreground">Let's make today a productive day.</p>
+      </header>
 
-export default function AuthPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        {/* Main column */}
+        <div className="lg:col-span-2 space-y-8">
+            {/* Quick Actions */}
+            <div>
+                <h2 className="text-2xl font-bold mb-4 font-headline">Quick Actions</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Link href="/doubt-solver" className="h-full">
+                        <Card className="h-full bg-primary/10 hover:bg-primary/20 transition-colors flex flex-col justify-between p-4 md:p-6">
+                            <div>
+                                <BrainCircuit className="h-8 w-8 md:h-10 md:w-10 text-primary mb-4"/>
+                                <h3 className="text-lg md:text-xl font-bold font-headline mb-1">AI Doubt Solver</h3>
+                                <p className="text-muted-foreground">Stuck? Get an instant explanation.</p>
+                            </div>
+                            <div className="text-primary font-semibold flex items-center mt-4">
+                                Ask a question <ArrowRight className="ml-2 h-5 w-5"/>
+                            </div>
+                        </Card>
+                    </Link>
+                    <Link href="/quiz" className="h-full">
+                         <Card className="h-full bg-secondary hover:bg-secondary/80 transition-colors flex flex-col justify-between p-4 md:p-6">
+                            <div>
+                                <NotebookText className="h-8 w-8 md:h-10 md:w-10 text-foreground/80 mb-4"/>
+                                <h3 className="text-lg md:text-xl font-bold font-headline mb-1">Custom Quiz</h3>
+                                <p className="text-muted-foreground">Test your knowledge on any chapter.</p>
+                            </div>
+                            <div className="text-foreground/90 font-semibold flex items-center mt-4">
+                                Create a quiz <ArrowRight className="ml-2 h-5 w-5"/>
+                            </div>
+                        </Card>
+                    </Link>
+                </div>
+            </div>
+             {/* Practice by Subject Section */}
+            <div>
+                <h2 className="text-2xl font-bold mb-4 font-headline">Practice by Subject</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {subjects.map((subject) => {
+                    const Icon = iconComponents[subject.iconName] || Icons.GraduationCap;
+                    return (
+                    <Card key={subject.id} className="flex flex-col">
+                        <CardHeader className="flex-row items-center gap-4 space-y-0">
+                        <Icon className="h-7 w-7 text-primary" />
+                        <CardTitle className="font-headline">{subject.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                            <p className="text-sm text-muted-foreground">Practice {subject.chapters.length} chapters and master {subject.name}.</p>
+                        </CardContent>
+                        <div className="p-6 pt-0">
+                        <Button asChild className="w-full">
+                            <Link href="/quiz">Start Practice</Link>
+                        </Button>
+                        </div>
+                    </Card>
+                    );
+                })}
+                </div>
+            </div>
+        </div>
 
-  const [isSignup, setIsSignup] = useState(false);
-  
-  const [loginState, loginAction] = useActionState(loginWithUsername, { message: '', success: false, redirectTo: null });
-  const [signupState, signupAction] = useActionState(signupWithUsername, { message: '', success: false, redirectTo: null });
-
-  const [username, setUsername] = useState('');
-  const [debouncedUsername] = useDebounce(username, 500);
-  const [availability, setAvailability] = useState<{ available: boolean; message: string } | null>(null);
-  const [isChecking, setIsChecking] = useState(false);
-
-  const [showPassword, setShowPassword] = useState(false);
-  
-  const state = isSignup ? signupState : loginState;
-  const action = isSignup ? signupAction : loginAction;
-
-  // This effect handles redirecting if the user is already logged in when they visit the page
-  useEffect(() => {
-    if (user && !loading) {
-      router.replace('/home');
-    }
-  }, [user, loading, router]);
-  
-  // This effect handles redirecting on successful login/signup
-  useEffect(() => {
-    if (state.success && state.redirectTo) {
-        router.push(state.redirectTo);
-    }
-  }, [state, router]);
-
-  useEffect(() => {
-    if (isSignup && debouncedUsername) {
-      setIsChecking(true);
-      checkUsernameAvailability(debouncedUsername).then(result => {
-        setAvailability(result);
-        setIsChecking(false);
-      });
-    } else {
-      setAvailability(null);
-    }
-  }, [debouncedUsername, isSignup]);
-
-  if (loading || user) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        {/* Right sidebar */}
+        <div className="space-y-8">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Welcome to Valedict AI</CardTitle>
+                    <CardDescription>Your personal AI-powered learning assistant.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                        Use the tools on this page to solve doubts, practice subjects, and test your knowledge with custom quizzes.
+                    </p>
+                </CardContent>
+            </Card>
+        </div>
       </div>
-    );
-  }
-  
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="mx-auto max-w-sm w-full">
-        <CardHeader className="text-center">
-          <BrainCircuit className="mx-auto h-10 w-10 text-primary mb-2" />
-          <CardTitle className="text-2xl font-headline">{isSignup ? 'Create an Account' : 'Welcome Back'}</CardTitle>
-          <CardDescription>{isSignup ? 'Choose a unique username to get started.' : 'Sign in to continue your learning journey.'}</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <form key={isSignup ? 'signup' : 'login'} action={action} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="username">Username</Label>
-                <div className="relative">
-                  <Input 
-                    id="username" 
-                    name="username" 
-                    placeholder="e.g., student_one" 
-                    required 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    autoComplete="username"
-                  />
-                  {isSignup && (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        {isChecking && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                        {!isChecking && availability?.available && <CheckCircle className="h-4 w-4 text-green-500" />}
-                        {!isChecking && availability && !availability.available && <XCircle className="h-4 w-4 text-destructive" />}
-                    </div>
-                  )}
-                </div>
-                 <AnimatePresence>
-                  {isSignup && availability && (
-                    <motion.p 
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className={`text-sm ${availability.available ? 'text-green-500' : 'text-destructive'}`}
-                    >
-                      {availability.message}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input 
-                    id="password" 
-                    name="password" 
-                    type={showPassword ? 'text' : 'password'} 
-                    required 
-                    minLength={6}
-                    className="pr-10"
-                    autoComplete={isSignup ? 'new-password' : 'current-password'}
-                  />
-                  <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground" 
-                      onClick={() => setShowPassword(!showPassword)}
-                  >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
-                  </Button>
-                </div>
-                 {isSignup && <p className="text-xs text-muted-foreground">Password must be at least 6 characters long.</p>}
-              </div>
-              <SubmitButton isSignup={isSignup} />
-              {state?.message && !state.success && (
-                <Alert variant="destructive">
-                  <AlertTitle>{isSignup ? 'Signup Failed' : 'Login Failed'}</AlertTitle>
-                  <AlertDescription>{state.message}</AlertDescription>
-                </Alert>
-              )}
-            </form>
-          <div className="mt-4 text-center text-sm">
-            {isSignup ? "Already have an account? " : "Don't have an account? "}
-            <Button variant="link" className="p-0 h-auto" onClick={() => {
-                setIsSignup(!isSignup);
-                setAvailability(null);
-                setUsername('');
-            }}>
-              {isSignup ? 'Sign In' : 'Sign Up'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
