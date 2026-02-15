@@ -1,6 +1,7 @@
 'use server';
 
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
@@ -57,8 +58,8 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
       totalxp: 0,
       weeklyxp: 0,
       streak: 0,
-      joinedat: adminDb.FieldValue.serverTimestamp(),
-      lastactive: adminDb.FieldValue.serverTimestamp(),
+      joinedat: FieldValue.serverTimestamp(),
+      lastactive: FieldValue.serverTimestamp(),
       onboardingComplete: false,
     });
 
