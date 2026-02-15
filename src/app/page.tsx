@@ -34,8 +34,8 @@ export default function AuthPage() {
   const router = useRouter();
   const [isSignup, setIsSignup] = useState(false);
   
-  const [signupState, signupAction] = useActionState(signupWithUsername, { message: null, success: false });
-  const [loginState, loginAction] = useActionState(loginWithUsername, { message: null, success: false });
+  const [signupState, signupAction] = useActionState(signupWithUsername, { message: null, success: false, redirectTo: null });
+  const [loginState, loginAction] = useActionState(loginWithUsername, { message: null, success: false, redirectTo: null });
 
   const state = isSignup ? signupState : loginState;
 
@@ -56,7 +56,7 @@ export default function AuthPage() {
           <CardDescription>{isSignup ? 'Enter your details to get started.' : 'Sign in to continue your learning.'}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={isSignup ? signupAction : loginAction} className="space-y-4">
+          <form key={isSignup ? 'signup' : 'login'} action={isSignup ? signupAction : loginAction} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input id="username" name="username" placeholder="e.g., studious_student" required />
@@ -66,8 +66,8 @@ export default function AuthPage() {
               <Input id="password" name="password" type="password" required />
             </div>
             
-            {state?.message && (
-              <Alert variant={state.success ? 'default' : 'destructive'}>
+            {state?.message && !state.success && (
+              <Alert variant="destructive">
                 <AlertDescription>{state.message}</AlertDescription>
               </Alert>
             )}
