@@ -1,7 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { adminAuth } from './lib/firebase-admin';
 
-export function middleware(request: NextRequest) {
+async function verifyToken(token: string) {
+    try {
+        await adminAuth.verifyIdToken(token);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get('firebase_token')?.value;
   const { pathname } = request.nextUrl;
 
@@ -12,14 +22,16 @@ export function middleware(request: NextRequest) {
 
   // If user is not authenticated and trying to access a protected route, redirect to login
   if (!token && isProtectedRoute) {
-    console.log(`[Middleware] No token, redirecting from protected route: ${pathname}`);
-    return NextResponse.redirect(new URL('/', request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    return NextResponse.redirect(url);
   }
 
   // If user is authenticated and trying to access a login/signup page, redirect to home
   if (token && authRoutes.includes(pathname)) {
-    console.log(`[Middleware] Has token, redirecting from auth route: ${pathname}`);
-    return NextResponse.redirect(new URL('/home', request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = '/home';
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

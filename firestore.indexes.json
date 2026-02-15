@@ -4,10 +4,14 @@
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
-        {
-          "fieldPath": "displayName",
-          "order": "ASCENDING"
-        }
+        { "fieldPath": "totalxp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "weeklyxp", "order": "DESCENDING" }
       ]
     }
   ],

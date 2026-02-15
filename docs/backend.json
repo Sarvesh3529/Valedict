@@ -1,50 +1,43 @@
 {
   "entities": {
-    "Quiz": {
-      "title": "Quiz",
-      "description": "Represents a quiz with a title and description.",
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user profile data.",
       "type": "object",
       "properties": {
-        "title": {
-          "type": "string",
-          "description": "The title of the quiz."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description of the quiz."
-        }
+        "username": { "type": "string", "description": "The user's public display name." },
+        "totalxp": { "type": "number", "description": "User's all-time experience points." },
+        "weeklyxp": { "type": "number", "description": "User's experience points for the current week." },
+        "streak": { "type": "number", "description": "User's current daily study streak." },
+        "joinedat": { "type": "string", "format": "date-time", "description": "Timestamp when the user joined." },
+        "lastactive": { "type": "string", "format": "date-time", "description": "Timestamp of the user's last activity." },
+        "onboardingComplete": { "type": "boolean", "description": "Flag indicating if the user has completed the onboarding flow." }
       },
-      "required": ["title"]
+      "required": ["username", "totalxp", "weeklyxp", "streak", "joinedat", "lastactive", "onboardingComplete"]
     },
-    "Question": {
-      "title": "Question",
-      "description": "A single question within a quiz.",
+    "Username": {
+      "title": "Username Registry",
+      "description": "Ensures unique usernames.",
       "type": "object",
       "properties": {
-        "text": {
-          "type": "string",
-          "description": "The question text."
-        },
-        "options": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "A list of possible answers."
-        },
-        "correctAnswerIndex": {
-          "type": "number",
-          "description": "The index of the correct answer in the options array."
-        }
+        "uid": { "type": "string", "description": "The UID of the user who owns this username." }
       },
-      "required": ["text", "options", "correctAnswerIndex"]
+      "required": ["uid"]
     }
   },
   "auth": {
-    "providers": []
+    "providers": ["emailpassword"]
   },
   "firestore": {
-    "/quizzes/{quizId}": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "description": "Stores user profile data. The document ID is the user's UID."
+    },
+    "/usernames/{username}": {
+      "schema": { "$ref": "#/backend/entities/Username" },
+      "description": "A registry to ensure unique usernames. The document ID is the lowercase username."
+    },
+     "/quizzes/{quizId}": {
       "schema": {
         "$ref": "#/backend/entities/Quiz"
       },

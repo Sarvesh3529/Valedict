@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import type { QuizQuestion } from '@/lib/types'; // UserProfile is removed, this might be unused. I'll change it.
+import type { UserProfile } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Crown, Loader2, ShieldX } from 'lucide-react';
@@ -10,16 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-// Simplified User Type since UserProfile is gone
-type LeaderboardUser = {
-  uid: string;
-  displayName: string | null;
-  photoURL: string | null;
-  weeklyXp?: number;
-  totalXp?: number;
-}
-
-type LeaderboardType = 'weekly' | 'all-time';
+type LeaderboardType = 'weeklyxp' | 'totalxp';
 
 const renderRank = (rank: number) => {
   const size = 'h-6 w-6';
@@ -30,8 +21,8 @@ const renderRank = (rank: number) => {
 };
 
 export default function LeaderboardPage() {
-  const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('weekly');
-  const [users, setUsers] = useState<LeaderboardUser[]>([]);
+  const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('weeklyxp');
+  const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,17 +30,16 @@ export default function LeaderboardPage() {
     const fetchLeaderboard = async () => {
       setLoading(true);
       setError(null);
-      const field = leaderboardType === 'weekly' ? 'weeklyXp' : 'totalXp';
+      const field = leaderboardType;
       
-      // Public access to users collection is needed for this to work now.
       const usersRef = collection(db, 'users');
       const q = query(usersRef, orderBy(field, 'desc'), limit(50));
       
       try {
         const querySnapshot = await getDocs(q);
-        const leaderboardUsers: LeaderboardUser[] = [];
+        const leaderboardUsers: UserProfile[] = [];
         querySnapshot.forEach((doc) => {
-          leaderboardUsers.push(doc.data() as LeaderboardUser);
+          leaderboardUsers.push({ uid: doc.id, ...doc.data() } as UserProfile);
         });
         setUsers(leaderboardUsers);
 
@@ -95,11 +85,11 @@ export default function LeaderboardPage() {
         <CardContent>
           <Tabs value={leaderboardType} onValueChange={(value) => setLeaderboardType(value as LeaderboardType)} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="weekly">Weekly</TabsTrigger>
-              <TabsTrigger value="all-time">All-Time</TabsTrigger>
+              <TabsTrigger value="weeklyxp">Weekly</TabsTrigger>
+              <TabsTrigger value="totalxp">All-Time</TabsTrigger>
             </TabsList>
-            <TabsContent value="weekly">{renderContent()}</TabsContent>
-            <TabsContent value="all-time">{renderContent()}</TabsContent>
+            <TabsContent value="weeklyxp">{renderContent()}</TabsContent>
+            <TabsContent value="totalxp">{renderContent()}</TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -107,7 +97,7 @@ export default function LeaderboardPage() {
   );
 }
 
-function UserList({ users, type }: { users: LeaderboardUser[], type: LeaderboardType}) {
+function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType}) {
   if (users.length === 0) {
     return <p className="text-center text-muted-foreground p-8">The leaderboard is empty. Complete a quiz to get started!</p>
   }
@@ -120,11 +110,11 @@ function UserList({ users, type }: { users: LeaderboardUser[], type: Leaderboard
              {renderRank(index)}
           </div>
           <Avatar>
-            <AvatarImage src={u.photoURL ?? ''} />
-            <AvatarFallback>{u.displayName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+            <AvatarImage src={''} />
+            <AvatarFallback>{u.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
           </Avatar>
-          <p className="font-medium flex-1 break-words">{u.displayName || 'Anonymous User'}</p>
-          <p className="font-bold text-primary">{type === 'weekly' ? (u.weeklyXp || 0) : (u.totalXp || 0)} XP</p>
+          <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
+          <p className="font-bold text-primary">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
         </div>
       ))}
     </div>

@@ -1,3 +1,14 @@
+export type UserProfile = {
+  uid: string;
+  username: string;
+  totalxp: number;
+  weeklyxp: number;
+  streak: number;
+  joinedat: any; // Firestore Timestamp
+  lastactive: any; // Firestore Timestamp
+  onboardingComplete: boolean;
+};
+
 export type Subject = {
   id: string;
   name: string;

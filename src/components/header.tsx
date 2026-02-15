@@ -2,27 +2,72 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, Trophy } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, Trophy, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { useAuth } from '@/context/AuthContext';
 
 const navLinks = [
-  { href: '/', label: 'Home', icon: Home },
+  { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
 ];
 
+function UserNav() {
+    const { profile, logout } = useAuth();
+
+    if (!profile) return null;
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                         <AvatarFallback>{profile.username?.[0].toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => logout()}>
+                    Log out
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
 export default function Header() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
+  const { user } = useAuth();
+
+  // Don't show header on auth pages
+  if (!user) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold">
+        <Link href="/home" className="flex items-center gap-2 font-bold">
           <BrainCircuit className="h-6 w-6 text-primary" />
           <span className="font-headline text-lg hidden sm:inline-block">Valedict AI</span>
         </Link>
@@ -52,6 +97,7 @@ export default function Header() {
         
         <div className="flex items-center gap-2">
             <ThemeToggle />
+            <UserNav />
         </div>
       </div>
     </header>
