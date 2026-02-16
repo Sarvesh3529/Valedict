@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import Header from '@/components/header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/AuthContext';
+import BottomNav from '@/components/BottomNav';
 
 export const metadata: Metadata = {
   title: 'Valedict AI',
@@ -39,10 +40,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <div className="relative flex min-h-screen flex-col">
               <Header />
-              <main className="flex-1 pt-16">{children}</main>
-            </div>
+              <main className="flex-1 pt-16 pb-16 md:pb-0">{children}</main>
+              <BottomNav />
             <Toaster />
           </AuthProvider>
         </ThemeProvider>

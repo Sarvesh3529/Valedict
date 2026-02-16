@@ -32,6 +32,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     await auth.signOut(); // This will trigger onIdTokenChanged
+    await serverLogout(); // Also clear the server-side session cookie
+    router.push('/');
   };
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setLoading(false);
         });
       } else {
-        await serverLogout();
+        // User is signed out
         setUser(null);
         setProfile(null);
         setLoading(false);

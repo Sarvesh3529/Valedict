@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, User, Menu } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, User, Menu, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -27,7 +27,7 @@ const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
 
 function UserNav() {
@@ -45,7 +45,7 @@ function UserNav() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
@@ -72,7 +72,7 @@ export default function Header() {
   }
   
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur-lg h-16">
+    <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur-lg h-16">
       <div className="container flex h-full items-center justify-between">
         <div className="flex items-center gap-2">
             {/* Mobile Menu */}
@@ -86,7 +86,7 @@ export default function Header() {
                         <span className="font-headline text-lg">Valedict AI</span>
                     </Link>
                     <nav className="flex flex-col gap-2">
-                        {navLinks.map((link) => (
+                        {[...navLinks, { href: '/profile', label: 'Profile', icon: User }].map((link) => (
                            <SheetClose asChild key={link.href}>
                              <Link
                                 href={link.href}
