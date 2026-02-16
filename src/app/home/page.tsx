@@ -7,13 +7,15 @@ import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
 
 // UI components
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, BookOpen } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
+import ContinueLearning from '@/components/home/ContinueLearning';
+
 
 const iconComponents: { [key: string]: React.ElementType } = {
   Calculator: Icons.Calculator,
@@ -21,28 +23,6 @@ const iconComponents: { [key: string]: React.ElementType } = {
   FlaskConical: Icons.FlaskConical,
   Leaf: Icons.Leaf,
 };
-
-function ContinueLearningCard({ chapterId }: { chapterId: string }) {
-    const chapter = chapters.find(c => c.id === chapterId);
-    if (!chapter) return null;
-
-    return (
-         <Card className="h-full bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 hover:border-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-accent/10 flex flex-col justify-between p-6">
-            <div>
-                <div className="mb-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/20">
-                    <BookOpen className="h-7 w-7 text-accent"/>
-                  </div>
-                </div>
-                <p className="text-sm text-accent font-semibold mb-1">Continue Learning</p>
-                <h3 className="text-xl font-bold font-headline mb-1">{chapter.name}</h3>
-            </div>
-            <div className="text-accent font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform">
-                Jump back in <ArrowRight className="ml-2 h-5 w-5"/>
-            </div>
-        </Card>
-    )
-}
 
 export default async function HomePage() {
   const cookieStore = cookies();
@@ -77,6 +57,7 @@ export default async function HomePage() {
   }
   
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
+  const lastPracticedChapter = chapters.find(c => c.id === profile.lastPracticedChapterId);
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -151,11 +132,7 @@ export default async function HomePage() {
 
         {/* Right sidebar */}
         <div className="space-y-8">
-            {profile.lastPracticedChapterId && (
-                <Link href={`/quiz?chapter=${profile.lastPracticedChapterId}`} className="group">
-                    <ContinueLearningCard chapterId={profile.lastPracticedChapterId} />
-                </Link>
-            )}
+            {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
             <StreakDisplay 
                 currentStreak={profile?.streak || 0}
                 highestStreak={profile?.highestStreak || 0}
