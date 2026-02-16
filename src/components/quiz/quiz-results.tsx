@@ -10,7 +10,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle2, XCircle, RotateCcw, BookCheck, Home } from 'lucide-react';
+import { CheckCircle2, XCircle, RotateCcw, Home } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -31,15 +31,10 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import 'katex/dist/katex.min.css';
-import { chapters } from '@/lib/data';
-import { useMemo } from 'react';
-import { Progress } from '../ui/progress';
 
 interface QuizResultsProps {
   results: QuizResult[];
   onRestart: () => void;
-  restartButtonText?: string;
-  RestartButtonIcon?: React.ElementType;
 }
 
 const chartConfig: ChartConfig = {
@@ -53,53 +48,7 @@ const chartConfig: ChartConfig = {
   },
 };
 
-const TopicBreakdown = ({ results }: { results: QuizResult[] }) => {
-    const breakdown = useMemo(() => {
-        const chapterResults: Record<string, { correct: number, total: number, name: string }> = {};
-
-        results.forEach(result => {
-            const { chapterId } = result.question;
-            if (!chapterResults[chapterId]) {
-                const chapterInfo = chapters.find(c => c.id === chapterId);
-                chapterResults[chapterId] = { correct: 0, total: 0, name: chapterInfo?.name || 'Unknown Chapter' };
-            }
-            chapterResults[chapterId].total++;
-            if (result.isCorrect) {
-                chapterResults[chapterId].correct++;
-            }
-        });
-
-        return Object.values(chapterResults);
-    }, [results]);
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <BookCheck className="h-6 w-6 text-primary" />
-                    Topic Breakdown
-                </CardTitle>
-                <CardDescription>Your performance in each chapter.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {breakdown.map(topic => {
-                    const percentage = (topic.correct / topic.total) * 100;
-                    return (
-                        <div key={topic.name}>
-                            <div className="flex justify-between items-center mb-1 text-sm">
-                                <p className="font-medium">{topic.name}</p>
-                                <p className="font-semibold">{topic.correct}/{topic.total}</p>
-                            </div>
-                             <Progress value={percentage} />
-                        </div>
-                    )
-                })}
-            </CardContent>
-        </Card>
-    );
-};
-
-export default function QuizResults({ results, onRestart, restartButtonText, RestartButtonIcon }: QuizResultsProps) {
+export default function QuizResults({ results, onRestart }: QuizResultsProps) {
   const correctAnswers = results.filter((r) => r.isCorrect).length;
   const totalQuestions = results.length;
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
@@ -108,8 +57,6 @@ export default function QuizResults({ results, onRestart, restartButtonText, Res
     { name: 'correct', value: correctAnswers, fill: 'var(--color-correct)' },
     { name: 'incorrect', value: totalQuestions - correctAnswers, fill: 'var(--color-incorrect)' },
   ];
-
-  const ButtonIcon = RestartButtonIcon || RotateCcw;
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -146,16 +93,14 @@ export default function QuizResults({ results, onRestart, restartButtonText, Res
         </CardContent>
       </Card>
       
-      <TopicBreakdown results={results} />
-
       <div>
         <h3 className="text-xl md:text-2xl font-semibold mb-4 text-center">Review Your Answers</h3>
-        <Accordion type="single" collapsible className="w-full space-y-2">
+        <Accordion type="single" collapsible className="w-full">
           {results.map((result, index) => (
-            <AccordionItem value={`item-${index}`} key={index} className="border-0 bg-card rounded-lg overflow-hidden">
+            <AccordionItem value={`item-${index}`} key={index}>
               <AccordionTrigger 
                 className={cn(
-                  'flex p-3 hover:no-underline text-sm md:text-base',
+                  'flex p-3 hover:no-underline',
                   result.isCorrect 
                     ? 'bg-accent/10 hover:bg-accent/20' 
                     : 'bg-destructive/10 hover:bg-destructive/20'
@@ -167,11 +112,11 @@ export default function QuizResults({ results, onRestart, restartButtonText, Res
                   ) : (
                     <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
                   )}
-                  <span className="flex-1 text-foreground font-medium">Question {index + 1}</span>
+                  <span className="flex-1 text-foreground">Question {index + 1}</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 md:p-6 border-t border-border">
-                <div className="text-foreground font-semibold mb-3 prose dark:prose-invert max-w-none">
+              <AccordionContent className="p-4 md:p-6 border-t">
+                <div className="text-foreground font-semibold mb-3">
                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                         {result.question.question}
                     </ReactMarkdown>
@@ -179,27 +124,25 @@ export default function QuizResults({ results, onRestart, restartButtonText, Res
                 <div className="space-y-2 text-sm">
                   <div>
                     Your answer:{' '}
-                    <span className={cn('font-medium inline', result.isCorrect ? 'text-accent' : 'text-destructive')}>
+                    <span className={cn('font-medium', result.isCorrect ? 'text-accent' : 'text-destructive')}>
                         {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                     </span>
                   </div>
                   {!result.isCorrect && (
                     <div>
                         Correct answer:{' '}
-                        <span className="font-medium text-muted-foreground inline">
+                        <span className="font-medium text-muted-foreground">
                             {result.question.options[result.question.correctAnswer]}
                         </span>
                     </div>
                   )}
                 </div>
-                <Alert className="mt-4 bg-secondary border-none">
-                  <AlertTitle className="font-semibold">Explanation</AlertTitle>
-                  <AlertDescription className="text-secondary-foreground/80">
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
-                            {result.question.explanation}
-                        </ReactMarkdown>
-                    </div>
+                <Alert className="mt-4">
+                  <AlertTitle>Explanation</AlertTitle>
+                  <AlertDescription>
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
+                        {result.question.explanation}
+                    </ReactMarkdown>
                   </AlertDescription>
                 </Alert>
               </AccordionContent>
@@ -210,8 +153,8 @@ export default function QuizResults({ results, onRestart, restartButtonText, Res
 
       <div className="text-center mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <Button onClick={onRestart} size="lg">
-            <ButtonIcon className="mr-2 h-4 w-4" />
-            {restartButtonText || 'Take Another Quiz'}
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Take Another Quiz
         </Button>
          <Button asChild size="lg" variant="outline">
             <Link href="/home">

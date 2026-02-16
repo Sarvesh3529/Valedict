@@ -36,29 +36,26 @@ function UserNav() {
 
     if (!user || !profile) return null;
 
-    const generateHslColor = (str: string, isDark: boolean) => {
+    // Stable color generation based on UID
+    const generateHslColor = (str: string) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
         const h = hash % 360;
-        // Generate a pleasant pastel color for light mode, and a muted one for dark mode
-        return isDark ? `hsl(${h}, 30%, 30%)` : `hsl(${h}, 70%, 85%)`;
+        return `hsl(${h}, 35%, 55%)`;
     };
-
-    const lightColor = useMemo(() => generateHslColor(user.uid, false), [user.uid]);
-    const darkColor = useMemo(() => generateHslColor(user.uid, true), [user.uid]);
     
-    // Using a style variable to switch between light and dark mode colors
-    const avatarStyle = { '--avatar-light-bg': lightColor, '--avatar-dark-bg': darkColor } as React.CSSProperties;
+    const avatarColor = useMemo(() => generateHslColor(user.uid), [user.uid]);
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                    <Avatar className="h-9 w-9" style={avatarStyle}>
+                    <Avatar className="h-9 w-9">
                          <AvatarFallback 
-                            className="bg-[var(--avatar-light-bg)] dark:bg-[var(--avatar-dark-bg)] text-foreground font-semibold"
+                            style={{ backgroundColor: avatarColor }}
+                            className="text-white font-semibold"
                          >
                             {profile.username?.[0].toUpperCase()}
                          </AvatarFallback>
@@ -90,7 +87,7 @@ function UserNav() {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => logout()}>
+                 <DropdownMenuItem onSelect={(e) => { e.preventDefault(); logout(); }}>
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>

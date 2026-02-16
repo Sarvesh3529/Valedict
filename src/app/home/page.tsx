@@ -121,7 +121,7 @@ export default async function HomePage() {
                 <h2 className="text-2xl font-bold mb-4 font-headline">Practice by Subject</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {subjects.map((subject) => {
-                    const Icon = iconComponents[subject.iconName] || Icons.GraduationCap;
+                    const Icon = iconComponents[subject.iconName] || Icons.Book;
                     return (
                     <Card key={subject.id} className="flex flex-col">
                         <CardHeader className="flex-row items-center gap-4 space-y-0">

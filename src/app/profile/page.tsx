@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, Flame, Star, CalendarDays } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -34,10 +34,20 @@ export default function ProfilePage() {
     }, [user, loading, router]);
 
 
+    const avatarColor = useMemo(() => {
+        if (!user) return 'hsl(var(--muted))';
+        let hash = 0;
+        for (let i = 0; i < user.uid.length; i++) {
+            hash = user.uid.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h = hash % 360;
+        return `hsl(${h}, 35%, 55%)`;
+    }, [user]);
+
     if (loading || !user || !profile) {
         return (
             <div className="flex h-screen w-full items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -61,16 +71,14 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <Avatar className="h-24 w-24 border-4 border-primary">
-                <AvatarFallback className="text-3xl">
+              <Avatar className="h-24 w-24">
+                <AvatarFallback className="text-3xl font-semibold text-white" style={{backgroundColor: avatarColor}}>
                   {profile.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1 text-center sm:text-left">
-                <div className="flex items-center gap-2 justify-center sm:justify-start">
-                  <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.username || 'Anonymous User'}</h2>
-                </div>
-                 <p className="text-muted-foreground">{user.email}</p>
+                <h2 className="text-2xl md:text-3xl font-bold font-headline">{profile.username || 'Anonymous User'}</h2>
+                 <p className="text-muted-foreground">{user.email || 'No email associated'}</p>
                 <p className="text-xs font-mono text-muted-foreground break-all pt-2">UID: {user.uid}</p>
               </div>
             </div>
@@ -87,12 +95,10 @@ export default function ProfilePage() {
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl text-destructive">Account Actions</CardTitle>
+                <CardTitle className="font-headline text-xl text-destructive">Account Actions</CardTitle>
             </CardHeader>
             <CardContent>
-                <form action={logout}>
-                  <Button variant="destructive" className="w-full">Log Out</Button>
-                </form>
+                <Button onClick={logout} variant="destructive" className="w-full">Log Out</Button>
             </CardContent>
         </Card>
       </div>

@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BrainCircuit, Loader2, Eye, EyeOff } from 'lucide-react';
 import { signupWithUsername, loginWithUsername } from './auth/actions';
+import { useActionState } from 'react';
+import { useEffect } from 'react';
 
 function SubmitButton({ isSignup, isPending }: { isSignup: boolean, isPending: boolean }) {
   return (
