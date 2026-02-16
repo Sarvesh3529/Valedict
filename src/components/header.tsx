@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, Trophy, User } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -21,8 +21,8 @@ import { useAuth } from '@/context/AuthContext';
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
-  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 function UserNav() {
@@ -44,6 +44,9 @@ function UserNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/leaderboard">Leaderboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout()}>

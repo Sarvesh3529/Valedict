@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, NotebookText, Trophy, BrainCircuit } from 'lucide-react';
+import { Home, NotebookText, User, BrainCircuit } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
-  { href: '/leaderboard', label: 'Rank', icon: Trophy },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function BottomNav() {
