@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { useAuth } from '@/context/AuthContext';
+import { useMemo } from 'react';
 
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
@@ -31,27 +32,62 @@ const navLinks = [
 ];
 
 function UserNav() {
-    const { profile, logout } = useAuth();
+    const { user, profile, logout } = useAuth();
 
-    if (!profile) return null;
+    if (!user || !profile) return null;
+
+    const generateHslColor = (str: string, isDark: boolean) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h = hash % 360;
+        // Generate a pleasant pastel color for light mode, and a muted one for dark mode
+        return isDark ? `hsl(${h}, 30%, 30%)` : `hsl(${h}, 70%, 85%)`;
+    };
+
+    const lightColor = useMemo(() => generateHslColor(user.uid, false), [user.uid]);
+    const darkColor = useMemo(() => generateHslColor(user.uid, true), [user.uid]);
+    
+    // Using a style variable to switch between light and dark mode colors
+    const avatarStyle = { '--avatar-light-bg': lightColor, '--avatar-dark-bg': darkColor } as React.CSSProperties;
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                         <AvatarFallback>{profile.username?.[0].toUpperCase()}</AvatarFallback>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9" style={avatarStyle}>
+                         <AvatarFallback 
+                            className="bg-[var(--avatar-light-bg)] dark:bg-[var(--avatar-dark-bg)] text-foreground font-semibold"
+                         >
+                            {profile.username?.[0].toUpperCase()}
+                         </AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{profile.username}</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{profile.username}</p>
+                         {user.email && (
+                            <p className="text-xs leading-none text-muted-foreground">
+                                {user.email}
+                            </p>
+                        )}
+                    </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile</Link>
+                    <Link href="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link href="/leaderboard">Leaderboard</Link>
+                    <Link href="/leaderboard">
+                        <Trophy className="mr-2 h-4 w-4" />
+                        <span>Leaderboard</span>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logout()}>
@@ -68,6 +104,7 @@ export default function Header() {
 
   const authRoutes = ['/', '/onboarding', '/revision'];
   if (!user || authRoutes.some(route => pathname.startsWith(route))) {
+     // Don't render the header on auth or onboarding pages
     return null;
   }
   

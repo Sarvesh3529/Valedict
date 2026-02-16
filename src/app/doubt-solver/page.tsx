@@ -179,15 +179,15 @@ export default function DoubtSolverPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)] flex flex-col p-0 md:p-4">
+    <div className="container mx-auto max-w-3xl h-full flex flex-col p-0 md:p-4">
       <Card className="flex-1 flex flex-col overflow-hidden">
         <CardContent className="flex-1 flex flex-col p-4 md:p-6">
             {/* Chat messages area */}
             <div className="flex-1 space-y-6 overflow-y-auto pr-4">
                 <AnimatePresence>
-                    {messages.map((message) => (
+                    {messages.map((message, index) => (
                          <motion.div
-                            key={message.id}
+                            key={message.id || index}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
@@ -223,8 +223,8 @@ export default function DoubtSolverPage() {
                             </Button>
                         </div>
                     )}
-                    <div className="flex items-center gap-2">
-                        <Label htmlFor="questionImage" className="cursor-pointer">
+                    <div className="flex items-end gap-2">
+                        <Label htmlFor="questionImage" className="cursor-pointer p-2">
                             <Paperclip className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
                             <Input id="questionImage" name="questionImage" type="file" accept="image/*" onChange={handleImageChange} className="hidden" ref={fileInputRef}/>
                         </Label>
@@ -232,10 +232,9 @@ export default function DoubtSolverPage() {
                             id="questionText"
                             name="questionText"
                             placeholder="e.g., How do I solve for x in 3x - 7 = 5?"
-                            rows={1}
                             value={questionText}
                             onChange={(e) => setQuestionText(e.target.value)}
-                            className="flex-1 resize-none"
+                            className="flex-1 resize-none min-h-[40px] max-h-48"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault();

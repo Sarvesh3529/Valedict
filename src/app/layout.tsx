@@ -30,7 +30,7 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          'min-h-screen bg-background font-body antialiased'
+          'min-h-screen bg-background font-body antialiased flex flex-col'
         )}
       >
         <ThemeProvider
@@ -41,7 +41,7 @@ export default function RootLayout({
         >
           <AuthProvider>
               <Header />
-              <main className="flex-1 pt-16 pb-16 md:pb-0">{children}</main>
+              <main className="flex-1 pt-16 pb-16 md:pb-0 overflow-y-auto">{children}</main>
               <BottomNav />
             <Toaster />
           </AuthProvider>
