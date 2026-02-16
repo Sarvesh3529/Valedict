@@ -8,7 +8,7 @@ import { subjects } from '@/lib/data';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Home } from 'lucide-react';
 import QuizView from '@/components/quiz/quiz-view';
 import QuizResults from '@/components/quiz/quiz-results';
 
@@ -94,7 +94,12 @@ function RevisionSessionContent() {
             {!isFinished ? (
               <QuizView questions={revisionQuestions} onFinish={handleFinishQuiz} />
             ) : (
-              <QuizResults results={results} onRestart={handleRestart} />
+              <QuizResults
+                results={results}
+                onRestart={handleRestart}
+                restartButtonText="Go to Dashboard"
+                RestartButtonIcon={Home}
+              />
             )}
           </div>
         </Card>

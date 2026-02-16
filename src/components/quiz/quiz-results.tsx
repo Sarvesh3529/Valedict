@@ -37,6 +37,8 @@ import { Progress } from '../ui/progress';
 interface QuizResultsProps {
   results: QuizResult[];
   onRestart: () => void;
+  restartButtonText?: string;
+  RestartButtonIcon?: React.ElementType;
 }
 
 const chartConfig: ChartConfig = {
@@ -96,7 +98,7 @@ const TopicBreakdown = ({ results }: { results: QuizResult[] }) => {
     );
 };
 
-export default function QuizResults({ results, onRestart }: QuizResultsProps) {
+export default function QuizResults({ results, onRestart, restartButtonText, RestartButtonIcon }: QuizResultsProps) {
   const correctAnswers = results.filter((r) => r.isCorrect).length;
   const totalQuestions = results.length;
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
@@ -105,6 +107,8 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
     { name: 'correct', value: correctAnswers, fill: 'var(--color-correct)' },
     { name: 'incorrect', value: totalQuestions - correctAnswers, fill: 'var(--color-incorrect)' },
   ];
+
+  const ButtonIcon = RestartButtonIcon || RotateCcw;
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -205,8 +209,8 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
 
       <div className="text-center mt-8">
         <Button onClick={onRestart} size="lg">
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Take Another Quiz
+            <ButtonIcon className="mr-2 h-4 w-4" />
+            {restartButtonText || 'Take Another Quiz'}
         </Button>
       </div>
     </div>
