@@ -18,16 +18,14 @@ const schema = z.object({
     ),
 });
 
-type FormState = {
-  userQuestion: { text?: string; image?: string } | null;
-  explanation: string;
-  error: string | null;
+type ActionResponse = {
+  explanation?: string;
+  error?: string;
 }
 
 export async function solveDoubt(
-  prevState: FormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<ActionResponse> {
   const validatedFields = schema.safeParse({
     questionText: formData.get('questionText') as string,
     questionImage: formData.get('questionImage') as File,
@@ -35,9 +33,6 @@ export async function solveDoubt(
 
   if (!validatedFields.success) {
     return {
-      ...prevState,
-      userQuestion: null,
-      explanation: '',
       error: validatedFields.error.flatten().fieldErrors.questionImage?.[0] ?? 'Invalid input.',
     };
   }
@@ -45,7 +40,7 @@ export async function solveDoubt(
   const { questionText, questionImage } = validatedFields.data;
 
   if (!questionText && (!questionImage || questionImage.size === 0)) {
-    return { ...prevState, userQuestion: null, explanation: '', error: 'Please enter a question or upload an image.' };
+    return { error: 'Please enter a question or upload an image.' };
   }
   
   let imageAsDataUrl: string | undefined = undefined;
@@ -55,16 +50,14 @@ export async function solveDoubt(
     imageAsDataUrl = `data:${questionImage.type};base64,${buffer.toString('base64')}`;
   }
   
-  const userQuestion = { text: questionText, image: imageAsDataUrl };
-
   try {
     const result = await aiDoubtSolver({
       questionText,
       questionImage: imageAsDataUrl,
     });
-    return { userQuestion, explanation: result.explanation, error: null };
+    return { explanation: result.explanation };
   } catch (error) {
     console.error(error);
-    return { userQuestion, explanation: '', error: 'An error occurred while getting the explanation. Please try again.' };
+    return { error: 'An error occurred while getting the explanation. Please try again.' };
   }
 }

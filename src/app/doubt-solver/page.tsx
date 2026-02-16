@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useActionState, useRef, useEffect } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,8 +15,17 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AnimatePresence, motion } from 'framer-motion';
+
+// Type definition for a message in the chat
+type ChatMessage = {
+  id: string;
+  role: 'user' | 'ai' | 'error';
+  content: React.ReactNode;
+};
+
+// --- Components for rendering messages ---
 
 function TypingIndicator() {
     return (
@@ -29,18 +37,57 @@ function TypingIndicator() {
     )
 }
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function UserMessage({ content }: { content: React.ReactNode }) {
+    return (
+        <div className="flex items-start gap-3 justify-end">
+            <div className="bg-secondary p-3 rounded-lg max-w-prose">
+                {content}
+            </div>
+            <Avatar className="h-9 w-9">
+                <AvatarFallback><User /></AvatarFallback>
+            </Avatar>
+        </div>
+    )
+}
+
+function AiMessage({ content }: { content: React.ReactNode }) {
+    return (
+        <div className="flex items-start gap-3">
+            <Avatar className="h-9 w-9 bg-primary/20 text-primary">
+                <AvatarFallback><Sparkles /></AvatarFallback>
+            </Avatar>
+            <div className="bg-primary/10 p-3 rounded-lg max-w-prose">
+                {content}
+            </div>
+        </div>
+    )
+}
+
+function SubmitButton({ isPending }: { isPending: boolean }) {
   return (
-    <Button type="submit" disabled={pending} size="icon" className="flex-shrink-0">
-      {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+    <Button type="submit" disabled={isPending} size="icon" className="flex-shrink-0">
+      {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
       <span className="sr-only">Submit</span>
     </Button>
   );
 }
 
+// --- Main Page Component ---
+
 export default function DoubtSolverPage() {
-  const [state, formAction, isPending] = useActionState(solveDoubt, { userQuestion: null, explanation: '', error: null });
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+        id: 'welcome-message',
+        role: 'ai',
+        content: (
+            <>
+                <p className="font-semibold text-primary mb-1">AI Doubt Solver</p>
+                <p>Stuck on a problem? Ask me anything! You can type your question or upload an image.</p>
+            </>
+        )
+    }
+  ]);
+  const [isPending, setIsPending] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +100,7 @@ export default function DoubtSolverPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [state, isPending]);
+  }, [messages, isPending]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,11 +120,62 @@ export default function DoubtSolverPage() {
     if(fileInputRef.current) fileInputRef.current.value = '';
   }
 
-  const handleFormSubmit = (formData: FormData) => {
-    formAction(formData);
-    // This is optimistic clearing, the form action will handle the state
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const currentQuestionText = formData.get('questionText') as string;
+    const currentQuestionImage = formData.get('questionImage') as File;
+    
+    if (!currentQuestionText && (!currentQuestionImage || currentQuestionImage.size === 0)) {
+        setMessages(prev => [...prev, {
+            id: crypto.randomUUID(),
+            role: 'error',
+            content: "Please enter a question or upload an image."
+        }]);
+        return;
+    }
+
+    const userMessageContent = (
+        <>
+            {currentQuestionText && <p className="mb-2">{currentQuestionText}</p>}
+            {imagePreview && <Image src={imagePreview} alt="Your question" width={200} height={150} className="rounded-md"/>}
+        </>
+    );
+
+    // Add user message optimistically
+    setMessages(prev => [...prev, {
+        id: crypto.randomUUID(),
+        role: 'user',
+        content: userMessageContent
+    }]);
+
+    setIsPending(true);
+    // Clear the input fields immediately
     setQuestionText('');
     clearImage();
+    formRef.current?.reset();
+
+    const result = await solveDoubt(formData);
+    
+    if (result.explanation) {
+        setMessages(prev => [...prev, {
+            id: crypto.randomUUID(),
+            role: 'ai',
+            content: (
+                 <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>{result.explanation!}</ReactMarkdown>
+                </div>
+            )
+        }]);
+    } else if (result.error) {
+        setMessages(prev => [...prev, {
+            id: crypto.randomUUID(),
+            role: 'error',
+            content: result.error
+        }]);
+    }
+
+    setIsPending(false);
   }
 
   return (
@@ -87,78 +185,36 @@ export default function DoubtSolverPage() {
             {/* Chat messages area */}
             <div className="flex-1 space-y-6 overflow-y-auto pr-4">
                 <AnimatePresence>
-                    {/* Welcome Message */}
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                        <div className="flex items-start gap-3">
-                            <Avatar className="h-9 w-9 bg-primary/20 text-primary">
-                                <AvatarFallback><Sparkles /></AvatarFallback>
-                            </Avatar>
-                            <div className="bg-primary/10 p-3 rounded-lg max-w-prose">
-                                <p className="font-semibold text-primary mb-1">AI Doubt Solver</p>
-                                <p>Stuck on a problem? Ask me anything! You can type your question or upload an image.</p>
-                            </div>
-                        </div>
-                    </motion.div>
+                    {messages.map((message) => (
+                         <motion.div
+                            key={message.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                         >
+                            {message.role === 'user' && <UserMessage content={message.content} />}
+                            {message.role === 'ai' && <AiMessage content={message.content} />}
+                            {message.role === 'error' && (
+                                <Alert variant="destructive">
+                                    <AlertTitle>Error</AlertTitle>
+                                    <AlertDescription>{message.content}</AlertDescription>
+                                </Alert>
+                            )}
+                         </motion.div>
+                    ))}
 
-                    {/* Previous User Question */}
-                    {state.userQuestion && (
-                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                            <div className="flex items-start gap-3 justify-end">
-                                <div className="bg-secondary p-3 rounded-lg max-w-prose">
-                                    {state.userQuestion.text && <p className="mb-2">{state.userQuestion.text}</p>}
-                                    {state.userQuestion.image && <Image src={state.userQuestion.image} alt="Your question" width={200} height={150} className="rounded-md"/>}
-                                </div>
-                                <Avatar className="h-9 w-9">
-                                    <AvatarFallback><User /></AvatarFallback>
-                                </Avatar>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* AI Explanation */}
-                    {state.explanation && (
-                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                            <div className="flex items-start gap-3">
-                                <Avatar className="h-9 w-9 bg-primary/20 text-primary">
-                                    <AvatarFallback><Sparkles /></AvatarFallback>
-                                </Avatar>
-                                <div className="bg-primary/10 p-3 rounded-lg max-w-prose">
-                                     <div className="prose prose-sm max-w-none dark:prose-invert">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>{state.explanation}</ReactMarkdown>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                    
-                     {/* Typing Indicator */}
                     {isPending && (
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                             <div className="flex items-start gap-3">
-                                <Avatar className="h-9 w-9 bg-primary/20 text-primary">
-                                    <AvatarFallback><Sparkles /></AvatarFallback>
-                                </Avatar>
-                                <div className="bg-primary/10 p-3 rounded-lg">
-                                    <TypingIndicator />
-                                </div>
-                            </div>
+                        <motion.div key="typing-indicator" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                             <AiMessage content={<TypingIndicator />} />
                         </motion.div>
                     )}
-
-                    {state.error && (
-                        <Alert variant="destructive">
-                        <AlertTitle>Error</AlertTitle>
-                        <AlertDescription>{state.error}</AlertDescription>
-                        </Alert>
-                    )}
-
                 </AnimatePresence>
                 <div ref={messagesEndRef} />
             </div>
 
             {/* Input area */}
             <div className="mt-4 pt-4 border-t">
-                 <form ref={formRef} action={handleFormSubmit} className="space-y-2">
+                 <form ref={formRef} onSubmit={handleFormSubmit} className="space-y-2">
                     {imagePreview && (
                         <div className="relative w-32 border p-1 rounded-lg">
                             <Image src={imagePreview} alt="Question preview" width={100} height={75} className="rounded-md w-full h-auto object-contain"/>
@@ -187,7 +243,7 @@ export default function DoubtSolverPage() {
                                 }
                             }}
                         />
-                        <SubmitButton />
+                        <SubmitButton isPending={isPending} />
                     </div>
                 </form>
             </div>
