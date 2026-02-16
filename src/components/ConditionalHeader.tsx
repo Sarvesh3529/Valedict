@@ -8,12 +8,13 @@ export default function ConditionalHeader() {
   const { user, loading } = useAuth();
 
   const authRoutes = ['/'];
-  
+  const hideOnRoutes = ['/onboarding', '/revision'];
+
   if (loading) {
     return null; // Don't show header while checking auth state
   }
-  
-  if (authRoutes.includes(pathname)) {
+
+  if (authRoutes.includes(pathname) || hideOnRoutes.some(route => pathname.startsWith(route))) {
     return null;
   }
 
