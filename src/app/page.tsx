@@ -43,12 +43,13 @@ export default function AuthPage() {
 
     const result = await action({ message: null, success: false }, formData);
 
+    setIsPending(false);
+
     if (result.success && result.redirectTo) {
       router.push(result.redirectTo);
       router.refresh();
     } else {
       setMessage(result.message);
-      setIsPending(false);
     }
   };
 
