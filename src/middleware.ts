@@ -1,15 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { adminAuth } from './lib/firebase-admin';
-
-async function verifyToken(token: string) {
-    try {
-        await adminAuth.verifyIdToken(token);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('firebase_token')?.value;
