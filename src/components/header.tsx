@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, User } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, User, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -66,7 +66,7 @@ export default function Header() {
   }
   
   return (
-    <header className="sticky top-0 z-40 hidden w-full border-b bg-card/80 backdrop-blur-lg md:flex">
+    <header className="fixed top-0 z-50 hidden w-full border-b bg-card/95 backdrop-blur-lg md:flex h-16">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/home" className="flex items-center gap-2 font-bold">
           <BrainCircuit className="h-6 w-6 text-primary" />
