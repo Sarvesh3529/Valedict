@@ -36,7 +36,6 @@ export async function updateUserStatsAfterQuiz(
     
     // --- Robust Streak Logic ---
     const now = new Date();
-    // Use a timezone-safe method to get the start of today
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const lastActiveDate = profile.lastactive?.toDate();
@@ -46,25 +45,28 @@ export async function updateUserStatsAfterQuiz(
       lastActiveDayStart = new Date(lastActiveDate.getFullYear(), lastActiveDate.getMonth(), lastActiveDate.getDate());
     }
 
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-
     let newStreak = profile.streak || 0;
     let streakIncreased = false;
 
-    // Case 1: No previous activity or last activity was before yesterday
-    if (!lastActiveDayStart || lastActiveDayStart.getTime() < yesterday.getTime()) {
-      newStreak = 1;
-      streakIncreased = true;
-    } 
-    // Case 2: Last activity was yesterday
-    else if (lastActiveDayStart.getTime() === yesterday.getTime()) {
-      newStreak++;
-      streakIncreased = true;
-    }
-    // Case 3: Last activity was today. Do nothing to the streak.
-    else {
-      streakIncreased = false;
+    if (!lastActiveDayStart) {
+        // First ever lesson
+        newStreak = 1;
+        streakIncreased = true;
+    } else {
+        const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+        const differenceInMs = today.getTime() - lastActiveDayStart.getTime();
+        const differenceInDays = Math.round(differenceInMs / ONE_DAY_IN_MS);
+
+        if (differenceInDays === 1) {
+            // Consecutive day
+            newStreak++;
+            streakIncreased = true;
+        } else if (differenceInDays > 1) {
+            // Missed one or more days, reset
+            newStreak = 1;
+            streakIncreased = true;
+        }
+        // if differenceInDays is 0 (same day), do nothing to streak value
     }
     
     const newHighestStreak = Math.max(profile.highestStreak || 0, newStreak);
