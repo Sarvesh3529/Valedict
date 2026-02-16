@@ -22,8 +22,8 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
         : "text-muted-foreground";
         
     const message = hasCompletedToday
-        ? "You're on a roll! Keep it up tomorrow."
-        : "Complete a quiz each day to build your streak!";
+        ? "You've hit your goal for today!"
+        : "Complete a lesson to keep your streak alive!";
 
     return (
         <Card className={cn("transition-colors", cardClasses)}>

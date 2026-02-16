@@ -34,51 +34,39 @@ export async function updateUserStatsAfterQuiz(
 
     const profile = userDoc.data() as UserProfile;
     
-    // --- Streak Logic ---
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize to the start of the day
+    // --- Robust Streak Logic ---
+    const now = new Date();
+    // Use a timezone-safe method to get the start of today
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const lastActiveDate = profile.lastactive?.toDate();
     
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-
     let lastActiveDayStart: Date | null = null;
     if (lastActiveDate) {
-        lastActiveDayStart = new Date(lastActiveDate);
-        lastActiveDayStart.setHours(0, 0, 0, 0);
+      lastActiveDayStart = new Date(lastActiveDate.getFullYear(), lastActiveDate.getMonth(), lastActiveDate.getDate());
     }
 
-    console.log("--- Streak Calculation ---");
-    console.log("Last Active Timestamp:", profile.lastactive);
-    console.log("Last Active Date:", lastActiveDate);
-    console.log("Today (start of day):", today);
-    console.log("Yesterday (start of day):", yesterday);
-    console.log("Current Streak:", profile.streak);
-
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
 
     let newStreak = profile.streak || 0;
     let streakIncreased = false;
 
+    // Case 1: No previous activity or last activity was before yesterday
     if (!lastActiveDayStart || lastActiveDayStart.getTime() < yesterday.getTime()) {
-      // If last active was before yesterday, reset streak to 1
-      console.log("Condition: Last active was before yesterday. Resetting streak to 1.");
       newStreak = 1;
       streakIncreased = true;
-    } else if (lastActiveDayStart.getTime() === yesterday.getTime()) {
-      // If last active was yesterday, increment streak
-      console.log("Condition: Last active was yesterday. Incrementing streak.");
+    } 
+    // Case 2: Last activity was yesterday
+    else if (lastActiveDayStart.getTime() === yesterday.getTime()) {
       newStreak++;
       streakIncreased = true;
-    } else {
-        // If last active was today, do nothing to the streak.
-        console.log("Condition: Last active was today. Streak remains unchanged.");
+    }
+    // Case 3: Last activity was today. Do nothing to the streak.
+    else {
+      streakIncreased = false;
     }
     
-    console.log("New Calculated Streak:", newStreak);
-    console.log("------------------------");
-
-
     const newHighestStreak = Math.max(profile.highestStreak || 0, newStreak);
 
     // --- Update Firestore ---

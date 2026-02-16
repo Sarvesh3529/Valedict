@@ -79,20 +79,25 @@ export default function QuizResults({
     // This effect runs once when the component mounts with the results
     const xpGained = correctAnswers * 10;
     
-    if (xpGained > 0) {
-      // Only update stats if the user gained XP
-      const lastChapterId = results[results.length - 1].question.chapterId;
-      updateUserStatsAfterQuiz(xpGained, lastChapterId)
-        .then(({ streakIncreased, newStreak }) => {
+    // Always call the update function if the quiz was completed, 
+    // even with 0 XP, to correctly handle the streak.
+    const lastChapterId = results[results.length - 1].question.chapterId;
+    updateUserStatsAfterQuiz(xpGained, lastChapterId)
+      .then(({ streakIncreased, newStreak }) => {
+        if (xpGained > 0) {
           setAnimationState({ xp: xpGained, streak: newStreak, streakIncreased, stage: 'xp' });
-        })
-        .catch(error => {
-          console.error("Failed to update stats:", error);
-          setIsUpdating(false); // Stop loading if server action fails
-        });
-    } else {
-      setIsUpdating(false); // No XP gained, no update needed
-    }
+        } else if (streakIncreased) {
+          // If no XP but streak increased (e.g., first quiz of the day with 0 score)
+          setAnimationState({ xp: 0, streak: newStreak, streakIncreased, stage: 'streak' });
+        } else {
+          // No XP and no streak change, just finish loading
+          setIsUpdating(false);
+        }
+      })
+      .catch(error => {
+        console.error("Failed to update stats:", error);
+        setIsUpdating(false); // Stop loading if server action fails
+      });
   }, [results, correctAnswers]);
 
 
@@ -126,7 +131,7 @@ export default function QuizResults({
 
   return (
     <>
-      {animationState?.stage === 'xp' && (
+      {animationState?.stage === 'xp' && animationState.xp > 0 && (
         <XpAnimation xp={animationState.xp} onComplete={handleXpComplete} />
       )}
       {animationState?.stage === 'streak' && (
