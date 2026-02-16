@@ -58,6 +58,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
       totalxp: 0,
       weeklyxp: 0,
       streak: 0,
+      highestStreak: 0,
       joinedat: FieldValue.serverTimestamp(),
       lastactive: FieldValue.serverTimestamp(),
       onboardingComplete: false,

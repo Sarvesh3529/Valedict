@@ -9,11 +9,12 @@
         "totalxp": { "type": "number", "description": "User's all-time experience points." },
         "weeklyxp": { "type": "number", "description": "User's experience points for the current week." },
         "streak": { "type": "number", "description": "User's current daily study streak." },
+        "highestStreak": { "type": "number", "description": "User's all-time highest daily study streak." },
         "joinedat": { "type": "string", "format": "date-time", "description": "Timestamp when the user joined." },
         "lastactive": { "type": "string", "format": "date-time", "description": "Timestamp of the user's last activity." },
         "onboardingComplete": { "type": "boolean", "description": "Flag indicating if the user has completed the onboarding flow." }
       },
-      "required": ["username", "totalxp", "weeklyxp", "streak", "joinedat", "lastactive", "onboardingComplete"]
+      "required": ["username", "totalxp", "weeklyxp", "streak", "highestStreak", "joinedat", "lastactive", "onboardingComplete"]
     },
     "Username": {
       "title": "Username Registry",

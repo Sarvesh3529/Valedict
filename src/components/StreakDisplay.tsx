@@ -29,7 +29,7 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
         <Card className={cn("transition-colors", cardClasses)}>
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className={cn("font-headline transition-colors", hasCompletedToday ? 'text-orange-400' : 'text-muted-foreground')}>Your Streak</CardTitle>
-                <Flame className={cn("h-6 w-6 transition-colors", iconClasses)} />
+                <Flame className={cn("h-6 w-6 transition-colors", iconClasses, hasCompletedToday && 'fill-orange-500')} />
             </CardHeader>
             <CardContent>
                 <div className="text-4xl font-bold">{currentStreak} <span className="text-2xl font-normal text-muted-foreground">days</span></div>

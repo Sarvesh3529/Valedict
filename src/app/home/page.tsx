@@ -158,7 +158,7 @@ export default async function HomePage() {
             )}
             <StreakDisplay 
                 currentStreak={profile?.streak || 0}
-                highestStreak={profile?.streak || 0} // highestStreak not in model
+                highestStreak={profile?.highestStreak || 0}
                 lastActivityDate={lastActiveDate}
             />
             <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />

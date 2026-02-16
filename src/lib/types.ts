@@ -4,6 +4,7 @@ export type UserProfile = {
   totalxp: number;
   weeklyxp: number;
   streak: number;
+  highestStreak: number;
   joinedat: any; // Firestore Timestamp
   lastactive: any; // Firestore Timestamp
   onboardingComplete: boolean;
