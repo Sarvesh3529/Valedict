@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, NotebookText, User, BrainCircuit } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
@@ -16,17 +15,15 @@ const navLinks = [
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const isMobile = useIsMobile();
   const { user } = useAuth();
 
-  const hideOnRoutes = ['/', '/onboarding', '/revision'];
-  
-  if (!user || !isMobile || hideOnRoutes.some(route => pathname.startsWith(route))) {
+  const authRoutes = ['/', '/onboarding', '/revision'];
+  if (!user || authRoutes.some(route => pathname.startsWith(route))) {
     return null;
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 grid h-16 grid-cols-4 items-center justify-items-center border-t bg-card/80 backdrop-blur-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 grid h-16 grid-cols-4 items-center justify-items-center border-t bg-card/95 backdrop-blur-lg md:hidden">
       {navLinks.map((link) => {
         const isActive = pathname === link.href;
         return (
