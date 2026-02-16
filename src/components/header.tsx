@@ -2,10 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Home, NotebookText, User, Users } from 'lucide-react';
+import { BrainCircuit, Home, NotebookText, User, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from '@/components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,14 +72,47 @@ export default function Header() {
   }
   
   return (
-    <header className="fixed top-0 z-50 hidden w-full border-b bg-card/95 backdrop-blur-lg md:flex h-16">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/home" className="flex items-center gap-2 font-bold">
-          <BrainCircuit className="h-6 w-6 text-primary" />
-          <span className="font-headline text-lg hidden sm:inline-block">Valedict AI</span>
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur-lg h-16">
+      <div className="container flex h-full items-center justify-between">
+        <div className="flex items-center gap-2">
+            {/* Mobile Menu */}
+            <Sheet>
+                <SheetTrigger asChild className="md:hidden">
+                    <Button variant="ghost" size="icon"><Menu className="h-5 w-5"/></Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 p-4">
+                    <Link href="/home" className="flex items-center gap-2 font-bold mb-8">
+                        <BrainCircuit className="h-6 w-6 text-primary" />
+                        <span className="font-headline text-lg">Valedict AI</span>
+                    </Link>
+                    <nav className="flex flex-col gap-2">
+                        {navLinks.map((link) => (
+                           <SheetClose asChild key={link.href}>
+                             <Link
+                                href={link.href}
+                                className={cn(
+                                'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
+                                pathname === link.href && 'bg-primary/10 text-primary'
+                                )}
+                            >
+                                <link.icon className="h-4 w-4" />
+                                {link.label}
+                             </Link>
+                           </SheetClose>
+                        ))}
+                    </nav>
+                </SheetContent>
+            </Sheet>
 
-        <nav className="flex items-center space-x-2">
+            {/* Desktop Logo */}
+            <Link href="/home" className="hidden items-center gap-2 font-bold md:flex">
+                <BrainCircuit className="h-6 w-6 text-primary" />
+                <span className="font-headline text-lg">Valedict AI</span>
+            </Link>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-2">
           {navLinks.map((link) => (
             <Button
               key={link.href}

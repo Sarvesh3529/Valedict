@@ -2,6 +2,7 @@
 
 import type { QuizResult } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +10,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle2, XCircle, RotateCcw, BookCheck } from 'lucide-react';
+import { CheckCircle2, XCircle, RotateCcw, BookCheck, Home } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -207,10 +208,16 @@ export default function QuizResults({ results, onRestart, restartButtonText, Res
         </Accordion>
       </div>
 
-      <div className="text-center mt-8">
+      <div className="text-center mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <Button onClick={onRestart} size="lg">
             <ButtonIcon className="mr-2 h-4 w-4" />
             {restartButtonText || 'Take Another Quiz'}
+        </Button>
+         <Button asChild size="lg" variant="outline">
+            <Link href="/home">
+                <Home className="mr-2 h-4 w-4" />
+                Go to Home
+            </Link>
         </Button>
       </div>
     </div>

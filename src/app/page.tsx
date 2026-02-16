@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BrainCircuit, Loader2 } from 'lucide-react';
+import { BrainCircuit, Loader2, Eye, EyeOff } from 'lucide-react';
 import { signupWithUsername, loginWithUsername } from './auth/actions';
 
 function SubmitButton({ isSignup, isPending }: { isSignup: boolean, isPending: boolean }) {
@@ -32,6 +32,7 @@ export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,13 +43,14 @@ export default function AuthPage() {
     const action = isSignup ? signupWithUsername : loginWithUsername;
 
     const result = await action({ message: null, success: false }, formData);
+    
+    setIsPending(false);
 
     if (result.success && result.redirectTo) {
       router.push(result.redirectTo);
       router.refresh();
     } else {
       setMessage(result.message);
-      setIsPending(false);
     }
   };
 
@@ -70,8 +72,19 @@ export default function AuthPage() {
                 <Input id="username" name="username" placeholder="e.g., studious_student" required />
                 </div>
                 <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" name="password" type="password" required />
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                        <Input id="password" name="password" type={showPassword ? 'text' : 'password'} required />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                    </div>
                 </div>
                 
                 {message && (
