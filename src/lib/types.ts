@@ -8,6 +8,15 @@ export type UserProfile = {
   lastactive: any; // Firestore Timestamp
   onboardingComplete: boolean;
   lastPracticedChapterId?: string;
+
+  // Onboarding data
+  grade?: string;
+  board?: string;
+  troublingSubjects?: string[];
+  studyTime?: string;
+  studySchedule?: string[];
+  biggestProblems?: string[];
+  nextExamDate?: string;
 };
 
 export type Subject = {

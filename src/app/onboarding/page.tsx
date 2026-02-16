@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { saveOnboardingData, completeOnboarding } from './actions';
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
   const progress = (current / total) * 100;
@@ -38,20 +39,33 @@ export default function OnboardingPage() {
     const newResponses = { ...responses, [question.firestoreField]: answer };
     setResponses(newResponses);
 
-    setTimeout(() => {
-      if (currentQuestionIndex < onboardingQuestions.length -1) {
+    setTimeout(async () => {
+      if (currentQuestionIndex < onboardingQuestions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setIsAnimating(false);
       } else {
         // This is the last question, handle completion
-        const grade = newResponses.grade;
-        const troublingSubjects = (newResponses.troublingSubjects || []) as string[];
+        const finalResponses = { ...newResponses, [question.firestoreField]: answer };
+        const saveResult = await saveOnboardingData(finalResponses);
+        
+        if (!saveResult.success) {
+            console.error(saveResult.message);
+            setIsAnimating(false);
+            // Optionally show an error to the user here
+            return;
+        }
+
+        const grade = finalResponses.grade;
+        const troublingSubjects = (finalResponses.troublingSubjects || []) as string[];
 
         if (troublingSubjects.length > 0 && grade) {
             const subjectsParam = troublingSubjects.join(',');
             router.push(`/revision/start?subjects=${subjectsParam}&grade=${grade}`);
         } else {
-            router.push('/');
+            // If no troubling subjects, mark onboarding complete and go home.
+            await completeOnboarding();
+            router.push('/home');
+            router.refresh();
         }
       }
     }, 400);

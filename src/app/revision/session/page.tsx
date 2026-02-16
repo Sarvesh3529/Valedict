@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Home } from 'lucide-react';
 import QuizView from '@/components/quiz/quiz-view';
 import QuizResults from '@/components/quiz/quiz-results';
+import { completeOnboarding } from '@/app/onboarding/actions';
 
 function RevisionSessionContent() {
   const router = useRouter();
@@ -37,14 +38,16 @@ function RevisionSessionContent() {
     return generateQuiz(chapterIds, 7, grade, 'all');
   }, [subjectIdsParam, grade]);
 
-  const handleFinishQuiz = (finalResults: QuizResult[]) => {
+  const handleFinishQuiz = async (finalResults: QuizResult[]) => {
+    await completeOnboarding();
     setResults(finalResults);
     setIsFinished(true);
   };
 
   const handleRestart = () => {
     // For a revision session, restarting should take you to the main dashboard
-    router.push('/');
+    router.push('/home');
+    router.refresh();
   };
 
   if (!subjectIdsParam || !grade) {
