@@ -6,8 +6,6 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const protectedRoutes = ['/home', '/profile', '/quiz', '/leaderboard', '/doubt-solver', '/onboarding', '/revision'];
-  const authRoute = '/';
-
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
   // If user is not authenticated and trying to access a protected route, redirect to login page ('/').
@@ -15,9 +13,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // If user is authenticated and trying to access the login page, redirect to home.
-  if (token && pathname === authRoute) {
-    return NextResponse.redirect(new URL('/home', request.url));
+  // If user is authenticated and trying to access the login page, let the page load.
+  // The client-side AuthProvider will handle redirecting them to '/home' if they are truly logged in.
+  // This change prevents a redirect loop if the cookie token is stale or invalid.
+  if (token && pathname === '/') {
+     // Allow access to login page even with a token.
+     // The home page itself has server-side logic to validate the token
+     // and will redirect if it's invalid.
   }
 
   return NextResponse.next();
