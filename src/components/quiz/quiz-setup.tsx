@@ -13,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BookCopy, Star, Home } from 'lucide-react';
-import Link from 'next/link';
+import { BookCopy, Star } from 'lucide-react';
 
 interface QuizSetupProps {
   onStart: (
@@ -196,16 +195,10 @@ export default function QuizSetup({ onStart, userGrade }: QuizSetupProps) {
         </Select>
       </div>
 
-      <div className="text-center flex flex-col sm:flex-row gap-4 justify-center">
+      <div className="text-center">
         <Button type="submit" size="lg" className="bg-accent hover:bg-accent/90">
           <BookCopy className="mr-2 h-5 w-5" />
           Start Quiz
-        </Button>
-        <Button asChild size="lg" variant="outline">
-          <Link href="/home">
-            <Home className="mr-2 h-4 w-4" />
-            Go to Home
-          </Link>
         </Button>
       </div>
     </form>

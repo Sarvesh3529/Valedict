@@ -2,7 +2,6 @@
 
 import type { QuizResult } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import {
   Accordion,
   AccordionContent,
@@ -10,7 +9,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle2, XCircle, RotateCcw, Home } from 'lucide-react';
+import { CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -31,10 +30,14 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import 'katex/dist/katex.min.css';
+import Link from 'next/link';
+import { Home } from 'lucide-react';
 
 interface QuizResultsProps {
   results: QuizResult[];
   onRestart: () => void;
+  restartButtonText?: string;
+  RestartButtonIcon?: React.ElementType;
 }
 
 const chartConfig: ChartConfig = {
@@ -48,7 +51,12 @@ const chartConfig: ChartConfig = {
   },
 };
 
-export default function QuizResults({ results, onRestart }: QuizResultsProps) {
+export default function QuizResults({
+  results,
+  onRestart,
+  restartButtonText = "Take Another Quiz",
+  RestartButtonIcon = RotateCcw
+}: QuizResultsProps) {
   const correctAnswers = results.filter((r) => r.isCorrect).length;
   const totalQuestions = results.length;
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
@@ -153,8 +161,8 @@ export default function QuizResults({ results, onRestart }: QuizResultsProps) {
 
       <div className="text-center mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <Button onClick={onRestart} size="lg">
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Take Another Quiz
+            <RestartButtonIcon className="mr-2 h-4 w-4" />
+            {restartButtonText}
         </Button>
          <Button asChild size="lg" variant="outline">
             <Link href="/home">

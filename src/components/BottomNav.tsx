@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, NotebookText, BrainCircuit, User, Trophy } from 'lucide-react';
+import { Home, NotebookText, BrainCircuit, Trophy, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
@@ -10,7 +10,7 @@ const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
   { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
 
 export default function BottomNav() {

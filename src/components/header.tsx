@@ -101,7 +101,6 @@ export default function Header() {
 
   const authRoutes = ['/', '/onboarding', '/revision'];
   if (!user || authRoutes.some(route => pathname.startsWith(route))) {
-     // Don't render the header on auth or onboarding pages
     return null;
   }
   

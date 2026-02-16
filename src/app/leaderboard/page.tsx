@@ -1,16 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Crown, Loader2, ShieldX, Home } from 'lucide-react';
+import { Crown, Loader2, ShieldX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
 
 type LeaderboardType = 'weeklyxp' | 'totalxp';
 
@@ -94,14 +92,6 @@ export default function LeaderboardPage() {
             <TabsContent value="totalxp">{renderContent()}</TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="justify-center pt-6">
-            <Button asChild variant="outline">
-                <Link href="/home">
-                    <Home className="mr-2 h-4 w-4" />
-                    Go to Home
-                </Link>
-            </Button>
-        </CardFooter>
       </Card>
     </div>
   );
