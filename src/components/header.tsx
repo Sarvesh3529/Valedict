@@ -62,7 +62,8 @@ export default function Header() {
   const isMobile = useIsMobile();
   const { user } = useAuth();
 
-  // Don't show header on auth pages
+  // The ConditionalHeader component handles hiding on auth/onboarding pages.
+  // This component only needs to check if a user is logged in.
   if (!user) {
     return null;
   }
