@@ -12,7 +12,6 @@ export default function WeeklyProgressChart({ weeklyXp }: { weeklyXp: number }) 
          <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Weekly Progress</CardTitle>
-                <CardDescription>You've earned {weeklyXp} XP this week. Keep it up!</CardDescription>
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={100}>

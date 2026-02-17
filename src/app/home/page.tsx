@@ -69,7 +69,6 @@ export default async function HomePage() {
         <h2 className="text-2xl font-bold text-foreground">
           Welcome Back, {profile?.username || 'Student'}!
         </h2>
-        <p className="text-muted-foreground">What will you learn today?</p>
       </header>
 
       {/* Row 2: Continue Learning & Profile */}
@@ -92,14 +91,14 @@ export default async function HomePage() {
       </div>
 
       {/* Row 3: Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StreakDisplay 
             currentStreak={profile?.streak || 0}
             highestStreak={profile?.highestStreak || 0}
             lastActivityDate={lastActiveDate}
         />
         <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
-        <Link href="/leaderboard" className="h-full group">
+        <Link href="/leaderboard" className="h-full group sm:col-span-2 lg:col-span-1">
             <Card className="h-full flex flex-col justify-between hover:border-primary/40 transition-colors">
                 <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2 flex-grow">
                     <Trophy className="h-6 w-6 text-primary" />
@@ -117,13 +116,12 @@ export default async function HomePage() {
       {/* Row 4: Quick Actions */}
       <div>
         <h2 className="text-3xl font-bold mb-6 font-headline text-primary/90">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6">
             <Link href="/doubt-solver" className="h-full group">
                 <Card className="h-full bg-primary/10 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 flex flex-col justify-between p-6">
                     <div>
                         <BrainCircuit className="h-10 w-10 text-primary mb-4"/>
                         <h3 className="text-xl font-bold font-headline mb-1">AI Doubt Solver</h3>
-                        <p className="text-muted-foreground">Stuck? Get an instant explanation.</p>
                     </div>
                     <div className="text-primary font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform">
                         Ask a question <ArrowRight className="ml-2 h-5 w-5"/>
@@ -135,7 +133,6 @@ export default async function HomePage() {
                     <div>
                         <NotebookText className="h-10 w-10 text-foreground/80 mb-4"/>
                         <h3 className="text-xl font-bold font-headline mb-1">Custom Quiz</h3>
-                        <p className="text-muted-foreground">Test your knowledge on any chapter.</p>
                     </div>
                     <div className="text-foreground/90 font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform">
                         Create a quiz <ArrowRight className="ml-2 h-5 w-5"/>
@@ -151,7 +148,6 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {subjects.map((subject) => {
               const Icon = iconComponents[subject.iconName] || Icons.Book;
-              const chaptersForGrade = subject.chapters.filter(c => c.grade === profile.grade);
               return (
               <Card key={subject.id} className="flex flex-col group hover:border-primary/40 transition-all duration-300 justify-between">
                   <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
