@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
@@ -9,6 +9,8 @@ import { Crown, Loader2, ShieldX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type LeaderboardType = 'weeklyxp' | 'totalxp';
 
@@ -19,6 +21,72 @@ const renderRank = (rank: number) => {
   if (rank === 2) return <Crown className={cn(size, "text-orange-400 fill-orange-400")} />;
   return <span className="font-bold text-lg">{rank + 1}</span>;
 };
+
+function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType}) {
+  if (users.length === 0) {
+    return <p className="text-center text-muted-foreground p-8">The leaderboard is empty. Complete a quiz to get started!</p>
+  }
+
+  return (
+    <div className="space-y-2 pt-4">
+      {users.map((u, index) => (
+        <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all">
+          <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
+             {renderRank(index)}
+          </div>
+          <Avatar>
+            <AvatarImage src={''} />
+            <AvatarFallback>{u.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+          </Avatar>
+          <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
+          <p className="font-bold text-primary">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function CurrentUserBar({ users, type }: { users: UserProfile[], type: LeaderboardType }) {
+  const { user } = useAuth();
+  const currentUserData = useMemo(() => {
+    if (!user) return null;
+    const rank = users.findIndex(u => u.uid === user.uid);
+    if (rank === -1) return null;
+    return { ...users[rank], rank };
+  }, [users, user]);
+
+  if (!currentUserData) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        className="fixed bottom-[4.5rem] md:bottom-4 left-2 right-2 md:left-auto md:right-auto md:w-full md:max-w-3xl z-40"
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 30 }}
+      >
+        <Card className="shadow-2xl border-primary/50 bg-card/95 backdrop-blur-sm">
+          <CardContent className="p-0">
+            <div className="flex items-center gap-4 p-3">
+              <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
+                <span className="font-bold text-lg text-primary">{currentUserData.rank + 1}</span>
+              </div>
+              <Avatar>
+                <AvatarImage src={''} />
+                <AvatarFallback className="bg-primary/20 text-primary font-bold">
+                    {currentUserData.username?.charAt(0).toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <p className="font-bold flex-1 break-words text-primary">You</p>
+              <p className="font-bold text-primary">{type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP</p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 
 export default function LeaderboardPage() {
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('weeklyxp');
@@ -61,7 +129,7 @@ export default function LeaderboardPage() {
 
   const renderContent = () => {
     if (loading) {
-      return <div className="flex justify-center p-8"><Loader2 className="animate-spin"/></div>;
+      return <div className="flex justify-center items-center p-8 min-h-[300px]"><Loader2 className="animate-spin h-8 w-8 text-primary"/></div>;
     }
     if (error) {
       return (
@@ -76,7 +144,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
+    <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12 pb-32 md:pb-28">
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
@@ -93,30 +161,7 @@ export default function LeaderboardPage() {
           </Tabs>
         </CardContent>
       </Card>
+      {!loading && !error && <CurrentUserBar users={users} type={leaderboardType} />}
     </div>
   );
-}
-
-function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType}) {
-  if (users.length === 0) {
-    return <p className="text-center text-muted-foreground p-8">The leaderboard is empty. Complete a quiz to get started!</p>
-  }
-
-  return (
-    <div className="space-y-2 pt-4">
-      {users.map((u, index) => (
-        <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card transition-all">
-          <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
-             {renderRank(index)}
-          </div>
-          <Avatar>
-            <AvatarImage src={''} />
-            <AvatarFallback>{u.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-          </Avatar>
-          <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
-          <p className="font-bold text-primary">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
-        </div>
-      ))}
-    </div>
-  )
 }

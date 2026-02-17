@@ -7,10 +7,10 @@ import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
 
 // UI components
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, Trophy } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
@@ -63,7 +63,7 @@ export default async function HomePage() {
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8">
       {/* Row 1: Welcome Header */}
       <header>
-        <h2 className="text-3xl font-bold font-headline text-foreground mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           Welcome Back, {profile?.username || 'Student'}!
         </h2>
         <p className="text-lg text-muted-foreground">What will you learn today?</p>
@@ -73,13 +73,29 @@ export default async function HomePage() {
       {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
 
       {/* Row 2: Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StreakDisplay 
             currentStreak={profile?.streak || 0}
             highestStreak={profile?.highestStreak || 0}
             lastActivityDate={lastActiveDate}
         />
         <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+        <Link href="/leaderboard" className="h-full group">
+            <Card className="h-full flex flex-col justify-between hover:border-primary/40 transition-colors">
+                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                    <Trophy className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline text-primary/90">Leaderboard</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground mt-2">See how you rank against other students!</p>
+                </CardContent>
+                <CardFooter className="pt-0">
+                    <div className="text-primary font-semibold flex items-center group-hover:translate-x-1 transition-transform">
+                        View Ranks <ArrowRight className="ml-2 h-5 w-5"/>
+                    </div>
+                </CardFooter>
+            </Card>
+        </Link>
       </div>
 
       {/* Row 3: Quick Actions */}
