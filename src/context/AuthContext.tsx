@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       unsubscribeAuth();
       unsubscribeProfile();
     };
-  }, []);
+  }, [router]);
 
   const value = { user, profile, loading, logout };
 
