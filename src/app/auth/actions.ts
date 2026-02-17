@@ -60,7 +60,6 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
       streak: 0,
       highestStreak: 0,
       joinedat: FieldValue.serverTimestamp(),
-      lastactive: FieldValue.serverTimestamp(),
       onboardingComplete: false,
     });
 
