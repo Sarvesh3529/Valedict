@@ -16,6 +16,7 @@ import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
 import ContinueLearning from '@/components/home/ContinueLearning';
+import { generateAvatarColor } from '@/lib/utils';
 
 
 const iconComponents: { [key: string]: React.ElementType } = {
@@ -59,6 +60,7 @@ export default async function HomePage() {
   
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
   const lastPracticedChapter = chapters.find(c => c.id === profile.lastPracticedChapterId);
+  const avatarColor = generateAvatarColor(profile.uid);
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8">
@@ -77,7 +79,7 @@ export default async function HomePage() {
         <Link href="/profile" className="group">
           <Card className="h-full flex items-center p-4 hover:border-primary/40 transition-colors">
             <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-2xl font-semibold bg-primary/20 text-primary">
+                <AvatarFallback className="text-2xl font-semibold text-white" style={{backgroundColor: avatarColor}}>
                     {profile.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
             </Avatar>

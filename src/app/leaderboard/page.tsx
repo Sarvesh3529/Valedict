@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Crown, Loader2, ShieldX, Home } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
+import { cn, generateAvatarColor } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,19 +31,24 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
 
   return (
     <div className="space-y-2 pt-4">
-      {users.map((u, index) => (
-        <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all">
-          <Avatar>
-            <AvatarImage src={''} />
-            <AvatarFallback>{u.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-          </Avatar>
-          <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
-             {renderRank(index)}
+      {users.map((u, index) => {
+        const avatarColor = generateAvatarColor(u.uid);
+        return (
+          <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all">
+            <Avatar>
+              <AvatarImage src={''} />
+              <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white">
+                {u.username?.charAt(0).toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
+              {renderRank(index)}
+            </div>
+            <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
+            <p className="font-bold text-primary">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
           </div>
-          <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
-          <p className="font-bold text-primary">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -58,6 +63,8 @@ function CurrentUserBar({ users, type }: { users: UserProfile[], type: Leaderboa
   }, [users, user]);
 
   if (!currentUserData) return null;
+  
+  const avatarColor = generateAvatarColor(currentUserData.uid);
 
   return (
     <AnimatePresence>
@@ -72,7 +79,7 @@ function CurrentUserBar({ users, type }: { users: UserProfile[], type: Leaderboa
             <div className="flex items-center gap-4 p-3">
               <Avatar>
                 <AvatarImage src={''} />
-                <AvatarFallback className="bg-primary/20 text-primary font-bold">
+                <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white font-bold">
                     {currentUserData.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
