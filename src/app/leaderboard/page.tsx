@@ -93,6 +93,7 @@ export default function LeaderboardPage() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -122,9 +123,16 @@ export default function LeaderboardPage() {
         setLoading(false);
       }
     };
-
-    fetchLeaderboard();
-  }, [leaderboardType]);
+    
+    // Only fetch data if authentication has finished and a user is logged in.
+    if (!authLoading && user) {
+      fetchLeaderboard();
+    } else if (!authLoading && !user) {
+      // Handle case where user is not logged in after auth check.
+      setLoading(false);
+      setError("You must be logged in to view the leaderboard.");
+    }
+  }, [leaderboardType, user, authLoading]);
   
 
   const renderContent = () => {
