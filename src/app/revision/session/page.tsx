@@ -102,6 +102,7 @@ function RevisionSessionContent() {
                 onRestart={handleRestart}
                 restartButtonText="Go to Dashboard"
                 RestartButtonIcon={Home}
+                fixedXpGained={20}
               />
             )}
           </div>

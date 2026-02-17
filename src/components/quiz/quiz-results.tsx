@@ -42,6 +42,7 @@ interface QuizResultsProps {
   onRestart: () => void;
   restartButtonText?: string;
   RestartButtonIcon?: React.ElementType;
+  fixedXpGained?: number;
 }
 
 const chartConfig: ChartConfig = {
@@ -66,7 +67,8 @@ export default function QuizResults({
   results,
   onRestart,
   restartButtonText = "Take Another Quiz",
-  RestartButtonIcon = RotateCcw
+  RestartButtonIcon = RotateCcw,
+  fixedXpGained,
 }: QuizResultsProps) {
   const [isUpdating, setIsUpdating] = useState(true);
   const [animationState, setAnimationState] = useState<AnimationState | null>(null);
@@ -99,9 +101,14 @@ export default function QuizResults({
       deduction = 5;
   }
 
-  const xpGained = Math.max(0, baseXP - deduction);
+  const calculatedXpGained = Math.max(0, baseXP - deduction);
+  const xpGained = fixedXpGained !== undefined ? fixedXpGained : calculatedXpGained;
   
   useEffect(() => {
+    if (results.length === 0) {
+        setIsUpdating(false);
+        return;
+    };
     // This effect runs once when the component mounts with the results
     const lastChapterId = results[results.length - 1].question.chapterId;
     updateUserStatsAfterQuiz(xpGained, lastChapterId)
@@ -121,6 +128,7 @@ export default function QuizResults({
         console.error("Failed to update stats:", error);
         setIsUpdating(false); // Stop loading if server action fails
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results, xpGained]);
 
 
