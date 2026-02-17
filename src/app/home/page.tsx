@@ -68,9 +68,20 @@ export default async function HomePage() {
         <p className="text-lg text-muted-foreground">What will you learn today?</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
+        {/* Left sidebar */}
+        <div className="lg:col-span-2 space-y-8">
+            {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
+            <StreakDisplay 
+                currentStreak={profile?.streak || 0}
+                highestStreak={profile?.highestStreak || 0}
+                lastActivityDate={lastActiveDate}
+            />
+            <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+        </div>
+
         {/* Main column */}
-        <div className="lg:col-span-2 space-y-10">
+        <div className="lg:col-span-3 space-y-10">
             {/* Quick Actions */}
             <div>
                 <h2 className="text-3xl font-bold mb-6 font-headline text-primary/90">Quick Actions</h2>
@@ -129,17 +140,6 @@ export default async function HomePage() {
                 })}
                 </div>
             </div>
-        </div>
-
-        {/* Right sidebar */}
-        <div className="space-y-8">
-            {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
-            <StreakDisplay 
-                currentStreak={profile?.streak || 0}
-                highestStreak={profile?.highestStreak || 0}
-                lastActivityDate={lastActiveDate}
-            />
-            <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
       </div>
     </div>
