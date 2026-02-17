@@ -100,7 +100,7 @@ function RevisionSessionContent() {
               <QuizResults
                 results={results}
                 onRestart={handleRestart}
-                restartButtonText="Go to Dashboard"
+                restartButtonText="Go to Home"
                 RestartButtonIcon={Home}
                 fixedXpGained={20}
               />

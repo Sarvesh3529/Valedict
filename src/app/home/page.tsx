@@ -107,6 +107,7 @@ export default async function HomePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {subjects.map((subject) => {
                     const Icon = iconComponents[subject.iconName] || Icons.Book;
+                    const chaptersForGrade = subject.chapters.filter(c => c.grade === profile.grade);
                     return (
                     <Card key={subject.id} className="flex flex-col group hover:border-primary/40 transition-all duration-300">
                         <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
@@ -116,7 +117,7 @@ export default async function HomePage() {
                             <CardTitle className="font-headline text-lg">{subject.name}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex-grow">
-                            <p className="text-sm text-muted-foreground">Practice {subject.chapters.length} chapters and master {subject.name}.</p>
+                            <p className="text-sm text-muted-foreground">Practice {chaptersForGrade.length} chapters and master {subject.name}.</p>
                         </CardContent>
                         <div className="p-6 pt-0">
                         <Button asChild className="w-full">

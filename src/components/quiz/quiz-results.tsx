@@ -82,11 +82,14 @@ export default function QuizResults({
   let baseXP = 0;
   if (totalQuestions === 5) {
       baseXP = 10;
+  } else if (totalQuestions === 7) { // For revision quiz
+      baseXP = fixedXpGained ?? 20; 
   } else if (totalQuestions === 10) {
       baseXP = 20;
   } else if (totalQuestions === 15) {
       baseXP = 30;
   }
+
 
   let deduction = 0;
   if (incorrectAnswers >= 1 && incorrectAnswers <= 2) {
@@ -266,12 +269,14 @@ export default function QuizResults({
               <RestartButtonIcon className="mr-2 h-4 w-4" />
               {restartButtonText}
           </Button>
-          <Button asChild size="lg" variant="outline">
-              <Link href="/home">
-                  <Home className="mr-2 h-4 w-4" />
-                  Go to Home
-              </Link>
-          </Button>
+          {RestartButtonIcon !== Home && (
+            <Button asChild size="lg" variant="outline">
+                <Link href="/home">
+                    <Home className="mr-2 h-4 w-4" />
+                    Go to Home
+                </Link>
+            </Button>
+          )}
         </div>
       </div>
     </>
