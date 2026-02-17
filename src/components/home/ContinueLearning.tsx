@@ -17,16 +17,15 @@ export default function ContinueLearning({ chapter }: ContinueLearningProps) {
   if (!chapter) return null;
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full h-full">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
         <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full h-full flex justify-between items-center p-3 sm:p-4 border rounded-lg hover:bg-accent/5">
+            <Button variant="ghost" className="w-full flex justify-between items-center p-3 sm:p-4 border rounded-lg hover:bg-accent/5 data-[state=open]:rounded-b-none">
                 <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
                     <div className="flex-shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-accent/20">
                          <BookOpen className="h-6 w-6 sm:h-7 sm:w-7 text-accent"/>
                     </div>
                     <div className="text-left overflow-hidden">
-                         <p className="text-xs sm:text-sm text-accent font-semibold hidden sm:block">Continue Learning</p>
-                         <h3 className="text-sm sm:text-lg font-bold font-headline truncate">{chapter.name}</h3>
+                         <h3 className="text-sm sm:text-lg font-bold font-headline truncate">Continue Learning</h3>
                     </div>
                 </div>
                 <ChevronsUpDown className="h-4 w-4 text-muted-foreground ml-1 flex-shrink-0" />
@@ -34,8 +33,8 @@ export default function ContinueLearning({ chapter }: ContinueLearningProps) {
             </Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-             <div className="p-6 border border-t-0 rounded-b-lg">
-                <p className="text-muted-foreground mb-4">You were last practicing this chapter. Jump back in to continue your progress!</p>
+             <div className="p-6 border border-t-0 rounded-b-lg space-y-4">
+                <p className="font-semibold text-center text-foreground">{chapter.name}</p>
                 <Button asChild className="w-full">
                     <Link href={`/quiz?chapter=${chapter.id}`}>
                         Jump Back In
