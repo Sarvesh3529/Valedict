@@ -124,16 +124,50 @@ export default function LeaderboardPage() {
       }
     };
     
-    // Only fetch data if authentication has finished and a user is logged in.
-    if (!authLoading && user) {
+    // Only fetch data if authentication is complete and there's a user.
+    if (user) {
       fetchLeaderboard();
-    } else if (!authLoading && !user) {
-      // Handle case where user is not logged in after auth check.
-      setLoading(false);
-      setError("You must be logged in to view the leaderboard.");
     }
-  }, [leaderboardType, user, authLoading]);
+  }, [leaderboardType, user]);
   
+  if (authLoading) {
+    return (
+        <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
+            <Card>
+                <CardHeader className="text-center">
+                    <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
+                    <CardDescription>See who's at the top of the class!</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex justify-center items-center p-8 min-h-[300px]">
+                        <Loader2 className="animate-spin h-8 w-8 text-primary"/>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+     )
+  }
+
+  if (!user) {
+      return (
+        <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
+             <Card>
+                <CardHeader className="text-center">
+                    <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
+                    <CardDescription>See who's at the top of the class!</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Alert variant="destructive" className="mt-4">
+                        <ShieldX className="h-4 w-4" />
+                        <AlertTitle>Access Denied</AlertTitle>
+                        <AlertDescription>You must be logged in to view the leaderboard.</AlertDescription>
+                    </Alert>
+                </CardContent>
+            </Card>
+        </div>
+      )
+  }
+
 
   const renderContent = () => {
     if (loading) {
@@ -143,7 +177,7 @@ export default function LeaderboardPage() {
       return (
         <Alert variant="destructive" className="mt-4">
           <ShieldX className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
+          <AlertTitle>Error Fetching Data</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       );
