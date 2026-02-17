@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BrainCircuit, Loader2, Eye, EyeOff } from 'lucide-react';
 import { signupWithUsername, loginWithUsername } from './auth/actions';
-import { useActionState } from 'react';
-import { useEffect } from 'react';
+import { auth } from '@/lib/firebase';
+import { signInWithCustomToken } from 'firebase/auth';
+
 
 function SubmitButton({ isSignup, isPending }: { isSignup: boolean, isPending: boolean }) {
   return (
@@ -46,13 +47,32 @@ export default function AuthPage() {
 
     const result = await action({ message: null, success: false }, formData);
     
-    setIsPending(false);
+    if (result.success && result.customToken && result.redirectTo) {
+      try {
+        // Use the custom token from the server to sign in on the client
+        const userCredential = await signInWithCustomToken(auth, result.customToken);
+        const user = userCredential.user;
 
-    if (result.success && result.redirectTo) {
-      router.push(result.redirectTo);
-      router.refresh();
+        // Now that the client is signed in, get the ID token
+        const idToken = await user.getIdToken();
+
+        // Send the ID token to the server to create the session cookie
+        await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        });
+
+        // Redirect on success
+        router.push(result.redirectTo);
+      } catch (error) {
+        console.error("Client-side sign-in failed:", error);
+        setMessage("Authentication failed. Please try again.");
+        setIsPending(false);
+      }
     } else {
       setMessage(result.message);
+      setIsPending(false);
     }
   };
 

@@ -2,7 +2,6 @@
 
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 const signupSchema = z.object({
@@ -10,7 +9,7 @@ const signupSchema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters."),
 });
 
-export async function signupWithUsername(prevState: any, formData: FormData) {
+export async function signupWithUsername(prevState: any, formData: FormData): Promise<{message: string, success: boolean, redirectTo?: string | null, customToken?: string | null}> {
   const result = signupSchema.safeParse(Object.fromEntries(formData));
 
   if (!result.success) {
@@ -33,7 +32,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
     const signupResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: syntheticEmail, password, returnSecureToken: true }),
+        body: JSON.stringify({ email: syntheticEmail, password, returnSecureToken: false }), // We don't need the token here anymore
     });
 
     const signupData = await signupResponse.json();
@@ -47,7 +46,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
         return { message: `Signup failed: ${error || 'An unknown error occurred.'}`, success: false };
     }
 
-    const { localId: uid, idToken } = signupData;
+    const { localId: uid } = signupData;
 
     // 3. Create user profile and username registry docs in a batch
     const batch = adminDb.batch();
@@ -61,6 +60,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
       highestStreak: 0,
       joinedat: FieldValue.serverTimestamp(),
       onboardingComplete: false,
+      lastactive: null,
     });
 
     const usernameRef = adminDb.collection('usernames').doc(usernameLower);
@@ -68,16 +68,10 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
 
     await batch.commit();
 
-    // 4. Create session cookie using the ID Token from the REST API response
-    cookies().set('firebase_token', idToken, {
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-    });
+    // 4. Create custom token to return to the client
+    const customToken = await adminAuth.createCustomToken(uid);
     
-    return { message: 'Signup successful!', success: true, redirectTo: '/onboarding/start' };
+    return { message: 'Signup successful!', success: true, redirectTo: '/onboarding/start', customToken };
 
   } catch (error: any) {
     console.error("SIGNUP ACTION UNEXPECTED ERROR:", error);
@@ -85,7 +79,7 @@ export async function signupWithUsername(prevState: any, formData: FormData) {
   }
 }
 
-export async function loginWithUsername(prevState: any, formData: FormData): Promise<{message: string, success: boolean, redirectTo?: string | null}> {
+export async function loginWithUsername(prevState: any, formData: FormData): Promise<{message: string, success: boolean, redirectTo?: string | null, customToken?: string | null}> {
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   
@@ -115,17 +109,10 @@ export async function loginWithUsername(prevState: any, formData: FormData): Pro
         return { message: 'Login failed. Please try again.', success: false };
     }
     
-    const idToken = data.idToken;
+    const { localId: uid } = data;
+    const customToken = await adminAuth.createCustomToken(uid);
 
-    cookies().set('firebase_token', idToken, {
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-
-    return { message: 'Login successful!', success: true, redirectTo: '/home' };
+    return { message: 'Login successful!', success: true, redirectTo: '/home', customToken };
 
   } catch (error: any) {
     console.error('Login Error:', error);
@@ -134,5 +121,6 @@ export async function loginWithUsername(prevState: any, formData: FormData): Pro
 }
 
 export async function logout() {
-    cookies().delete('firebase_token');
+    // This server action is simple: it just clears the cookie.
+    // The client will handle signing out of the Firebase SDK.
 }
