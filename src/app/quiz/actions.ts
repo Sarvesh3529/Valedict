@@ -62,9 +62,9 @@ export async function updateUserStatsAfterQuiz(
             newStreak++;
             streakIncreased = true;
         } else if (differenceInDays > 1) {
-            // Missed one or more days, so reset streak to 1 for today's lesson.
-            newStreak = 1;
-            streakIncreased = true;
+            // Missed one or more days, so reset streak to 0.
+            newStreak = 0;
+            streakIncreased = false;
         }
         // if differenceInDays is 0 (same day), do nothing to streak value
     }
