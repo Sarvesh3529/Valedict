@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, Trophy, User } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, Trophy } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
@@ -71,23 +71,6 @@ export default async function HomePage() {
 
       {/* Continue Learning Card */}
       {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
-
-      <Link href="/profile" className="h-full group block">
-            <Card className="h-full flex flex-col justify-between hover:border-primary/40 transition-colors">
-                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                    <User className="h-6 w-6 text-primary" />
-                    <CardTitle className="font-headline text-primary/90">My Profile</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground mt-2">View your stats and manage your account.</p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                    <div className="text-primary font-semibold flex items-center group-hover:translate-x-1 transition-transform">
-                        Go to Profile <ArrowRight className="ml-2 h-5 w-5"/>
-                    </div>
-                </CardFooter>
-            </Card>
-      </Link>
 
       {/* Row 2: Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
