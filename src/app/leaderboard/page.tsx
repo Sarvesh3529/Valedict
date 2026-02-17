@@ -45,7 +45,7 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
               {renderRank(index)}
             </div>
             <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
-            <p className="font-bold text-primary">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
+            <p className="font-bold text-foreground">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
           </div>
         )
       })}
@@ -84,10 +84,10 @@ function CurrentUserBar({ users, type }: { users: UserProfile[], type: Leaderboa
                 </AvatarFallback>
               </Avatar>
               <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
-                <span className="font-bold text-lg text-primary">{currentUserData.rank + 1}</span>
+                <span className="font-bold text-lg text-foreground">{currentUserData.rank + 1}</span>
               </div>
-              <p className="font-bold flex-1 break-words text-primary">You</p>
-              <p className="font-bold text-primary">{type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP</p>
+              <p className="font-bold flex-1 break-words text-foreground">You</p>
+              <p className="font-bold text-foreground">{type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP</p>
             </div>
           </CardContent>
         </Card>
@@ -151,12 +151,12 @@ export default function LeaderboardPage() {
         <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
+                    <CardTitle className="font-headline text-2xl md:text-3xl text-foreground">Leaderboard</CardTitle>
                     <CardDescription>See who's at the top of the class!</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex justify-center items-center p-8 min-h-[300px]">
-                        <Loader2 className="animate-spin h-8 w-8 text-primary"/>
+                        <Loader2 className="animate-spin h-8 w-8 text-foreground"/>
                     </div>
                 </CardContent>
             </Card>
@@ -169,7 +169,7 @@ export default function LeaderboardPage() {
         <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
              <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
+                    <CardTitle className="font-headline text-2xl md:text-3xl text-foreground">Leaderboard</CardTitle>
                     <CardDescription>See who's at the top of the class!</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -195,7 +195,7 @@ export default function LeaderboardPage() {
 
   const renderContent = () => {
     if (loading) {
-      return <div className="flex justify-center items-center p-8 min-h-[300px]"><Loader2 className="animate-spin h-8 w-8 text-primary"/></div>;
+      return <div className="flex justify-center items-center p-8 min-h-[300px]"><Loader2 className="animate-spin h-8 w-8 text-foreground"/></div>;
     }
     if (error) {
       return (
@@ -213,7 +213,7 @@ export default function LeaderboardPage() {
     <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12 pb-32 md:pb-28">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-2xl md:text-3xl text-primary">Leaderboard</CardTitle>
+          <CardTitle className="font-headline text-2xl md:text-3xl text-foreground">Leaderboard</CardTitle>
           <CardDescription>See who's at the top of the class!</CardDescription>
         </CardHeader>
         <CardContent>
