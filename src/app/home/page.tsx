@@ -73,19 +73,18 @@ export default async function HomePage() {
       </header>
 
       {/* Row 2: Continue Learning & Profile */}
-       <div className={`grid gap-6 ${lastPracticedChapter ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+       <div className={`grid gap-4 ${lastPracticedChapter ? 'grid-cols-2' : 'grid-cols-1'}`}>
         {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
 
         <Link href="/profile" className="group">
-          <Card className="h-full flex items-center p-4 hover:border-primary/40 transition-colors">
-            <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-2xl font-semibold text-white" style={{backgroundColor: avatarColor}}>
+          <Card className="h-full flex items-center p-3 sm:p-4 hover:border-primary/40 transition-colors">
+            <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
+                <AvatarFallback className="text-xl sm:text-2xl font-semibold text-white" style={{backgroundColor: avatarColor}}>
                     {profile.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
             </Avatar>
-            <div className="ml-4">
-                 <h3 className="font-bold text-lg">{profile.username}</h3>
-                 <p className="text-muted-foreground text-sm">View your profile and stats</p>
+            <div className="ml-4 hidden sm:block">
+                 <h3 className="font-bold text-lg truncate">{profile.username}</h3>
             </div>
             <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </Card>
@@ -102,14 +101,11 @@ export default async function HomePage() {
         <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         <Link href="/leaderboard" className="h-full group">
             <Card className="h-full flex flex-col justify-between hover:border-primary/40 transition-colors">
-                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2 flex-grow">
                     <Trophy className="h-6 w-6 text-primary" />
                     <CardTitle className="font-headline text-primary/90">Leaderboard</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground mt-2">See how you rank against other students!</p>
-                </CardContent>
-                <CardFooter className="pt-0">
+                <CardFooter className="pt-4">
                     <div className="text-primary font-semibold flex items-center group-hover:translate-x-1 transition-transform">
                         View Ranks <ArrowRight className="ml-2 h-5 w-5"/>
                     </div>
@@ -157,16 +153,13 @@ export default async function HomePage() {
               const Icon = iconComponents[subject.iconName] || Icons.Book;
               const chaptersForGrade = subject.chapters.filter(c => c.grade === profile.grade);
               return (
-              <Card key={subject.id} className="flex flex-col group hover:border-primary/40 transition-all duration-300">
+              <Card key={subject.id} className="flex flex-col group hover:border-primary/40 transition-all duration-300 justify-between">
                   <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                           <Icon className="h-7 w-7 text-primary" />
                       </div>
                       <CardTitle className="font-headline text-lg">{subject.name}</CardTitle>
                   </CardHeader>
-                  <CardContent className="flex-grow">
-                      <p className="text-sm text-muted-foreground">Practice {chaptersForGrade.length} chapters and master {subject.name}.</p>
-                  </CardContent>
                   <div className="p-6 pt-0">
                   <Button asChild className="w-full">
                       <Link href="/quiz">Start Practice</Link>

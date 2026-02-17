@@ -17,19 +17,19 @@ export default function ContinueLearning({ chapter }: ContinueLearningProps) {
   if (!chapter) return null;
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full h-full">
         <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full flex justify-between items-center p-4 h-auto border rounded-lg hover:bg-accent/5">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/20">
-                         <BookOpen className="h-7 w-7 text-accent"/>
+            <Button variant="ghost" className="w-full h-full flex justify-between items-center p-3 sm:p-4 border rounded-lg hover:bg-accent/5">
+                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+                    <div className="flex-shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-accent/20">
+                         <BookOpen className="h-6 w-6 sm:h-7 sm:w-7 text-accent"/>
                     </div>
-                    <div>
-                         <p className="text-sm text-accent font-semibold text-left">Continue Learning</p>
-                         <h3 className="text-lg font-bold font-headline text-left">{chapter.name}</h3>
+                    <div className="text-left overflow-hidden">
+                         <p className="text-xs sm:text-sm text-accent font-semibold hidden sm:block">Continue Learning</p>
+                         <h3 className="text-sm sm:text-lg font-bold font-headline truncate">{chapter.name}</h3>
                     </div>
                 </div>
-                <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronsUpDown className="h-4 w-4 text-muted-foreground ml-1 flex-shrink-0" />
                 <span className="sr-only">Toggle</span>
             </Button>
         </CollapsibleTrigger>
