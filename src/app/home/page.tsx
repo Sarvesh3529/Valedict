@@ -9,6 +9,7 @@ import Link from 'next/link';
 // UI components
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as Icons from 'lucide-react';
 import { BrainCircuit, NotebookText, ArrowRight, Trophy } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
@@ -63,16 +64,33 @@ export default async function HomePage() {
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8">
       {/* Row 1: Welcome Header */}
       <header>
-        <h2 className="text-2xl font-bold text-foreground mb-2">
+        <h2 className="text-2xl font-bold text-foreground">
           Welcome Back, {profile?.username || 'Student'}!
         </h2>
-        <p className="text-lg text-muted-foreground">What will you learn today?</p>
+        <p className="text-muted-foreground">What will you learn today?</p>
       </header>
 
-      {/* Continue Learning Card */}
-      {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
+      {/* Row 2: Continue Learning & Profile */}
+       <div className={`grid gap-6 ${lastPracticedChapter ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+        {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
 
-      {/* Row 2: Stats */}
+        <Link href="/profile" className="group">
+          <Card className="h-full flex items-center p-4 hover:border-primary/40 transition-colors">
+            <Avatar className="h-16 w-16">
+                <AvatarFallback className="text-2xl font-semibold bg-primary/20 text-primary">
+                    {profile.username?.charAt(0).toUpperCase() || 'U'}
+                </AvatarFallback>
+            </Avatar>
+            <div className="ml-4">
+                 <h3 className="font-bold text-lg">{profile.username}</h3>
+                 <p className="text-muted-foreground text-sm">View your profile and stats</p>
+            </div>
+            <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Card>
+        </Link>
+      </div>
+
+      {/* Row 3: Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StreakDisplay 
             currentStreak={profile?.streak || 0}
@@ -98,7 +116,7 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* Row 3: Quick Actions */}
+      {/* Row 4: Quick Actions */}
       <div>
         <h2 className="text-3xl font-bold mb-6 font-headline text-primary/90">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,7 +147,7 @@ export default async function HomePage() {
         </div>
       </div>
       
-      {/* Row 4 & 5: Practice by Subject Section */}
+      {/* Row 5: Practice by Subject Section */}
       <div>
           <h2 className="text-3xl font-bold mb-6 font-headline text-primary/90">Practice by Subject</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
