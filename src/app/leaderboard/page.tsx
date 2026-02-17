@@ -3,14 +3,16 @@ import { useState, useEffect, useMemo } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Crown, Loader2, ShieldX } from 'lucide-react';
+import { Crown, Loader2, ShieldX, Home } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 type LeaderboardType = 'weeklyxp' | 'totalxp';
 
@@ -96,6 +98,16 @@ export default function LeaderboardPage() {
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
+    // Wait until auth is resolved before trying to fetch data
+    if (authLoading) {
+      return; 
+    }
+    
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     const fetchLeaderboard = async () => {
       setLoading(true);
       setError(null);
@@ -124,11 +136,8 @@ export default function LeaderboardPage() {
       }
     };
     
-    // Only fetch data if authentication is complete and there's a user.
-    if (user) {
-      fetchLeaderboard();
-    }
-  }, [leaderboardType, user]);
+    fetchLeaderboard();
+  }, [leaderboardType, user, authLoading]);
   
   if (authLoading) {
     return (
@@ -163,6 +172,14 @@ export default function LeaderboardPage() {
                         <AlertDescription>You must be logged in to view the leaderboard.</AlertDescription>
                     </Alert>
                 </CardContent>
+                 <CardFooter className="justify-center">
+                    <Button asChild variant="outline">
+                        <Link href="/home">
+                            <Home className="mr-2 h-4 w-4" />
+                            Go to Home
+                        </Link>
+                    </Button>
+                </CardFooter>
             </Card>
         </div>
       )
@@ -202,6 +219,14 @@ export default function LeaderboardPage() {
             <TabsContent value="totalxp">{renderContent()}</TabsContent>
           </Tabs>
         </CardContent>
+        <CardFooter className="justify-center">
+            <Button asChild variant="outline">
+                <Link href="/home">
+                    <Home className="mr-2 h-4 w-4" />
+                    Go to Home
+                </Link>
+            </Button>
+        </CardFooter>
       </Card>
       {!loading && !error && <CurrentUserBar users={users} type={leaderboardType} />}
     </div>

@@ -1,13 +1,14 @@
 'use client';
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, Flame, Star, CalendarDays } from "lucide-react";
+import { Loader2, Flame, Star, CalendarDays, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import Link from 'next/link';
 
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) {
   return (
@@ -91,6 +92,14 @@ export default function ProfilePage() {
               <StatCard icon={CalendarDays} label="Joined On" value={joinDate} />
             </div>
           </CardContent>
+          <CardFooter className="justify-center">
+             <Button asChild variant="outline">
+                <Link href="/home">
+                    <Home className="mr-2 h-4 w-4" />
+                    Go to Home
+                </Link>
+            </Button>
+          </CardFooter>
         </Card>
 
         <Card>
