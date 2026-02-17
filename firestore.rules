@@ -2,17 +2,40 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // 1. User Profiles: Stores XP, Streaks, etc.
     match /users/{userId} {
+      // LEADERBOARD FIX: Allows any logged-in user to see other profiles for the leaderboard.
       allow get, list: if request.auth != null;
-      allow create, update: if request.auth.uid == userId;
+      
+      // Allow a user to create their own profile document.
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow a user to update their own document, but prevent cheating.
+      // - They can't change their username or join date.
+      // - They can't manually decrease their total XP.
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && request.resource.data.username == resource.data.username
+                    && request.resource.data.joinedat == resource.data.joinedat
+                    && request.resource.data.totalxp >= resource.data.totalxp;
+      
+      // Deleting profiles is not allowed.
       allow delete: if false;
     }
 
+    // 2. Username Registry: Ensures no duplicates.
     match /usernames/{username} {
+      // Allow anyone to check if a username is available.
       allow get: if true;
-      allow create: if request.auth != null;
+      
+      // Allow a user to claim a username only if it doesn't already exist.
+      allow create: if request.auth != null 
+                    && !exists(/databases/$(database)/documents/usernames/$(username));
+      
+      // Once a username is claimed, it cannot be changed or deleted.
+      allow update, delete: if false;
     }
 
+    // 3. Quizzes: Static content that is read-only for users.
     match /quizzes/{document=**} {
       allow read: if true;
       allow write: if false;
