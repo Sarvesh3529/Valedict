@@ -75,12 +75,34 @@ export default function QuizResults({
   const totalQuestions = results.length;
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
   
+  const incorrectAnswers = totalQuestions - correctAnswers;
+
+  let baseXP = 0;
+  if (totalQuestions === 5) {
+      baseXP = 10;
+  } else if (totalQuestions === 10) {
+      baseXP = 20;
+  } else if (totalQuestions === 15) {
+      baseXP = 30;
+  }
+
+  let deduction = 0;
+  if (incorrectAnswers >= 1 && incorrectAnswers <= 2) {
+      deduction = 1;
+  } else if (incorrectAnswers >= 3 && incorrectAnswers <= 4) {
+      deduction = 2;
+  } else if (incorrectAnswers >= 5 && incorrectAnswers <= 6) {
+      deduction = 3;
+  } else if (incorrectAnswers >= 7 && incorrectAnswers <= 8) {
+      deduction = 4;
+  } else if (incorrectAnswers >= 9) {
+      deduction = 5;
+  }
+
+  const xpGained = Math.max(0, baseXP - deduction);
+  
   useEffect(() => {
     // This effect runs once when the component mounts with the results
-    const xpGained = correctAnswers * 10;
-    
-    // Always call the update function if the quiz was completed, 
-    // even with 0 XP, to correctly handle the streak.
     const lastChapterId = results[results.length - 1].question.chapterId;
     updateUserStatsAfterQuiz(xpGained, lastChapterId)
       .then(({ streakIncreased, newStreak }) => {
@@ -98,7 +120,7 @@ export default function QuizResults({
         console.error("Failed to update stats:", error);
         setIsUpdating(false); // Stop loading if server action fails
       });
-  }, [results, correctAnswers]);
+  }, [results, xpGained]);
 
 
   const chartData = [
@@ -143,7 +165,7 @@ export default function QuizResults({
           <CardHeader>
             <CardTitle className="text-3xl md:text-4xl font-bold">Your Score</CardTitle>
             <CardDescription>
-              You answered {correctAnswers} out of {totalQuestions} questions correctly and earned {correctAnswers * 10} XP!
+              You answered {correctAnswers} out of {totalQuestions} questions correctly and earned {xpGained} XP!
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
