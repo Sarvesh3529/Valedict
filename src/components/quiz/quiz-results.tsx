@@ -106,13 +106,14 @@ export default function QuizResults({
     const lastChapterId = results[results.length - 1].question.chapterId;
     updateUserStatsAfterQuiz(xpGained, lastChapterId)
       .then(({ streakIncreased, newStreak }) => {
-        if (xpGained > 0) {
+        // User wants streak animation first
+        if (streakIncreased) {
+          setAnimationState({ xp: xpGained, streak: newStreak, streakIncreased, stage: 'streak' });
+        } else if (xpGained > 0) {
+          // If no streak increase, but XP was gained, show XP animation
           setAnimationState({ xp: xpGained, streak: newStreak, streakIncreased, stage: 'xp' });
-        } else if (streakIncreased) {
-          // If no XP but streak increased (e.g., first quiz of the day with 0 score)
-          setAnimationState({ xp: 0, streak: newStreak, streakIncreased, stage: 'streak' });
         } else {
-          // No XP and no streak change, just finish loading
+          // No animations needed, just finish loading
           setIsUpdating(false);
         }
       })
@@ -128,16 +129,16 @@ export default function QuizResults({
     { name: 'incorrect', value: totalQuestions - correctAnswers, fill: 'var(--color-incorrect)' },
   ];
 
-  const handleXpComplete = () => {
-    if (animationState?.streakIncreased) {
-      setAnimationState(prev => prev ? { ...prev, stage: 'streak' } : null);
+  const handleStreakComplete = () => {
+    if (animationState && animationState.xp > 0) {
+        setAnimationState(prev => prev ? { ...prev, stage: 'xp' } : null);
     } else {
-      setAnimationState(prev => prev ? { ...prev, stage: 'done' } : null);
-      setIsUpdating(false);
+        setAnimationState(prev => prev ? { ...prev, stage: 'done' } : null);
+        setIsUpdating(false);
     }
   };
 
-  const handleStreakComplete = () => {
+  const handleXpComplete = () => {
     setAnimationState(prev => prev ? { ...prev, stage: 'done' } : null);
     setIsUpdating(false);
   };
@@ -153,11 +154,11 @@ export default function QuizResults({
 
   return (
     <>
-      {animationState?.stage === 'xp' && animationState.xp > 0 && (
-        <XpAnimation xp={animationState.xp} onComplete={handleXpComplete} />
-      )}
       {animationState?.stage === 'streak' && (
         <StreakAnimation count={animationState.streak} onComplete={handleStreakComplete} />
+      )}
+      {animationState?.stage === 'xp' && animationState.xp > 0 && (
+        <XpAnimation xp={animationState.xp} onComplete={handleXpComplete} />
       )}
 
       <div className={cn("space-y-6 md:space-y-8", isUpdating ? 'opacity-0' : 'opacity-100 transition-opacity duration-500')}>
