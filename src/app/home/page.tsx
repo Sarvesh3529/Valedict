@@ -28,7 +28,7 @@ const iconComponents: { [key: string]: React.ElementType } = {
 
 export default async function HomePage() {
   const cookieStore = cookies();
-  const token = cookieStore.get('firebase_token')?.value;
+  const token = (await cookieStore).get('firebase_token')?.value;
 
   if (!token) {
     redirect('/');
@@ -38,17 +38,14 @@ export default async function HomePage() {
   try {
     decodedToken = await adminAuth.verifyIdToken(token);
   } catch (error) {
-    // Invalid token, delete cookie and redirect
-    cookieStore.delete('firebase_token');
+    (await cookieStore).delete('firebase_token');
     redirect('/');
   }
 
   const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
 
   if (!userDoc.exists) {
-    // This can happen if signup fails after auth user creation but before DB write.
-    // Or if user is deleted from DB but not Auth.
-    cookieStore.delete('firebase_token');
+    (await cookieStore).delete('firebase_token');
     redirect('/');
   }
 
@@ -71,26 +68,26 @@ export default async function HomePage() {
         </h2>
       </header>
 
-      {/* Row 2: Continue Learning & Profile */}
+      {/* Row 2: Continue Learning & Profile - Responsive Side-by-Side */}
        <div className={`grid gap-4 ${lastPracticedChapter ? 'grid-cols-2' : 'grid-cols-1'}`}>
         {lastPracticedChapter && <ContinueLearning chapter={lastPracticedChapter} />}
 
         <Link href="/profile" className="group">
           <Card className="h-full flex items-center p-3 sm:p-4 hover:border-primary/40 transition-colors">
-            <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
-                <AvatarFallback className="text-xl sm:text-2xl font-semibold text-white" style={{backgroundColor: avatarColor}}>
+            <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+                <AvatarFallback className="text-lg sm:text-xl font-semibold text-white" style={{backgroundColor: avatarColor}}>
                     {profile.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
             </Avatar>
-            <div className="ml-4 hidden sm:block">
-                 <h3 className="font-bold text-lg truncate">{profile.username}</h3>
+            <div className="ml-3 sm:ml-4 hidden xs:block overflow-hidden">
+                 <h3 className="font-bold text-sm sm:text-base truncate">{profile.username}</h3>
             </div>
-            <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </Card>
         </Link>
       </div>
 
-      {/* Row 3: Stats */}
+      {/* Row 3: Stats - Grid Logic */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StreakDisplay 
             currentStreak={profile?.streak || 0}
@@ -98,6 +95,8 @@ export default async function HomePage() {
             lastActivityDate={lastActiveDate}
         />
         <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+        
+        {/* Leaderboard takes full width row on tablet, but joins 3-col grid on desktop */}
         <Link href="/leaderboard" className="h-full group sm:col-span-2 lg:col-span-1">
             <Card className="h-full flex flex-col justify-between hover:border-primary/40 transition-colors">
                 <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2 flex-grow">
@@ -105,8 +104,8 @@ export default async function HomePage() {
                     <CardTitle className="font-headline text-primary/90">Leaderboard</CardTitle>
                 </CardHeader>
                 <CardFooter className="pt-4">
-                    <div className="text-primary font-semibold flex items-center group-hover:translate-x-1 transition-transform">
-                        View Ranks <ArrowRight className="ml-2 h-5 w-5"/>
+                    <div className="text-primary font-semibold flex items-center group-hover:translate-x-1 transition-transform text-sm">
+                        View Ranks <ArrowRight className="ml-2 h-4 w-4"/>
                     </div>
                 </CardFooter>
             </Card>
@@ -115,27 +114,27 @@ export default async function HomePage() {
 
       {/* Row 4: Quick Actions */}
       <div>
-        <h2 className="text-3xl font-bold mb-6 font-headline text-primary/90">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-6">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 font-headline text-primary/90">Quick Actions</h2>
+        <div className="grid grid-cols-2 gap-4 sm:gap-6">
             <Link href="/doubt-solver" className="h-full group">
-                <Card className="h-full bg-primary/10 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 flex flex-col justify-between p-6">
+                <Card className="h-full bg-primary/10 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 flex flex-col justify-between p-4 sm:p-6">
                     <div>
-                        <BrainCircuit className="h-10 w-10 text-primary mb-4"/>
-                        <h3 className="text-xl font-bold font-headline mb-1">AI Doubt Solver</h3>
+                        <BrainCircuit className="h-8 w-8 sm:h-10 sm:w-10 text-primary mb-3 sm:mb-4"/>
+                        <h3 className="text-base sm:text-xl font-bold font-headline mb-1">Doubt Solver</h3>
                     </div>
-                    <div className="text-primary font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform">
-                        Ask a question <ArrowRight className="ml-2 h-5 w-5"/>
+                    <div className="text-primary font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform text-xs sm:text-sm">
+                        Ask <ArrowRight className="ml-1 sm:ml-2 h-4 w-4"/>
                     </div>
                 </Card>
             </Link>
             <Link href="/quiz" className="h-full group">
-                 <Card className="h-full bg-secondary/70 border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg flex flex-col justify-between p-6">
+                 <Card className="h-full bg-secondary/70 border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg flex flex-col justify-between p-4 sm:p-6">
                     <div>
-                        <NotebookText className="h-10 w-10 text-foreground/80 mb-4"/>
-                        <h3 className="text-xl font-bold font-headline mb-1">Custom Quiz</h3>
+                        <NotebookText className="h-8 w-8 sm:h-10 sm:w-10 text-foreground/80 mb-3 sm:mb-4"/>
+                        <h3 className="text-base sm:text-xl font-bold font-headline mb-1">Custom Quiz</h3>
                     </div>
-                    <div className="text-foreground/90 font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform">
-                        Create a quiz <ArrowRight className="ml-2 h-5 w-5"/>
+                    <div className="text-foreground/90 font-semibold flex items-center mt-4 group-hover:translate-x-1 transition-transform text-xs sm:text-sm">
+                        Create <ArrowRight className="ml-1 sm:ml-2 h-4 w-4"/>
                     </div>
                 </Card>
             </Link>
@@ -144,20 +143,20 @@ export default async function HomePage() {
       
       {/* Row 5: Practice by Subject Section */}
       <div>
-          <h2 className="text-3xl font-bold mb-6 font-headline text-primary/90">Practice by Subject</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 font-headline text-primary/90">Practice</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {subjects.map((subject) => {
               const Icon = iconComponents[subject.iconName] || Icons.Book;
               return (
               <Card key={subject.id} className="flex flex-col group hover:border-primary/40 transition-all duration-300 justify-between">
                   <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <Icon className="h-7 w-7 text-primary" />
+                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                          <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
                       </div>
-                      <CardTitle className="font-headline text-lg">{subject.name}</CardTitle>
+                      <CardTitle className="font-headline text-base sm:text-lg">{subject.name}</CardTitle>
                   </CardHeader>
-                  <div className="p-6 pt-0">
-                  <Button asChild className="w-full">
+                  <div className="p-4 sm:p-6 pt-0">
+                  <Button asChild className="w-full" size="sm">
                       <Link href="/quiz">Start Practice</Link>
                   </Button>
                   </div>

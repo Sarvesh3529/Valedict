@@ -21,7 +21,7 @@ const renderRank = (rank: number) => {
   if (rank === 0) return <Crown className={cn(size, "text-yellow-400 fill-yellow-400")} />;
   if (rank === 1) return <Crown className={cn(size, "text-gray-400 fill-gray-400")} />;
   if (rank === 2) return <Crown className={cn(size, "text-orange-400 fill-orange-400")} />;
-  return <span className="font-bold text-lg">{rank + 1}</span>;
+  return <span className="font-bold text-lg text-white">{rank + 1}</span>;
 };
 
 function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType}) {
@@ -34,18 +34,18 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
       {users.map((u, index) => {
         const avatarColor = generateAvatarColor(u.uid);
         return (
-          <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all">
-            <Avatar>
+          <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all border border-transparent hover:border-white/10">
+            <Avatar className="h-10 w-10">
               <AvatarImage src={''} />
-              <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white">
+              <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white font-bold">
                 {u.username?.charAt(0).toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
               {renderRank(index)}
             </div>
-            <p className="font-medium flex-1 break-words">{u.username || 'Anonymous User'}</p>
-            <p className="font-bold text-foreground">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
+            <p className="font-medium flex-1 break-words text-white">{u.username || 'Anonymous User'}</p>
+            <p className="font-bold text-white tabular-nums">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
           </div>
         )
       })}
@@ -74,20 +74,20 @@ function CurrentUserBar({ users, type }: { users: UserProfile[], type: Leaderboa
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 30 }}
       >
-        <Card className="shadow-2xl border-primary/50 bg-card/95 backdrop-blur-sm">
+        <Card className="shadow-2xl border-primary bg-slate-900/95 backdrop-blur-md">
           <CardContent className="p-0">
             <div className="flex items-center gap-4 p-3">
-              <Avatar>
+              <Avatar className="h-10 w-10">
                 <AvatarImage src={''} />
                 <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white font-bold">
                     {currentUserData.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
-                <span className="font-bold text-lg text-foreground">{currentUserData.rank + 1}</span>
+                <span className="font-bold text-lg text-white">{currentUserData.rank + 1}</span>
               </div>
-              <p className="font-bold flex-1 break-words text-foreground">You</p>
-              <p className="font-bold text-foreground">{type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP</p>
+              <p className="font-bold flex-1 break-words text-white">You</p>
+              <p className="font-bold text-white tabular-nums">{type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP</p>
             </div>
           </CardContent>
         </Card>
@@ -105,11 +105,7 @@ export default function LeaderboardPage() {
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    // Wait until auth is resolved before trying to fetch data
-    if (authLoading) {
-      return; 
-    }
-    
+    if (authLoading) return;
     if (!user) {
       setLoading(false);
       return;
@@ -118,10 +114,9 @@ export default function LeaderboardPage() {
     const fetchLeaderboard = async () => {
       setLoading(true);
       setError(null);
-      const field = leaderboardType;
       
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, orderBy(field, 'desc'), limit(50));
+      const q = query(usersRef, orderBy(leaderboardType, 'desc'), limit(50));
       
       try {
         const querySnapshot = await getDocs(q);
@@ -130,7 +125,6 @@ export default function LeaderboardPage() {
           leaderboardUsers.push({ uid: doc.id, ...doc.data() } as UserProfile);
         });
         setUsers(leaderboardUsers);
-
       } catch (e: any) {
         if (e.code === 'permission-denied') {
           setError("You don't have permission to view the leaderboard. This may be due to security rules.");
@@ -151,12 +145,12 @@ export default function LeaderboardPage() {
         <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl md:text-3xl text-foreground">Leaderboard</CardTitle>
+                    <CardTitle className="font-headline text-2xl md:text-3xl text-white">Leaderboard</CardTitle>
                     <CardDescription>See who's at the top of the class!</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex justify-center items-center p-8 min-h-[300px]">
-                        <Loader2 className="animate-spin h-8 w-8 text-foreground"/>
+                        <Loader2 className="animate-spin h-8 w-8 text-white"/>
                     </div>
                 </CardContent>
             </Card>
@@ -169,7 +163,7 @@ export default function LeaderboardPage() {
         <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
              <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl md:text-3xl text-foreground">Leaderboard</CardTitle>
+                    <CardTitle className="font-headline text-2xl md:text-3xl text-white">Leaderboard</CardTitle>
                     <CardDescription>See who's at the top of the class!</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -192,10 +186,9 @@ export default function LeaderboardPage() {
       )
   }
 
-
   const renderContent = () => {
     if (loading) {
-      return <div className="flex justify-center items-center p-8 min-h-[300px]"><Loader2 className="animate-spin h-8 w-8 text-foreground"/></div>;
+      return <div className="flex justify-center items-center p-8 min-h-[300px]"><Loader2 className="animate-spin h-8 w-8 text-white"/></div>;
     }
     if (error) {
       return (
@@ -213,7 +206,7 @@ export default function LeaderboardPage() {
     <div className="container mx-auto max-w-3xl px-4 py-6 md:py-12 pb-32 md:pb-28">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-2xl md:text-3xl text-foreground">Leaderboard</CardTitle>
+          <CardTitle className="font-headline text-2xl md:text-3xl text-white">Leaderboard</CardTitle>
           <CardDescription>See who's at the top of the class!</CardDescription>
         </CardHeader>
         <CardContent>

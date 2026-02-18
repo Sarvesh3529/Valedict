@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   output: {schema: AIDoubtSolverOutputSchema},
   prompt: `You are an expert tutor, skilled at explaining complex topics in a clear and concise way.
 
-  A student has the following question.  Provide a detailed explanation and solution.
+  A student has the following question.  Provide a detailed explanation and solution. Don't give super long solutions for stupidly simple questions
   {{#if questionText}}
   Question:
   {{questionText}}
