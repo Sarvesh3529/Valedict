@@ -187,7 +187,7 @@ export default async function HomePage() {
       {/* Row 4: Subjects Section */}
       <section>
           <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 pl-1">Learning Path</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           {subjects.map((subject) => {
               const Icon = iconComponents[subject.iconName] || Icons.Book;
               const count = subject.chapters.filter(c => c.grade === profile.grade).length;
@@ -195,19 +195,19 @@ export default async function HomePage() {
               
               return (
               <Card key={subject.id} className="glass-card border-2 border-border glow-border bouncy-hover overflow-hidden group">
-                  <div className="p-6 flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
-                          <Icon className="h-8 w-8 text-primary" />
+                  <div className="p-4 md:p-6 flex items-center gap-3 md:gap-4">
+                      <div className="flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-xl md:rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
+                          <Icon className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                       </div>
-                      <div className="flex-1">
-                        <CardTitle className="font-black text-xl mb-1 uppercase tracking-tight text-foreground">{subject.name}</CardTitle>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                      <div className="flex-1 overflow-hidden">
+                        <CardTitle className="font-black text-lg md:text-xl mb-0.5 md:mb-1 uppercase tracking-tight text-foreground truncate">{subject.name}</CardTitle>
+                        <p className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase tracking-wider">
                             {count} Chapters
                         </p>
                       </div>
                   </div>
-                  <div className="px-6 pb-6">
-                    <Button asChild variant="outline" className="w-full border-2">
+                  <div className="px-4 pb-4 md:px-6 md:pb-6">
+                    <Button asChild variant="outline" className="w-full border-2 h-10 md:h-12 text-xs md:text-sm">
                         <Link href={`/quiz?subject=${subject.id}`}>Practice</Link>
                     </Button>
                   </div>
