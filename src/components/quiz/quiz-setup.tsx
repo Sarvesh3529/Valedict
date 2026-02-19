@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BookCopy, Star, Sparkles } from 'lucide-react';
+import { Star, ArrowRight } from 'lucide-react';
 
 interface QuizSetupProps {
   onStart: (
@@ -151,8 +151,7 @@ export default function QuizSetup({ onStart, userGrade }: QuizSetupProps) {
                     {subject.chapters.map((chapter) => (
                       <div
                         key={chapter.id}
-                        className="flex items-center space-x-3 p-3 rounded-2xl border-2 border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group"
-                        onClick={() => handleChapterToggle(chapter.id)}
+                        className="flex items-center space-x-3 p-3 rounded-2xl border-2 border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all group"
                       >
                         <Checkbox
                           id={chapter.id}
@@ -162,7 +161,7 @@ export default function QuizSetup({ onStart, userGrade }: QuizSetupProps) {
                         />
                         <Label
                           htmlFor={chapter.id}
-                          className="text-base font-bold leading-tight cursor-pointer group-hover:text-primary transition-colors"
+                          className="text-base font-bold leading-tight cursor-pointer group-hover:text-primary transition-colors flex-1"
                         >
                           {chapter.name}
                         </Label>
@@ -206,6 +205,3 @@ export default function QuizSetup({ onStart, userGrade }: QuizSetupProps) {
     </form>
   );
 }
-
-// Add this to the top of the file if not present
-import { ArrowRight } from 'lucide-react';

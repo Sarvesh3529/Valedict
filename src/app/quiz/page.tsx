@@ -11,19 +11,21 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { chapters } from '@/lib/data';
+import { useAuth } from '@/context/AuthContext';
 
 type QuizState = 'setup' | 'course-suggestion' | 'active' | 'results';
 
 export default function QuizPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { profile } = useAuth();
 
   const [quizState, setQuizState] = useState<QuizState>('setup');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
   const [pendingConfig, setPendingQuizData] = useState<{ chapterIds: string[], count: number, difficulty: any } | null>(null);
   
-  const userGrade = '9'; // Hardcoded grade since auth is removed
+  const userGrade = profile?.grade || '10';
   const [loading, setLoading] = useState(false);
 
   // Auto-start quiz if chapterId is in URL
@@ -34,9 +36,6 @@ export default function QuizPage() {
         const generatedQuestions = generateQuiz([chapterId], 7, userGrade, 'all');
         if (generatedQuestions.length > 0) {
             setQuestions(generatedQuestions);
-            // Even from URL, we could show course suggestion if we wanted, 
-            // but usually a "Jump Back In" link implies direct action.
-            // Let's stick to 'active' for URL triggers.
             setQuizState('active');
         }
         setLoading(false);
