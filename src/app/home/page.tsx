@@ -94,8 +94,10 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* Row 2: Main Stats Grid - Locked to 3 columns for 1/3 layout */}
-      <div className="grid grid-cols-3 gap-4 sm:gap-6">
+      {/* Row 2 & 3: Main Stats Grid */}
+      {/* Mobile: 2 columns (Streak/XP half row, Leaderboard full row below) */}
+      {/* Desktop: 3 columns (All in one row) */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
               currentStreak={profile?.streak || 0}
@@ -107,8 +109,8 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Occupies exactly 1/3 of the row */}
-        <Link href="/leaderboard" className="group h-full col-span-1">
+        {/* Leaderboard Link - Full width on mobile (col-span-2), 1/3 on desktop (md:col-span-1) */}
+        <Link href="/leaderboard" className="group h-full col-span-2 md:col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
                     <div>
@@ -121,7 +123,7 @@ export default async function HomePage() {
                 </div>
 
                 <div className="space-y-4">
-                    {/* Hidden on mobile/landscape where footer is visible */}
+                    {/* Hidden on mobile where footer is visible */}
                     <div className="hidden md:flex items-center gap-4 py-2 border-t border-white/5">
                         <div className="flex-1">
                             <p className="text-xs font-black uppercase text-muted-foreground">Top Students</p>
@@ -134,7 +136,7 @@ export default async function HomePage() {
                         </div>
                     </div>
 
-                    {/* Avatars hidden on mobile/landscape where footer is visible */}
+                    {/* Avatars hidden on mobile where footer is visible */}
                     <div className="hidden md:flex -space-x-3">
                         {topUsers.map((user, i) => (
                             <Avatar key={user.uid} className="h-8 w-8 border-2 border-background shadow-lg">
