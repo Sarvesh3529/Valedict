@@ -65,9 +65,6 @@ export default async function HomePage() {
     username: doc.data().username,
   }));
 
-  // Find user's rank
-  const userRank = "#1"; // Simplification for MVP
-
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
   const lastPracticedChapter = chapters.find(c => c.id === profile.lastPracticedChapterId);
   const avatarColor = generateAvatarColor(profile.uid);
@@ -124,12 +121,11 @@ export default async function HomePage() {
                 </div>
 
                 <div className="space-y-4">
-                    <div className="flex items-center gap-4 py-2 border-y border-white/5">
-                        <span className="text-2xl font-black text-primary">{userRank}</span>
+                    <div className="flex items-center gap-4 py-2 border-t border-white/5">
                         <div className="flex-1">
-                            <p className="text-xs font-black uppercase text-muted-foreground">Current Position</p>
+                            <p className="text-xs font-black uppercase text-muted-foreground">Top Students</p>
                             <p className="text-sm font-bold flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3 text-accent" /> Improved 2 spots
+                                Join the competition!
                             </p>
                         </div>
                         <div className="text-right">
@@ -189,6 +185,9 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {subjects.map((subject) => {
               const Icon = iconComponents[subject.iconName] || Icons.Book;
+              const count = subject.chapters.filter(c => c.grade === profile.grade).length;
+              if (count === 0) return null;
+              
               return (
               <Card key={subject.id} className="glass-card border-2 border-border glow-border bouncy-hover overflow-hidden group">
                   <div className="p-6 flex items-center gap-4">
@@ -198,13 +197,13 @@ export default async function HomePage() {
                       <div className="flex-1">
                         <CardTitle className="font-black text-xl mb-1 uppercase tracking-tight text-foreground">{subject.name}</CardTitle>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
-                            Master {subject.chapters.filter(c => c.grade === profile.grade).length} Chapters
+                            {count} Chapters
                         </p>
                       </div>
                   </div>
                   <div className="px-6 pb-6">
                     <Button asChild variant="outline" className="w-full border-2">
-                        <Link href={`/quiz?subject=${subject.id}`}>Explore Course</Link>
+                        <Link href={`/quiz?subject=${subject.id}`}>Practice</Link>
                     </Button>
                   </div>
               </Card>

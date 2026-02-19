@@ -28,16 +28,16 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
       className="h-full"
     >
       <Card className={cn(
-        "h-full overflow-hidden border-none text-white relative bouncy-hover streak-gradient",
-        isOnFire && "streak-gradient-glow"
+        "h-full overflow-hidden border-2 flex flex-col justify-center items-center relative bouncy-hover glass-card",
+        isOnFire ? "border-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.2)]" : "border-border"
       )}>
-        <CardContent className="p-6 flex flex-col h-full justify-between gap-4">
+        <CardContent className="p-6 flex flex-col h-full w-full justify-between gap-4">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <h3 className="text-xs font-black uppercase tracking-widest opacity-80">Daily Streak</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Daily Streak</h3>
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-black">{currentStreak}</span>
-                <span className="text-lg font-bold opacity-80">days</span>
+                <span className={cn("text-5xl font-black tabular-nums", isOnFire ? "text-orange-500" : "text-foreground")}>{currentStreak}</span>
+                <span className="text-lg font-bold text-muted-foreground">days</span>
               </div>
             </div>
             <div className="relative h-16 w-16">
@@ -48,7 +48,8 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
                   cy="32"
                   r="28"
                   fill="transparent"
-                  stroke="rgba(255,255,255,0.2)"
+                  stroke="currentColor"
+                  className="text-muted/20"
                   strokeWidth="4"
                 />
                 <motion.circle
@@ -59,7 +60,8 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
                   cy="32"
                   r="28"
                   fill="transparent"
-                  stroke="white"
+                  stroke="currentColor"
+                  className={isOnFire ? "text-orange-500" : "text-primary"}
                   strokeWidth="4"
                   strokeLinecap="round"
                 />
@@ -68,18 +70,17 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
                 <motion.div
                   animate={isOnFire ? {
                     scale: [1, 1.2, 1],
-                    filter: ["brightness(1)", "brightness(1.5)", "brightness(1)"]
                   } : {}}
                   transition={{ repeat: Infinity, duration: 2 }}
                 >
-                  <Flame className={cn("h-8 w-8", isOnFire ? "fill-white text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" : "text-white/40")} />
+                  <Flame className={cn("h-8 w-8", isOnFire ? "fill-orange-500 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" : "text-muted-foreground/40")} />
                 </motion.div>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider opacity-70">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
               <Star className="h-3 w-3 fill-current" />
               Highest: {highestStreak} days
             </div>
