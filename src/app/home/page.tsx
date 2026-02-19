@@ -11,7 +11,7 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, Medal, TrendingUp } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, Medal } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
@@ -77,7 +77,7 @@ export default async function HomePage() {
           <ContinueLearning chapter={lastPracticedChapter} />
         </div>
         
-        {/* Profile Card - Hidden on Mobile */}
+        {/* Profile Card - Hidden on Mobile (where footer is visible) */}
         <Link href="/profile" className="hidden md:flex group">
           <Card className="h-full w-full glass-card glow-border border-2 flex items-center p-6 bouncy-hover overflow-hidden">
             <Avatar className="h-16 w-16 border-4 border-white dark:border-slate-800 shadow-xl">
@@ -107,8 +107,8 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Hidden on Mobile */}
-        <Link href="/leaderboard" className="hidden lg:flex group h-full">
+        {/* Leaderboard Link - Simplified on devices with footer visible */}
+        <Link href="/leaderboard" className="group h-full col-span-2 lg:col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-6">
                 <div className="flex items-start justify-between">
                     <div>
@@ -121,7 +121,8 @@ export default async function HomePage() {
                 </div>
 
                 <div className="space-y-4">
-                    <div className="flex items-center gap-4 py-2 border-t border-white/5">
+                    {/* Hidden on mobile/landscape where footer is visible */}
+                    <div className="hidden md:flex items-center gap-4 py-2 border-t border-white/5">
                         <div className="flex-1">
                             <p className="text-xs font-black uppercase text-muted-foreground">Top Students</p>
                             <p className="text-sm font-bold flex items-center gap-1">
@@ -133,7 +134,8 @@ export default async function HomePage() {
                         </div>
                     </div>
 
-                    <div className="flex -space-x-3">
+                    {/* Avatars hidden on mobile/landscape where footer is visible */}
+                    <div className="hidden md:flex -space-x-3">
                         {topUsers.map((user, i) => (
                             <Avatar key={user.uid} className="h-8 w-8 border-2 border-background shadow-lg">
                                 <AvatarFallback style={{backgroundColor: generateAvatarColor(user.uid)}} className="text-[10px] font-black text-white">
@@ -142,7 +144,7 @@ export default async function HomePage() {
                             </Avatar>
                         ))}
                         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black border-2 border-background">
-                            +47
+                            +{topUsers.length > 0 ? '47' : '0'}
                         </div>
                     </div>
                 </div>
@@ -167,7 +169,7 @@ export default async function HomePage() {
                 </Card>
             </Link>
             
-            {/* Custom Quiz Link - Hidden on Mobile */}
+            {/* Custom Quiz Link - Hidden on Mobile (where footer is visible) */}
             <Link href="/quiz" className="hidden md:flex group h-full">
                  <Card className="h-full w-full bg-accent text-accent-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4">
                     <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
