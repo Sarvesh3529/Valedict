@@ -73,15 +73,6 @@ export default function StreakDisplay({ currentStreak, highestStreak }: StreakDi
           </div>
 
           <div className="space-y-3">
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
-              <p className="text-sm font-black italic">
-                {isOnFire ? "YOU'RE ON FIRE! 🔥" : "KEEP IT UP! 💪"}
-              </p>
-              <p className="text-[10px] font-bold opacity-80 uppercase">
-                {currentStreak < goal ? `${goal - currentStreak} more days to hit your goal!` : "Goal smashed!"}
-              </p>
-            </div>
-            
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider opacity-70">
               <Star className="h-3 w-3 fill-current" />
               Highest: {highestStreak} days
