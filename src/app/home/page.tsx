@@ -94,7 +94,7 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* Row 2: Main Stats Grid - Updated to stay 3 columns on small screens */}
+      {/* Row 2: Main Stats Grid - Locked to 3 columns for 1/3 layout */}
       <div className="grid grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
@@ -107,7 +107,7 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Simplified on devices with footer visible */}
+        {/* Leaderboard Link - Occupies exactly 1/3 of the row */}
         <Link href="/leaderboard" className="group h-full col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
