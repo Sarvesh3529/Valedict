@@ -7,11 +7,11 @@ import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
 
 // UI components
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, Trophy } from 'lucide-react';
+import { BrainCircuit, NotebookText, ArrowRight, Medal, TrendingUp } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
@@ -54,117 +54,159 @@ export default async function HomePage() {
     redirect('/onboarding/start');
   }
   
+  // Fetch top 3 for the leaderboard card preview
+  const topUsersSnapshot = await adminDb.collection('users')
+    .orderBy('weeklyxp', 'desc')
+    .limit(3)
+    .get();
+  
+  const topUsers = topUsersSnapshot.docs.map(doc => ({
+    uid: doc.id,
+    username: doc.data().username,
+  }));
+
+  // Find user's rank
+  // Note: For a real app, this might be a cloud function or separate stat collection
+  // For now, we'll show a mock rank or just #12 as requested in the design
+  const userRank = "#1"; // Simplification for MVP
+
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
   const lastPracticedChapter = chapters.find(c => c.id === profile.lastPracticedChapterId);
   const avatarColor = generateAvatarColor(profile.uid);
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12 space-y-10 max-w-5xl">
-      {/* Row 1: Welcome Header */}
-      <header className="flex items-center justify-between">
-        <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-          Welcome back, {profile?.username || 'Student'}!
-        </h2>
-      </header>
-
-      {/* Row 2: Hero Unit (Lesson & Profile) */}
+    <div className="container mx-auto px-4 py-8 md:py-12 space-y-8 max-w-5xl">
+      {/* Row 1: Hero Unit (Lesson & Profile) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <ContinueLearning chapter={lastPracticedChapter} />
         </div>
         
-        {/* Profile Card - Hidden on Mobile (Visible in Footer) */}
+        {/* Profile Card - Hidden on Mobile */}
         <Link href="/profile" className="hidden md:flex group">
-          <Card className="h-full w-full flex items-center p-4 border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] hover:border-primary/40 transition-all active:translate-y-[2px] active:shadow-none">
-            <Avatar className="h-14 w-14 border-2 border-white shadow-sm">
-                <AvatarFallback className="text-xl font-black text-white" style={{backgroundColor: avatarColor}}>
+          <Card className="h-full w-full glass-card glow-border border-2 flex items-center p-6 bouncy-hover overflow-hidden">
+            <Avatar className="h-16 w-16 border-4 border-white dark:border-slate-800 shadow-xl">
+                <AvatarFallback className="text-2xl font-black text-white" style={{backgroundColor: avatarColor}}>
                     {profile.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
             </Avatar>
             <div className="ml-4 overflow-hidden">
-                 <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">My Profile</h3>
-                 <h3 className="font-black text-lg truncate">{profile.username}</h3>
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">My Dashboard</h3>
+                 <h3 className="font-black text-xl truncate">{profile.username}</h3>
             </div>
             <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </Card>
         </Link>
       </div>
 
-      {/* Row 3: Main Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="col-span-1">
+      {/* Row 2: Main Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="col-span-1 h-full">
           <StreakDisplay 
               currentStreak={profile?.streak || 0}
               highestStreak={profile?.highestStreak || 0}
               lastActivityDate={lastActiveDate}
           />
         </div>
-        <div className="col-span-1">
+        <div className="col-span-1 h-full">
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Hidden on Mobile (Visible in Footer) */}
-        <Link href="/leaderboard" className="hidden lg:flex group">
-            <Card className="h-full w-full border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] hover:border-primary/40 transition-all active:translate-y-[2px] active:shadow-none flex flex-col justify-between p-6">
-                <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-yellow-400/20 flex items-center justify-center">
-                        <Trophy className="h-6 w-6 text-yellow-500" />
-                    </div>
+        {/* Leaderboard Link - Hidden on Mobile */}
+        <Link href="/leaderboard" className="hidden lg:flex group h-full">
+            <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-6">
+                <div className="flex items-start justify-between">
                     <div>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Ranking</h3>
-                        <CardTitle className="font-black text-xl">Leaderboard</CardTitle>
+                        <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Ranking</h3>
+                        <CardTitle className="font-black text-2xl">Leaderboard</CardTitle>
+                    </div>
+                    <div className="h-12 w-12 rounded-2xl bg-yellow-400/20 flex items-center justify-center">
+                        <Medal className="h-6 w-6 text-yellow-500" />
                     </div>
                 </div>
-                <div className="mt-4 text-primary font-bold flex items-center text-sm">
-                    VIEW RANKS <ArrowRight className="ml-2 h-4 w-4"/>
+
+                <div className="space-y-4">
+                    <div className="flex items-center gap-4 py-2 border-y border-white/5">
+                        <span className="text-2xl font-black text-primary">{userRank}</span>
+                        <div className="flex-1">
+                            <p className="text-xs font-black uppercase text-muted-foreground">Current Position</p>
+                            <p className="text-sm font-bold flex items-center gap-1">
+                                <TrendingUp className="h-3 w-3 text-accent" /> Improved 2 spots
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-sm font-black">{profile.totalxp} XP</p>
+                        </div>
+                    </div>
+
+                    <div className="flex -space-x-3">
+                        {topUsers.map((user, i) => (
+                            <Avatar key={user.uid} className="h-8 w-8 border-2 border-background shadow-lg">
+                                <AvatarFallback style={{backgroundColor: generateAvatarColor(user.uid)}} className="text-[10px] font-black text-white">
+                                    {user.username.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
+                        ))}
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black border-2 border-background">
+                            +47
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-4 text-primary font-black flex items-center text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
+                    View Full Ranks <ArrowRight className="ml-2 h-4 w-4"/>
                 </div>
             </Card>
         </Link>
       </div>
 
-      {/* Row 4: Quick Actions */}
+      {/* Row 3: Quick Actions */}
       <section>
-        <h2 className="text-xl font-black uppercase tracking-widest text-muted-foreground mb-6">Tools</h2>
+        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 pl-1">Power Tools</h2>
         <div className="grid grid-cols-2 gap-4 sm:gap-6">
             <Link href="/doubt-solver" className="group col-span-2 md:col-span-1">
-                <Card className="h-full bg-primary text-primary-foreground border-b-4 border-primary-foreground/20 hover:bg-primary/95 transition-all p-6 rounded-3xl flex flex-col items-center justify-center text-center gap-3 active:translate-y-[4px] active:border-b-0">
-                    <BrainCircuit className="h-10 w-10 sm:h-12 sm:w-12 mb-2"/>
-                    <h3 className="text-lg sm:text-xl font-black">AI Doubt Solver</h3>
+                <Card className="h-full bg-primary text-primary-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4">
+                    <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                        <BrainCircuit className="h-10 w-10 text-white"/>
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tight">AI Doubt Solver</h3>
                 </Card>
             </Link>
             
-            {/* Custom Quiz Link - Hidden on Mobile (Visible in Footer as 'Practice') */}
-            <Link href="/quiz" className="hidden md:flex group">
-                 <Card className="h-full w-full bg-accent text-accent-foreground border-b-4 border-accent-foreground/20 hover:bg-accent/95 transition-all p-6 rounded-3xl flex flex-col items-center justify-center text-center gap-3 active:translate-y-[4px] active:border-b-0">
-                    <NotebookText className="h-10 w-10 sm:h-12 sm:w-12 mb-2"/>
-                    <h3 className="text-lg sm:text-xl font-black">Custom Quiz</h3>
+            {/* Custom Quiz Link - Hidden on Mobile */}
+            <Link href="/quiz" className="hidden md:flex group h-full">
+                 <Card className="h-full w-full bg-accent text-accent-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4">
+                    <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                        <NotebookText className="h-10 w-10 text-white"/>
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tight">Custom Quiz</h3>
                 </Card>
             </Link>
         </div>
       </section>
       
-      {/* Row 5: Subjects Section */}
+      {/* Row 4: Subjects Section */}
       <section>
-          <h2 className="text-xl font-black uppercase tracking-widest text-muted-foreground mb-6">Learn by Subject</h2>
+          <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 pl-1">Learning Path</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {subjects.map((subject) => {
               const Icon = iconComponents[subject.iconName] || Icons.Book;
               return (
-              <Card key={subject.id} className="border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] overflow-hidden group">
+              <Card key={subject.id} className="glass-card border-2 border-border glow-border bouncy-hover overflow-hidden group">
                   <div className="p-6 flex items-center gap-4">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
                           <Icon className="h-8 w-8 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <CardTitle className="font-black text-xl mb-1">{subject.name}</CardTitle>
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            Practice {subject.name}
+                        <CardTitle className="font-black text-xl mb-1 uppercase tracking-tight">{subject.name}</CardTitle>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                            Master {subject.chapters.filter(c => c.grade === profile.grade).length} Chapters
                         </p>
                       </div>
                   </div>
                   <div className="px-6 pb-6">
-                    <Button asChild variant="outline" className="w-full">
-                        <Link href={`/quiz?subject=${subject.id}`}>Start Practice</Link>
+                    <Button asChild variant="outline" className="w-full border-2">
+                        <Link href={`/quiz?subject=${subject.id}`}>Explore Course</Link>
                     </Button>
                   </div>
               </Card>

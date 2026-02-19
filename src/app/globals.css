@@ -10,7 +10,7 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 197 100% 45%;
+    --primary: 230 100% 60%;
     --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222 47% 11.2%;
@@ -22,30 +22,30 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 197 100% 45%;
-    --radius: 1.25rem;
+    --ring: 230 100% 60%;
+    --radius: 1.5rem;
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 15%;
+    --card: 222 47% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 15%;
+    --popover: 222 47% 10%;
     --popover-foreground: 210 40% 98%;
-    --primary: 197 100% 50%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 222 47% 20%;
+    --primary: 230 100% 65%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 222 47% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 20%;
+    --muted: 222 47% 15%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 145 100% 45%;
-    --accent-foreground: 222 47% 11%;
+    --accent-foreground: 222 47% 6%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 222 47% 25%;
-    --input: 222 47% 25%;
-    --ring: 197 100% 50%;
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 230 100% 65%;
   }
 }
 
@@ -58,13 +58,30 @@
   }
 }
 
-.duo-button-shadow {
-  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.2);
+@layer components {
+  .glass-card {
+    @apply bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/20 dark:border-white/5 shadow-xl;
+  }
+  
+  .glow-border {
+    @apply relative after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-white/20 after:pointer-events-none hover:after:border-primary/50 transition-all;
+  }
+
+  .bouncy-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl active:translate-y-0.5 active:shadow-md;
+  }
 }
 
-.duo-button-shadow:active {
-  box-shadow: none;
-  transform: translateY(4px);
+.streak-gradient {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.streak-gradient-glow {
+  box-shadow: 0 0 20px rgba(245, 87, 108, 0.4);
+}
+
+.segmented-progress-item {
+  @apply h-8 w-full rounded-md transition-all duration-500;
 }
 
 .katex-mathml { 
