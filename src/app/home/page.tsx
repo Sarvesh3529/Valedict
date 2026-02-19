@@ -72,8 +72,10 @@ export default async function HomePage() {
         <div className="md:col-span-2">
           <ContinueLearning chapter={lastPracticedChapter} />
         </div>
-        <Link href="/profile" className="group">
-          <Card className="h-full flex items-center p-4 border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] hover:border-primary/40 transition-all active:translate-y-[2px] active:shadow-none">
+        
+        {/* Profile Card - Hidden on Mobile (Visible in Footer) */}
+        <Link href="/profile" className="hidden md:flex group">
+          <Card className="h-full w-full flex items-center p-4 border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] hover:border-primary/40 transition-all active:translate-y-[2px] active:shadow-none">
             <Avatar className="h-14 w-14 border-2 border-white shadow-sm">
                 <AvatarFallback className="text-xl font-black text-white" style={{backgroundColor: avatarColor}}>
                     {profile.username?.charAt(0).toUpperCase() || 'U'}
@@ -89,16 +91,21 @@ export default async function HomePage() {
       </div>
 
       {/* Row 3: Main Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StreakDisplay 
-            currentStreak={profile?.streak || 0}
-            highestStreak={profile?.highestStreak || 0}
-            lastActivityDate={lastActiveDate}
-        />
-        <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="col-span-1">
+          <StreakDisplay 
+              currentStreak={profile?.streak || 0}
+              highestStreak={profile?.highestStreak || 0}
+              lastActivityDate={lastActiveDate}
+          />
+        </div>
+        <div className="col-span-1">
+          <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+        </div>
         
-        <Link href="/leaderboard" className="group sm:col-span-2 lg:col-span-1">
-            <Card className="h-full border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] hover:border-primary/40 transition-all active:translate-y-[2px] active:shadow-none flex flex-col justify-between p-6">
+        {/* Leaderboard Link - Hidden on Mobile (Visible in Footer) */}
+        <Link href="/leaderboard" className="hidden lg:flex group">
+            <Card className="h-full w-full border-2 border-border shadow-[0_4px_0_0_rgba(0,0,0,0.05)] hover:border-primary/40 transition-all active:translate-y-[2px] active:shadow-none flex flex-col justify-between p-6">
                 <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-2xl bg-yellow-400/20 flex items-center justify-center">
                         <Trophy className="h-6 w-6 text-yellow-500" />
@@ -117,16 +124,18 @@ export default async function HomePage() {
 
       {/* Row 4: Quick Actions */}
       <section>
-        <h2 className="text-xl font-black uppercase tracking-widest text-muted-foreground mb-6">Quick Actions</h2>
+        <h2 className="text-xl font-black uppercase tracking-widest text-muted-foreground mb-6">Tools</h2>
         <div className="grid grid-cols-2 gap-4 sm:gap-6">
-            <Link href="/doubt-solver" className="group">
-                <Card className="h-full bg-primary text-primary-foreground border-b-4 border-primary-foreground/20 hover:bg-primary/95 transition-all p-6 rounded-3xl flex flex-col items-center text-center gap-3 active:translate-y-[4px] active:border-b-0">
+            <Link href="/doubt-solver" className="group col-span-2 md:col-span-1">
+                <Card className="h-full bg-primary text-primary-foreground border-b-4 border-primary-foreground/20 hover:bg-primary/95 transition-all p-6 rounded-3xl flex flex-col items-center justify-center text-center gap-3 active:translate-y-[4px] active:border-b-0">
                     <BrainCircuit className="h-10 w-10 sm:h-12 sm:w-12 mb-2"/>
-                    <h3 className="text-lg sm:text-xl font-black">Doubt Solver</h3>
+                    <h3 className="text-lg sm:text-xl font-black">AI Doubt Solver</h3>
                 </Card>
             </Link>
-            <Link href="/quiz" className="group">
-                 <Card className="h-full bg-accent text-accent-foreground border-b-4 border-accent-foreground/20 hover:bg-accent/95 transition-all p-6 rounded-3xl flex flex-col items-center text-center gap-3 active:translate-y-[4px] active:border-b-0">
+            
+            {/* Custom Quiz Link - Hidden on Mobile (Visible in Footer as 'Practice') */}
+            <Link href="/quiz" className="hidden md:flex group">
+                 <Card className="h-full w-full bg-accent text-accent-foreground border-b-4 border-accent-foreground/20 hover:bg-accent/95 transition-all p-6 rounded-3xl flex flex-col items-center justify-center text-center gap-3 active:translate-y-[4px] active:border-b-0">
                     <NotebookText className="h-10 w-10 sm:h-12 sm:w-12 mb-2"/>
                     <h3 className="text-lg sm:text-xl font-black">Custom Quiz</h3>
                 </Card>
@@ -149,13 +158,13 @@ export default async function HomePage() {
                       <div className="flex-1">
                         <CardTitle className="font-black text-xl mb-1">{subject.name}</CardTitle>
                         <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            {subject.chapters.filter(c => c.grade === profile.grade).length} Chapters
+                            Practice {subject.name}
                         </p>
                       </div>
                   </div>
                   <div className="px-6 pb-6">
                     <Button asChild variant="outline" className="w-full">
-                        <Link href="/quiz">Start Practice</Link>
+                        <Link href={`/quiz?subject=${subject.id}`}>Start Practice</Link>
                     </Button>
                   </div>
               </Card>
