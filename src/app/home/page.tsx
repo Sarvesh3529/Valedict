@@ -66,8 +66,6 @@ export default async function HomePage() {
   }));
 
   // Find user's rank
-  // Note: For a real app, this might be a cloud function or separate stat collection
-  // For now, we'll show a mock rank or just #12 as requested in the design
   const userRank = "#1"; // Simplification for MVP
 
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
@@ -118,7 +116,7 @@ export default async function HomePage() {
                 <div className="flex items-start justify-between">
                     <div>
                         <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Ranking</h3>
-                        <CardTitle className="font-black text-2xl">Leaderboard</CardTitle>
+                        <CardTitle className="font-black text-2xl text-foreground">Leaderboard</CardTitle>
                     </div>
                     <div className="h-12 w-12 rounded-2xl bg-yellow-400/20 flex items-center justify-center">
                         <Medal className="h-6 w-6 text-yellow-500" />
@@ -135,7 +133,7 @@ export default async function HomePage() {
                             </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-sm font-black">{profile.totalxp} XP</p>
+                            <p className="text-sm font-black text-foreground">{profile.totalxp} XP</p>
                         </div>
                     </div>
 
@@ -198,7 +196,7 @@ export default async function HomePage() {
                           <Icon className="h-8 w-8 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <CardTitle className="font-black text-xl mb-1 uppercase tracking-tight">{subject.name}</CardTitle>
+                        <CardTitle className="font-black text-xl mb-1 uppercase tracking-tight text-foreground">{subject.name}</CardTitle>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
                             Master {subject.chapters.filter(c => c.grade === profile.grade).length} Chapters
                         </p>

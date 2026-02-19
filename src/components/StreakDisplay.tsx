@@ -11,10 +11,16 @@ interface StreakDisplayProps {
   lastActivityDate?: string;
 }
 
-export default function StreakDisplay({ currentStreak, highestStreak }: StreakDisplayProps) {
+export default function StreakDisplay({ currentStreak, highestStreak, lastActivityDate }: StreakDisplayProps) {
   const goal = 7;
   const progress = Math.min((currentStreak / goal) * 100, 100);
-  const isOnFire = currentStreak >= 3;
+  
+  // Check if activity was done today
+  const isToday = lastActivityDate 
+    ? new Date(lastActivityDate).toDateString() === new Date().toDateString() 
+    : false;
+    
+  const isOnFire = isToday;
 
   return (
     <motion.div
@@ -66,7 +72,7 @@ export default function StreakDisplay({ currentStreak, highestStreak }: StreakDi
                   } : {}}
                   transition={{ repeat: Infinity, duration: 2 }}
                 >
-                  <Flame className={cn("h-8 w-8", isOnFire ? "fill-yellow-300 text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]" : "text-white/40")} />
+                  <Flame className={cn("h-8 w-8", isOnFire ? "fill-white text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" : "text-white/40")} />
                 </motion.div>
               </div>
             </div>

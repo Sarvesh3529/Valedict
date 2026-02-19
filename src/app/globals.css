@@ -73,11 +73,11 @@
 }
 
 .streak-gradient {
-  background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%);
+  background: linear-gradient(135deg, #FF8008 0%, #FFC837 100%);
 }
 
 .streak-gradient-glow {
-  box-shadow: 0 0 20px rgba(255, 153, 102, 0.4);
+  box-shadow: 0 0 20px rgba(255, 128, 8, 0.4);
 }
 
 .segmented-progress-item {
