@@ -94,8 +94,8 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* Row 2: Main Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      {/* Row 2: Main Stats Grid - Updated to stay 3 columns on small screens */}
+      <div className="grid grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
               currentStreak={profile?.streak || 0}
@@ -108,15 +108,15 @@ export default async function HomePage() {
         </div>
         
         {/* Leaderboard Link - Simplified on devices with footer visible */}
-        <Link href="/leaderboard" className="group h-full col-span-2 lg:col-span-1">
-            <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-6">
+        <Link href="/leaderboard" className="group h-full col-span-1">
+            <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
                     <div>
-                        <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Ranking</h3>
-                        <CardTitle className="font-black text-2xl text-foreground">Leaderboard</CardTitle>
+                        <h3 className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Ranking</h3>
+                        <CardTitle className="font-black text-lg md:text-2xl text-foreground">Leaderboard</CardTitle>
                     </div>
-                    <div className="h-12 w-12 rounded-2xl bg-yellow-400/20 flex items-center justify-center">
-                        <Medal className="h-6 w-6 text-yellow-500" />
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-yellow-400/20 flex items-center justify-center flex-shrink-0">
+                        <Medal className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
                     </div>
                 </div>
 
@@ -149,8 +149,9 @@ export default async function HomePage() {
                     </div>
                 </div>
 
-                <div className="mt-4 text-primary font-black flex items-center text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-                    View Full Ranks <ArrowRight className="ml-2 h-4 w-4"/>
+                <div className="mt-4 text-primary font-black flex items-center text-[10px] md:text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
+                    <span className="hidden sm:inline">View Ranks</span>
+                    <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 md:h-4 md:w-4"/>
                 </div>
             </Card>
         </Link>
