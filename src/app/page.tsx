@@ -103,7 +103,7 @@ export default function AuthPage() {
             {isSignup ? 'Create Account' : 'Welcome Back'}
           </CardTitle>
           <CardDescription className="font-bold">
-            {isSignup ? 'Start your journey to the top.' : 'Sign in to keep your streak alive.'}
+            {isSignup ? 'Start your journey to the top.' : 'Sign in to access your account.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
