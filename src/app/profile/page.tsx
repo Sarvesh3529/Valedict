@@ -56,7 +56,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8 md:py-12 space-y-8">
-      <Card className="border-2 border-border shadow-[0_8px_0_0_rgba(0,0,0,0.05)] overflow-hidden">
+      <Card className="border-2 border-border shadow-[0_8px_0_0_rgba(0,0,0,0.05)] overflow-hidden rounded-[2.5rem]">
         <CardHeader className="bg-secondary/10 border-b-2 p-8">
           <div className="flex flex-col sm:flex-row items-center gap-8">
             <Avatar className="h-32 w-32 border-4 border-background shadow-2xl">
@@ -66,16 +66,16 @@ export default function ProfilePage() {
             </Avatar>
             <div className="grid gap-1 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-3">
-                <h2 className="text-3xl md:text-4xl font-black">
+                <h2 className="text-3xl md:text-4xl font-black text-foreground">
                   {profile.username || 'Anonymous User'}
                 </h2>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary"
+                  className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
                   onClick={() => setIsEditOpen(true)}
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-5 w-5" />
                 </Button>
               </div>
               <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest pt-1">
@@ -95,13 +95,13 @@ export default function ProfilePage() {
         </CardContent>
 
         <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between border-t-2 bg-secondary/5 p-8">
-          <Button asChild variant="outline" className="border-2 w-full sm:w-auto">
+          <Button asChild variant="outline" className="border-2 w-full sm:w-auto h-12 px-8 rounded-full">
             <Link href="/home">
               <Home className="mr-2 h-4 w-4" />
-              Back to Home
+              Return Home
             </Link>
           </Button>
-          <Button onClick={logout} variant="destructive" className="w-full sm:w-auto border-2">
+          <Button onClick={logout} variant="destructive" className="w-full sm:w-auto border-2 h-12 px-8 rounded-full">
             Log Out
           </Button>
         </CardFooter>

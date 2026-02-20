@@ -6,7 +6,7 @@
       "description": "Stores user profile data.",
       "type": "object",
       "properties": {
-        "username": { "type": "string", "description": "The user's public display name." },
+        "username": { "type": "string", "description": "The user's public display name (preserved casing)." },
         "totalxp": { "type": "number", "description": "User's all-time experience points." },
         "weeklyxp": { "type": "number", "description": "User's experience points for the current week." },
         "streak": { "type": "number", "description": "User's current daily study streak." },
@@ -33,27 +33,13 @@
       "description": "Tracks friend requests between users.",
       "type": "object",
       "properties": {
-        "fromUid": { "type": "string" },
-        "fromUsername": { "type": "string" },
-        "toUid": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "senderId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["fromUid", "toUid", "status", "createdAt"]
-    },
-    "Notification": {
-      "title": "Notification",
-      "description": "User alerts for social activities.",
-      "type": "object",
-      "properties": {
-        "type": { "type": "string", "enum": ["friend_request"] },
-        "fromUid": { "type": "string" },
-        "fromUsername": { "type": "string" },
-        "status": { "type": "string", "enum": ["unread", "read"] },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "relatedId": { "type": "string", "description": "ID of the related entity (e.g. friend request ID)" }
-      },
-      "required": ["type", "fromUid", "status", "createdAt"]
+      "required": ["senderId", "receiverId", "senderName", "status", "createdAt"]
     }
   },
   "auth": {
@@ -71,10 +57,6 @@
     "/friend_requests/{requestId}": {
       "schema": { "$ref": "#/backend/entities/FriendRequest" },
       "description": "Friend request tracking."
-    },
-    "/users/{userId}/notifications/{notificationId}": {
-      "schema": { "$ref": "#/backend/entities/Notification" },
-      "description": "User specific notifications."
     }
   }
 }

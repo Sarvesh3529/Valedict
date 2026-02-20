@@ -40,6 +40,7 @@ export default function PublicProfilePage() {
     useEffect(() => {
         if (!uid) return;
         
+        // Use a snapshot to always get the freshest data (preserving casing)
         const unsub = onSnapshot(doc(db, 'users', uid as string), (doc) => {
             if (doc.exists()) {
                 setProfile({ uid: doc.id, ...doc.data() } as UserProfile);
@@ -55,22 +56,28 @@ export default function PublicProfilePage() {
     useEffect(() => {
         if (!user || !uid) return;
         
-        // Check if already friends or if request exists
-        const checkRequest = async () => {
+        const checkStatus = async () => {
+            // 1. Check if already in friends list
+            if (currentUserProfile?.friends?.includes(uid as string)) {
+                setRequestStatus('accepted');
+                return;
+            }
+
+            // 2. Check for pending friend request
             const q = query(
                 collection(db, 'friend_requests'),
-                where('fromUid', '==', user.uid),
-                where('toUid', '==', uid)
+                where('senderId', '==', user.uid),
+                where('receiverId', '==', uid),
+                where('status', '==', 'pending')
             );
             const snap = await getDocs(q);
             if (!snap.empty) {
-                const status = snap.docs[0].data().status;
-                setRequestStatus(status);
-            } else if (currentUserProfile?.friends?.includes(uid as string)) {
-                setRequestStatus('accepted');
+                setRequestStatus('pending');
+            } else {
+                setRequestStatus('none');
             }
         };
-        checkRequest();
+        checkStatus();
     }, [user, uid, currentUserProfile]);
 
     if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -88,6 +95,7 @@ export default function PublicProfilePage() {
     const handleSendRequest = async () => {
         if (!user || !currentUserProfile) return;
         setActionLoading(true);
+        // Preserved casing for senderName
         const result = await handleFriendRequest(user.uid, currentUserProfile.username, profile.uid);
         if (result.success) setRequestStatus('pending');
         setActionLoading(false);
@@ -104,7 +112,7 @@ export default function PublicProfilePage() {
                 </Button>
             </div>
 
-            <Card className="border-2 border-border shadow-[0_8px_0_0_rgba(0,0,0,0.05)] overflow-hidden">
+            <Card className="border-2 border-border shadow-[0_8px_0_0_rgba(0,0,0,0.05)] overflow-hidden rounded-[2.5rem]">
                 <CardHeader className="bg-secondary/10 border-b-2 p-8">
                     <div className="flex flex-col sm:flex-row items-center gap-8">
                         <Avatar className="h-32 w-32 border-4 border-background shadow-2xl">
@@ -113,27 +121,29 @@ export default function PublicProfilePage() {
                             </AvatarFallback>
                         </Avatar>
                         <div className="grid gap-1 text-center sm:text-left flex-1">
-                            <h2 className="text-3xl md:text-4xl font-black">{profile.username}</h2>
+                            <h2 className="text-3xl md:text-4xl font-black text-foreground">
+                                {profile.username}
+                            </h2>
                             <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest pt-1">
                                 UID: {profile.uid}
                             </div>
                             
                             {user?.uid !== profile.uid && (
-                                <div className="mt-4 flex justify-center sm:justify-start">
+                                <div className="mt-6 flex justify-center sm:justify-start">
                                     {requestStatus === 'none' && (
-                                        <Button onClick={handleSendRequest} disabled={actionLoading}>
+                                        <Button onClick={handleSendRequest} disabled={actionLoading} className="px-8 shadow-primary/20">
                                             {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
                                             Add Friend
                                         </Button>
                                     )}
                                     {requestStatus === 'pending' && (
-                                        <Button variant="secondary" disabled>
+                                        <Button variant="secondary" disabled className="px-8">
                                             <Clock className="mr-2 h-4 w-4" />
-                                            Request Pending
+                                            Requested
                                         </Button>
                                     )}
                                     {requestStatus === 'accepted' && (
-                                        <Button variant="outline" className="border-2 border-green-500 text-green-500 hover:bg-green-500/10" disabled>
+                                        <Button variant="outline" className="border-2 border-green-500 text-green-500 hover:bg-green-500/10 px-8" disabled>
                                             <Check className="mr-2 h-4 w-4" />
                                             Friends
                                         </Button>
@@ -153,11 +163,11 @@ export default function PublicProfilePage() {
                     </div>
                 </CardContent>
 
-                <CardFooter className="justify-center border-t-2 bg-secondary/5 p-6">
-                    <Button asChild variant="default" className="border-2 px-8">
+                <CardFooter className="justify-center border-t-2 bg-secondary/5 p-8">
+                    <Button asChild variant="default" className="border-2 px-12 rounded-full h-14">
                         <Link href="/home">
-                            <Home className="mr-2 h-4 w-4" />
-                            Go to Home
+                            <Home className="mr-2 h-5 w-5" />
+                            Return Home
                         </Link>
                     </Button>
                 </CardFooter>

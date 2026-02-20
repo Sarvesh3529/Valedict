@@ -24,21 +24,11 @@ export type UserProfile = {
 
 export type FriendRequest = {
   id: string;
-  fromUid: string;
-  fromUsername: string;
-  toUid: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  senderId: string;
+  receiverId: string;
+  senderName: string;
+  status: 'pending' | 'accepted' | 'declined';
   createdAt: any;
-};
-
-export type Notification = {
-  id: string;
-  type: 'friend_request';
-  fromUid: string;
-  fromUsername: string;
-  status: 'unread' | 'read';
-  createdAt: any;
-  relatedId: string;
 };
 
 export type Subject = {
