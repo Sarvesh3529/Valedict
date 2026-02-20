@@ -2,139 +2,120 @@
 
 import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
-import { useAuth } from '@/context/AuthContext';
-import { updateProfile } from 'firebase/auth';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { checkUsernameAvailability, updateUserDisplayName } from '@/lib/username';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { checkUsernameAvailability } from '@/lib/username';
+import { updateUsername } from '@/app/auth/actions';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface EditUsernameDialogProps {
   isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  onOpenChange: (open: boolean) => void;
   currentUsername: string;
 }
 
-export default function EditUsernameDialog({ isOpen, setIsOpen, currentUsername }: EditUsernameDialogProps) {
-  const { user } = useAuth();
+export default function EditUsernameDialog({ isOpen, onOpenChange, currentUsername }: EditUsernameDialogProps) {
   const [username, setUsername] = useState(currentUsername);
   const [debouncedUsername] = useDebounce(username, 500);
-  
   const [isChecking, setIsChecking] = useState(false);
   const [availability, setAvailability] = useState<{ available: boolean, message: string } | null>(null);
-  
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (debouncedUsername && debouncedUsername.toLowerCase() !== currentUsername.toLowerCase()) {
-        if (debouncedUsername.length >= 3) {
-            setIsChecking(true);
-            checkUsernameAvailability(debouncedUsername).then(result => {
-                setAvailability(result);
-                setIsChecking(false);
-            });
-        } else {
-             setAvailability({ available: false, message: 'Username must be at least 3 characters.' });
-        }
+      if (debouncedUsername.length >= 3) {
+        setIsChecking(true);
+        checkUsernameAvailability(debouncedUsername).then((res) => {
+          setAvailability(res);
+          setIsChecking(false);
+        });
+      } else {
+        setAvailability({ available: false, message: 'Minimum 3 characters.' });
+      }
     } else {
       setAvailability(null);
     }
   }, [debouncedUsername, currentUsername]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!user) return;
-
+  const handleSave = async () => {
     if (username.toLowerCase() === currentUsername.toLowerCase()) {
-        setIsOpen(false);
-        return;
+      onOpenChange(false);
+      return;
     }
     
-    if (availability && !availability.available) {
-        setError(availability?.message || 'Username is not available.');
-        return;
-    }
+    if (availability && !availability.available) return;
 
     setIsPending(true);
-
-    try {
-      // 1. Update the Auth user's displayName
-      await updateProfile(user, { displayName: username });
-      
-      // 2. Update the displayName in the Firestore 'users' document
-      const userRef = doc(db, 'users', user.uid);
-      const data = { displayName: username };
-      await updateDoc(userRef, data).catch(err => {
-         const permissionError = new FirestorePermissionError({ path: userRef.path, operation: 'update', requestResourceData: data });
-         errorEmitter.emit('permission-error', permissionError);
-         // throw the original error to be caught below
-         throw err;
-      })
-
-      setIsOpen(false);
-    } catch (authError: any) {
-       setError(authError.message || 'Failed to update profile.');
-    } finally {
-        setIsPending(false);
+    setError(null);
+    
+    const result = await updateUsername(username);
+    if (result.success) {
+      onOpenChange(false);
+    } else {
+      setError(result.message || 'Failed to update username.');
+      setIsPending(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm border-2">
         <DialogHeader>
-          <DialogTitle>Change your Username</DialogTitle>
-          <DialogDescription>This will be your public name on the leaderboard.</DialogDescription>
+          <DialogTitle className="font-black text-xl uppercase">Update Username</DialogTitle>
+          <DialogDescription className="font-bold">
+            Choose a unique name for the leaderboard.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username-edit">Username</Label>
-              <div className="relative">
-                <Input
-                  id="username-edit"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  minLength={3}
-                  maxLength={20}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    {isChecking && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                    {!isChecking && availability?.available && <CheckCircle className="h-4 w-4 text-green-500" />}
-                    {!isChecking && availability && !availability.available && <XCircle className="h-4 w-4 text-destructive" />}
+        
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label className="font-black text-xs uppercase tracking-widest text-muted-foreground">New Username</Label>
+            <div className="relative">
+              <Input 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="New username"
+                className="border-2 h-12 font-bold"
+                maxLength={15}
+              />
+              {debouncedUsername.toLowerCase() !== currentUsername.toLowerCase() && username.length >= 3 && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {isChecking ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : 
+                   availability?.available ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : 
+                   <XCircle className="h-4 w-4 text-destructive" />}
                 </div>
-              </div>
-              {availability && (
-                <p className={`text-sm ${availability.available ? 'text-green-500' : 'text-destructive'}`}>
-                  {availability.message}
-                </p>
               )}
             </div>
-            {error && (
-                <Alert variant="destructive">
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
+            {availability && (
+              <p className={`text-[10px] font-black uppercase tracking-wider ${availability.available ? 'text-green-500' : 'text-destructive'}`}>
+                {availability.message}
+              </p>
             )}
-            <DialogFooter>
-                <DialogClose asChild>
-                    <Button type="button" variant="secondary">Cancel</Button>
-                </DialogClose>
-                <Button type="submit" disabled={isPending || (!!availability && !availability.available)}>
-                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Save Changes'}
-                </Button>
-            </DialogFooter>
-        </form>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="border-2">
+              <AlertDescription className="font-bold">{error}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={isPending || (availability !== null && !availability.available) || username.length < 3}
+            className="w-full sm:w-auto"
+          >
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Name'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

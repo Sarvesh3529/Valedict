@@ -3,6 +3,7 @@
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { z } from 'zod';
+import { cookies } from 'next/headers';
 
 const signupSchema = z.object({
     username: z.string().min(3, "Username must be 3-15 characters.").max(15, "Username must be 3-15 characters.").regex(/^[a-zA-Z0-9_]+$/, "No spaces or special characters."),
@@ -32,7 +33,7 @@ export async function signupWithUsername(prevState: any, formData: FormData): Pr
     const signupResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: syntheticEmail, password, returnSecureToken: false }), // We don't need the token here anymore
+        body: JSON.stringify({ email: syntheticEmail, password, returnSecureToken: false }),
     });
 
     const signupData = await signupResponse.json();
@@ -121,6 +122,56 @@ export async function loginWithUsername(prevState: any, formData: FormData): Pro
 }
 
 export async function logout() {
-    // This server action is simple: it just clears the cookie.
-    // The client will handle signing out of the Firebase SDK.
+    // Session is cleared by clearing the cookie in the route handler.
+}
+
+export async function updateUsername(newUsername: string) {
+  const cookieStore = cookies();
+  const token = (await cookieStore).get('firebase_token')?.value;
+
+  if (!token) throw new Error('Not authenticated');
+
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    const uid = decodedToken.uid;
+
+    const userRef = adminDb.collection('users').doc(uid);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) throw new Error('Profile not found');
+    
+    const oldUsername = userDoc.data()?.username;
+    if (!oldUsername) throw new Error('Old username not found');
+
+    if (oldUsername.toLowerCase() === newUsername.toLowerCase()) {
+      // Just update casing if it's the same name
+      await userRef.update({ username: newUsername });
+      return { success: true };
+    }
+
+    // 1. Check availability
+    const newUsernameLower = newUsername.toLowerCase();
+    const oldUsernameLower = oldUsername.toLowerCase();
+    const availabilityDoc = await adminDb.collection('usernames').doc(newUsernameLower).get();
+    if (availabilityDoc.exists) throw new Error('Username taken');
+
+    // 2. Atomic Batch Update
+    const batch = adminDb.batch();
+    
+    // Delete old registry
+    batch.delete(adminDb.collection('usernames').doc(oldUsernameLower));
+    
+    // Create new registry
+    batch.set(adminDb.collection('usernames').doc(newUsernameLower), { uid });
+    
+    // Update user profile
+    batch.update(userRef, { username: newUsername });
+
+    await batch.commit();
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("Update Username Error:", error);
+    return { success: false, message: error.message || 'Update failed' };
+  }
 }
