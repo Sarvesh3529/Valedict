@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -19,15 +18,14 @@ import NotificationBell from './notifications/NotificationBell';
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
   { href: '/quiz', label: 'Practice', icon: NotebookText },
-  { href: '/doubt-solver', label: 'Doubt Solver', icon: BrainCircuit },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function Header() {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  // Fix: Corrected route check to prevent hiding the header on all functional pages
   const isAuthRoute = pathname === '/' || pathname.startsWith('/onboarding') || pathname.startsWith('/revision');
   
   if (!user || isAuthRoute) {
@@ -49,7 +47,7 @@ export default function Header() {
                         <span className="font-headline text-lg">Valedict AI</span>
                     </Link>
                     <nav className="flex flex-col gap-2">
-                        {[...navLinks, { href: '/profile', label: 'Profile', icon: User }].map((link) => (
+                        {navLinks.map((link) => (
                            <SheetClose asChild key={link.href}>
                              <Link
                                 href={link.href}
@@ -97,8 +95,7 @@ export default function Header() {
         </nav>
         
         <div className="flex items-center gap-1 sm:gap-2">
-            {/* Show notification bell in header only if not on Home page (where it is in the dashboard row) */}
-            {pathname !== '/home' && <NotificationBell />}
+            <NotificationBell />
             <ThemeToggle />
         </div>
       </div>

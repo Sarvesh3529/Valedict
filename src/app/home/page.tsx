@@ -1,4 +1,3 @@
-
 'use server';
 
 import { cookies } from 'next/headers';
@@ -18,7 +17,6 @@ import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
 import ContinueLearning from '@/components/home/ContinueLearning';
 import { generateAvatarColor } from '@/lib/utils';
-import NotificationBell from '@/components/notifications/NotificationBell';
 
 const iconComponents: { [key: string]: React.ElementType } = {
   Calculator: Icons.Calculator,
@@ -69,40 +67,16 @@ export default async function HomePage() {
 
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
   const lastPracticedChapter = chapters.find(c => c.id === profile.lastPracticedChapterId);
-  const avatarColor = generateAvatarColor(profile.uid);
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8 max-w-5xl">
-      {/* Row 1: Hero Unit (Lesson, Profile, and Notifications) */}
-      {/* Refined Grid: 7/12 for Lesson, 4/12 for Profile, 1/12 for Notifications on Desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-        <div className="md:col-span-7 w-full">
-          <ContinueLearning chapter={lastPracticedChapter} />
-        </div>
-        
-        {/* Profile Card - Hidden on Mobile (where footer is visible) */}
-        <Link href="/profile" className="hidden md:flex group md:col-span-4 h-full">
-          <Card className="h-full w-full glass-card glow-border border-2 flex items-center p-6 bouncy-hover overflow-hidden">
-            <Avatar className="h-16 w-16 border-4 border-white dark:border-slate-800 shadow-xl">
-                <AvatarFallback className="text-2xl font-black text-white" style={{backgroundColor: avatarColor}}>
-                    {profile.username?.charAt(0).toUpperCase() || 'U'}
-                </AvatarFallback>
-            </Avatar>
-            <div className="ml-4 overflow-hidden">
-                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">My Dashboard</h3>
-                 <h3 className="font-black text-xl truncate">{profile.username}</h3>
-            </div>
-            <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-          </Card>
-        </Link>
-
-        {/* Notification Bell - Integrated at the end of the row for landscape devices */}
-        <div className="hidden md:flex justify-center md:col-span-1">
-            <NotificationBell />
-        </div>
+      {/* Row 1: Hero Unit (Lesson) */}
+      <div className="w-full">
+        <ContinueLearning chapter={lastPracticedChapter} />
       </div>
 
-      {/* Row 2 & 3: Main Stats Grid */}
+      {/* Row 2: Main Stats Grid */}
+      {/* Mobile grid is 2 cols (Streak/XP), Row below is Leaderboard. Desktop is 3 cols. */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
@@ -115,7 +89,7 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Full width on mobile (col-span-2), 1/3 on desktop (md:col-span-1) */}
+        {/* Leaderboard Link - Full width on mobile footer devices (md:hidden), 1/3 on desktop */}
         <Link href="/leaderboard" className="group h-full col-span-2 md:col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
@@ -128,23 +102,20 @@ export default async function HomePage() {
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    {/* Hidden on mobile where footer is visible */}
-                    <div className="hidden md:flex items-center gap-4 py-2 border-t border-white/5">
+                {/* Content hidden on mobile/landscape where footer is visible */}
+                <div className="hidden md:block space-y-4">
+                    <div className="flex items-center gap-4 py-2 border-t border-white/5">
                         <div className="flex-1">
-                            <p className="text-xs font-black uppercase text-muted-foreground">Top Students</p>
-                            <p className="text-sm font-bold flex items-center gap-1">
-                                Join the competition!
-                            </p>
+                            <p className="text-xs font-black uppercase text-muted-foreground">Competetion</p>
+                            <p className="text-sm font-bold">Join the race!</p>
                         </div>
                         <div className="text-right">
                             <p className="text-sm font-black text-foreground">{profile.totalxp} XP</p>
                         </div>
                     </div>
 
-                    {/* Avatars hidden on mobile where footer is visible */}
-                    <div className="hidden md:flex -space-x-3">
-                        {topUsers.map((user, i) => (
+                    <div className="flex -space-x-3">
+                        {topUsers.map((user) => (
                             <Avatar key={user.uid} className="h-8 w-8 border-2 border-background shadow-lg">
                                 <AvatarFallback style={{backgroundColor: generateAvatarColor(user.uid)}} className="text-[10px] font-black text-white">
                                     {user.username.charAt(0).toUpperCase()}
@@ -152,39 +123,29 @@ export default async function HomePage() {
                             </Avatar>
                         ))}
                         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black border-2 border-background">
-                            +{topUsers.length > 0 ? '47' : '0'}
+                            +47
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-4 text-primary font-black flex items-center text-[10px] md:text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-                    <span className="hidden sm:inline">View Ranks</span>
+                    <span>View Ranks</span>
                     <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 md:h-4 md:w-4"/>
                 </div>
             </Card>
         </Link>
       </div>
 
-      {/* Row 3: Quick Actions */}
+      {/* Row 3: Quick Actions (AI Doubt Solver Centered) */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 pl-1">Power Tools</h2>
-        <div className="grid grid-cols-2 gap-4 sm:gap-6">
-            <Link href="/doubt-solver" className="group col-span-2 md:col-span-1">
+        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 text-center">Power Tools</h2>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+            <Link href="/doubt-solver" className="group col-span-12 md:col-span-6 md:col-start-4">
                 <Card className="h-full bg-primary text-primary-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4">
                     <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
                         <BrainCircuit className="h-10 w-10 text-white"/>
                     </div>
                     <h3 className="text-xl font-black uppercase tracking-tight">AI Doubt Solver</h3>
-                </Card>
-            </Link>
-            
-            {/* Custom Quiz Link - Hidden on Mobile (where footer is visible) */}
-            <Link href="/quiz" className="hidden md:flex group h-full">
-                 <Card className="h-full w-full bg-accent text-accent-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4">
-                    <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                        <NotebookText className="h-10 w-10 text-white"/>
-                    </div>
-                    <h3 className="text-xl font-black uppercase tracking-tight">Custom Quiz</h3>
                 </Card>
             </Link>
         </div>
@@ -201,19 +162,19 @@ export default async function HomePage() {
               
               return (
               <Card key={subject.id} className="glass-card border-2 border-border glow-border bouncy-hover overflow-hidden group">
-                  <div className="p-4 md:p-6 flex items-center gap-3 md:gap-4">
-                      <div className="flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-xl md:rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
-                          <Icon className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+                  <div className="p-3 md:p-6 flex items-center gap-3 md:gap-4">
+                      <div className="flex h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-xl md:rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
+                          <Icon className="h-5 w-5 md:h-8 md:w-8 text-primary" />
                       </div>
                       <div className="flex-1 overflow-hidden">
-                        <CardTitle className="font-black text-lg md:text-xl mb-0.5 md:mb-1 uppercase tracking-tight text-foreground truncate">{subject.name}</CardTitle>
+                        <CardTitle className="font-black text-base md:text-xl mb-0.5 md:mb-1 uppercase tracking-tight text-foreground truncate">{subject.name}</CardTitle>
                         <p className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase tracking-wider">
                             {count} Chapters
                         </p>
                       </div>
                   </div>
-                  <div className="px-4 pb-4 md:px-6 md:pb-6">
-                    <Button asChild variant="outline" className="w-full border-2 h-10 md:h-12 text-xs md:text-sm">
+                  <div className="px-3 pb-3 md:px-6 md:pb-6">
+                    <Button asChild variant="outline" className="w-full border-2 h-9 md:h-12 text-[10px] md:text-sm">
                         <Link href={`/quiz?subject=${subject.id}`}>Practice</Link>
                     </Button>
                   </div>
