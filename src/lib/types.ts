@@ -1,3 +1,4 @@
+
 export type UserProfile = {
   uid: string;
   username: string;
@@ -9,6 +10,7 @@ export type UserProfile = {
   lastactive: any; // Firestore Timestamp
   onboardingComplete: boolean;
   lastPracticedChapterId?: string;
+  friends?: string[];
 
   // Onboarding data
   grade?: string;
@@ -20,10 +22,29 @@ export type UserProfile = {
   nextExamDate?: string;
 };
 
+export type FriendRequest = {
+  id: string;
+  fromUid: string;
+  fromUsername: string;
+  toUid: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: any;
+};
+
+export type Notification = {
+  id: string;
+  type: 'friend_request';
+  fromUid: string;
+  fromUsername: string;
+  status: 'unread' | 'read';
+  createdAt: any;
+  relatedId: string;
+};
+
 export type Subject = {
   id: string;
   name: string;
-  iconName: string; // Name of a lucide-react icon
+  iconName: string; 
   chapters: Chapter[];
 };
 

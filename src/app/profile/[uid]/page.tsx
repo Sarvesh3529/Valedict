@@ -1,15 +1,19 @@
-'use server';
 
-import { adminDb } from '@/lib/firebase-admin';
-import { notFound } from 'next/navigation';
-import type { UserProfile } from '@/lib/types';
+'use client';
+
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot, collection, query, where, getDocs } from 'firebase/firestore';
+import { notFound, useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import type { UserProfile, FriendRequest } from '@/lib/types';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Flame, Star, CalendarDays, Home, ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
+import { Flame, Star, CalendarDays, Home, ArrowLeft, GraduationCap, Trophy, UserPlus, Check, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import Link from 'next/link';
 import { generateAvatarColor } from '@/lib/utils';
+import { handleFriendRequest } from '@/app/social/actions';
 
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) {
   return (
@@ -25,21 +29,54 @@ function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label
   )
 }
 
-interface Props {
-    params: { uid: string };
-}
+export default function PublicProfilePage() {
+    const { uid } = useParams();
+    const { user, profile: currentUserProfile } = useAuth();
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [requestStatus, setRequestStatus] = useState<'none' | 'pending' | 'accepted'>('none');
+    const [actionLoading, setActionLoading] = useState(false);
 
-export default async function PublicProfilePage({ params }: Props) {
-    const { uid } = await params;
-    const userDoc = await adminDb.collection('users').doc(uid).get();
+    useEffect(() => {
+        if (!uid) return;
+        
+        const unsub = onSnapshot(doc(db, 'users', uid as string), (doc) => {
+            if (doc.exists()) {
+                setProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+            } else {
+                setProfile(null);
+            }
+            setLoading(false);
+        });
 
-    if (!userDoc.exists) {
-        notFound();
-    }
+        return () => unsub();
+    }, [uid]);
 
-    const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
+    useEffect(() => {
+        if (!user || !uid) return;
+        
+        // Check if already friends or if request exists
+        const checkRequest = async () => {
+            const q = query(
+                collection(db, 'friend_requests'),
+                where('fromUid', '==', user.uid),
+                where('toUid', '==', uid)
+            );
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                const status = snap.docs[0].data().status;
+                setRequestStatus(status);
+            } else if (currentUserProfile?.friends?.includes(uid as string)) {
+                setRequestStatus('accepted');
+            }
+        };
+        checkRequest();
+    }, [user, uid, currentUserProfile]);
+
+    if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    if (!profile) notFound();
+
     const avatarColor = generateAvatarColor(profile.uid);
-
     const joinDate = profile.joinedat?.toDate 
         ? profile.joinedat.toDate().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -48,9 +85,17 @@ export default async function PublicProfilePage({ params }: Props) {
         }) 
         : 'N/A';
 
+    const handleSendRequest = async () => {
+        if (!user || !currentUserProfile) return;
+        setActionLoading(true);
+        const result = await handleFriendRequest(user.uid, currentUserProfile.username, profile.uid);
+        if (result.success) setRequestStatus('pending');
+        setActionLoading(false);
+    };
+
     return (
         <div className="container mx-auto max-w-3xl px-4 py-8 md:py-12 space-y-8">
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center justify-between gap-4 mb-4">
                 <Button asChild variant="ghost" size="sm">
                     <Link href="/leaderboard">
                         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -67,21 +112,44 @@ export default async function PublicProfilePage({ params }: Props) {
                                 {profile.username?.charAt(0).toUpperCase() || 'U'}
                             </AvatarFallback>
                         </Avatar>
-                        <div className="grid gap-2 text-center sm:text-left">
-                            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">{profile.username}</h2>
-                            <p className="text-sm font-bold text-primary bg-primary/10 px-4 py-1 rounded-full inline-block self-center sm:self-start">
-                                Grade {profile.grade || 'N/A'} Student
-                            </p>
+                        <div className="grid gap-1 text-center sm:text-left flex-1">
+                            <h2 className="text-3xl md:text-4xl font-black">{profile.username}</h2>
+                            <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest pt-1">
+                                UID: {profile.uid}
+                            </div>
+                            
+                            {user?.uid !== profile.uid && (
+                                <div className="mt-4 flex justify-center sm:justify-start">
+                                    {requestStatus === 'none' && (
+                                        <Button onClick={handleSendRequest} disabled={actionLoading}>
+                                            {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                                            Add Friend
+                                        </Button>
+                                    )}
+                                    {requestStatus === 'pending' && (
+                                        <Button variant="secondary" disabled>
+                                            <Clock className="mr-2 h-4 w-4" />
+                                            Request Pending
+                                        </Button>
+                                    )}
+                                    {requestStatus === 'accepted' && (
+                                        <Button variant="outline" className="border-2 border-green-500 text-green-500 hover:bg-green-500/10" disabled>
+                                            <Check className="mr-2 h-4 w-4" />
+                                            Friends
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </CardHeader>
                 
                 <CardContent className="p-8 space-y-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <StatCard icon={Flame} label="Active Streak" value={`${profile.streak || 0} days`} />
-                        <StatCard icon={Star} label="Total Experience" value={`${profile.totalxp || 0} XP`} />
-                        <StatCard icon={CalendarDays} label="Joined Valedict" value={joinDate} />
-                        <StatCard icon={Star} label="Highest Streak" value={`${profile.highestStreak || 0} days`} />
+                        <StatCard icon={Flame} label="Daily Streak" value={`${profile.streak || 0} days`} />
+                        <StatCard icon={GraduationCap} label="Grade" value={`Class ${profile.grade || 'N/A'}`} />
+                        <StatCard icon={CalendarDays} label="Joined At" value={joinDate} />
+                        <StatCard icon={Trophy} label="Total XP" value={`${profile.totalxp || 0} XP`} />
                     </div>
                 </CardContent>
 

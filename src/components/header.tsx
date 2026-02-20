@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -13,6 +14,7 @@ import {
   SheetClose,
 } from '@/components/ui/sheet';
 import { useAuth } from '@/context/AuthContext';
+import NotificationBell from './notifications/NotificationBell';
 
 const navLinks = [
   { href: '/home', label: 'Home', icon: Home },
@@ -93,6 +95,7 @@ export default function Header() {
         </nav>
         
         <div className="flex items-center gap-2">
+            <NotificationBell />
             <ThemeToggle />
         </div>
       </div>

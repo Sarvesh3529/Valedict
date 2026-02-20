@@ -1,16 +1,16 @@
+
 'use client';
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, Flame, Star, CalendarDays, Home, Pencil } from "lucide-react";
+import { Loader2, Flame, Star, CalendarDays, Home, Pencil, GraduationCap, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import Link from 'next/link';
 import EditUsernameDialog from "@/components/profile/EditUsernameDialog";
-import { generateAvatarColor } from "@/lib/utils";
+import { generateAvatarColor, cn } from "@/lib/utils";
 
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number | undefined }) {
   return (
@@ -64,9 +64,9 @@ export default function ProfilePage() {
                 {profile.username?.charAt(0).toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
-            <div className="grid gap-2 text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
+            <div className="grid gap-1 text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-3">
+                <h2 className="text-3xl md:text-4xl font-black">
                   {profile.username || 'Anonymous User'}
                 </h2>
                 <Button 
@@ -78,11 +78,8 @@ export default function ProfilePage() {
                   <Pencil className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="text-sm font-bold text-muted-foreground">
-                Joined Valedict AI on {joinDate}
-              </p>
               <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest pt-1">
-                ID: {user.uid.slice(0, 8)}...
+                UID: {user.uid}
               </div>
             </div>
           </div>
@@ -91,9 +88,9 @@ export default function ProfilePage() {
         <CardContent className="p-8 space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <StatCard icon={Flame} label="Daily Streak" value={`${profile.streak || 0} days`} />
-            <StatCard icon={Star} label="Total XP" value={`${profile.totalxp || 0} XP`} />
-            <StatCard icon={CalendarDays} label="Grade Level" value={`Class ${profile.grade || 'N/A'}`} />
-            <StatCard icon={Star} label="Highest Streak" value={`${profile.highestStreak || 0} days`} />
+            <StatCard icon={GraduationCap} label="Grade" value={`Class ${profile.grade || 'N/A'}`} />
+            <StatCard icon={CalendarDays} label="Joined At" value={joinDate} />
+            <StatCard icon={Trophy} label="Total XP" value={`${profile.totalxp || 0} XP`} />
           </div>
         </CardContent>
 

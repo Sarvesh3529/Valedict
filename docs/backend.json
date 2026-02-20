@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -12,9 +13,11 @@
         "highestStreak": { "type": "number", "description": "User's all-time highest daily study streak." },
         "joinedat": { "type": "string", "format": "date-time", "description": "Timestamp when the user joined." },
         "lastactive": { "type": "string", "format": "date-time", "description": "Timestamp of the user's last activity." },
-        "onboardingComplete": { "type": "boolean", "description": "Flag indicating if the user has completed the onboarding flow." }
+        "onboardingComplete": { "type": "boolean", "description": "Flag indicating if the user has completed the onboarding flow." },
+        "grade": { "type": "string" },
+        "friends": { "type": "array", "items": { "type": "string" }, "description": "List of friend UIDs." }
       },
-      "required": ["username", "totalxp", "weeklyxp", "streak", "highestStreak", "joinedat", "lastactive", "onboardingComplete"]
+      "required": ["username", "totalxp", "weeklyxp", "streak", "highestStreak", "joinedat", "onboardingComplete"]
     },
     "Username": {
       "title": "Username Registry",
@@ -24,6 +27,33 @@
         "uid": { "type": "string", "description": "The UID of the user who owns this username." }
       },
       "required": ["uid"]
+    },
+    "FriendRequest": {
+      "title": "Friend Request",
+      "description": "Tracks friend requests between users.",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string" },
+        "fromUsername": { "type": "string" },
+        "toUid": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fromUid", "toUid", "status", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User alerts for social activities.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["friend_request"] },
+        "fromUid": { "type": "string" },
+        "fromUsername": { "type": "string" },
+        "status": { "type": "string", "enum": ["unread", "read"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "relatedId": { "type": "string", "description": "ID of the related entity (e.g. friend request ID)" }
+      },
+      "required": ["type", "fromUid", "status", "createdAt"]
     }
   },
   "auth": {
@@ -38,17 +68,13 @@
       "schema": { "$ref": "#/backend/entities/Username" },
       "description": "A registry to ensure unique usernames. The document ID is the lowercase username."
     },
-     "/quizzes/{quizId}": {
-      "schema": {
-        "$ref": "#/backend/entities/Quiz"
-      },
-      "description": "Stores quiz metadata."
+    "/friend_requests/{requestId}": {
+      "schema": { "$ref": "#/backend/entities/FriendRequest" },
+      "description": "Friend request tracking."
     },
-    "/quizzes/{quizId}/questions/{questionId}": {
-      "schema": {
-        "$ref": "#/backend/entities/Question"
-      },
-      "description": "Stores the questions for a specific quiz."
+    "/users/{userId}/notifications/{notificationId}": {
+      "schema": { "$ref": "#/backend/entities/Notification" },
+      "description": "User specific notifications."
     }
   }
 }
