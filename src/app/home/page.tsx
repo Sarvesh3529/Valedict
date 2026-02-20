@@ -1,3 +1,4 @@
+
 'use server';
 
 import { cookies } from 'next/headers';
@@ -17,6 +18,7 @@ import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
 import ContinueLearning from '@/components/home/ContinueLearning';
 import { generateAvatarColor } from '@/lib/utils';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 const iconComponents: { [key: string]: React.ElementType } = {
   Calculator: Icons.Calculator,
@@ -71,14 +73,15 @@ export default async function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8 max-w-5xl">
-      {/* Row 1: Hero Unit (Lesson & Profile) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
+      {/* Row 1: Hero Unit (Lesson, Profile, and Notifications) */}
+      {/* Refined Grid: 7/12 for Lesson, 4/12 for Profile, 1/12 for Notifications on Desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div className="md:col-span-7 w-full">
           <ContinueLearning chapter={lastPracticedChapter} />
         </div>
         
         {/* Profile Card - Hidden on Mobile (where footer is visible) */}
-        <Link href="/profile" className="hidden md:flex group">
+        <Link href="/profile" className="hidden md:flex group md:col-span-4 h-full">
           <Card className="h-full w-full glass-card glow-border border-2 flex items-center p-6 bouncy-hover overflow-hidden">
             <Avatar className="h-16 w-16 border-4 border-white dark:border-slate-800 shadow-xl">
                 <AvatarFallback className="text-2xl font-black text-white" style={{backgroundColor: avatarColor}}>
@@ -92,11 +95,14 @@ export default async function HomePage() {
             <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </Card>
         </Link>
+
+        {/* Notification Bell - Integrated at the end of the row for landscape devices */}
+        <div className="hidden md:flex justify-center md:col-span-1">
+            <NotificationBell />
+        </div>
       </div>
 
       {/* Row 2 & 3: Main Stats Grid */}
-      {/* Mobile: 2 columns (Streak/XP half row, Leaderboard full row below) */}
-      {/* Desktop: 3 columns (All in one row) */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 

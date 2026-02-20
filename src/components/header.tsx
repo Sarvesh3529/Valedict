@@ -27,8 +27,10 @@ export default function Header() {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  const authRoutes = ['/', '/onboarding', '/revision'];
-  if (!user || authRoutes.some(route => pathname.startsWith(route))) {
+  // Fix: Corrected route check to prevent hiding the header on all functional pages
+  const isAuthRoute = pathname === '/' || pathname.startsWith('/onboarding') || pathname.startsWith('/revision');
+  
+  if (!user || isAuthRoute) {
     return null;
   }
   
@@ -95,7 +97,8 @@ export default function Header() {
         </nav>
         
         <div className="flex items-center gap-1 sm:gap-2">
-            <NotificationBell />
+            {/* Show notification bell in header only if not on Home page (where it is in the dashboard row) */}
+            {pathname !== '/home' && <NotificationBell />}
             <ThemeToggle />
         </div>
       </div>
