@@ -34,7 +34,7 @@ export default function Header() {
   
   return (
     <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur-lg h-16">
-      <div className="container flex h-full items-center justify-between">
+      <div className="container flex h-full items-center justify-between px-4">
         <div className="flex items-center gap-2">
             {/* Mobile Menu */}
             <Sheet>
@@ -94,7 +94,7 @@ export default function Header() {
           ))}
         </nav>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
             <NotificationBell />
             <ThemeToggle />
         </div>

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import type { FriendRequest } from '@/lib/types';
 import { acceptFriendRequest, declineFriendRequest } from '@/app/social/actions';
 import { formatDistanceToNow } from 'date-fns';
@@ -25,17 +25,25 @@ export default function NotificationBell() {
   useEffect(() => {
     if (!user) return;
 
-    // Red Dot Logic: Query pending requests where I am the receiver
+    // Query pending requests where I am the receiver
+    // Removed orderBy to ensure it works without a custom index for now
     const q = query(
       collection(db, 'friend_requests'),
       where('receiverId', '==', user.uid),
-      where('status', '==', 'pending'),
-      orderBy('createdAt', 'desc')
+      where('status', '==', 'pending')
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FriendRequest));
-      setRequests(docs);
+      // Sort manually by createdAt if available
+      const sorted = docs.sort((a, b) => {
+          const timeA = a.createdAt?.toMillis?.() || 0;
+          const timeB = b.createdAt?.toMillis?.() || 0;
+          return timeB - timeA;
+      });
+      setRequests(sorted);
+    }, (error) => {
+        console.error("Notification listener error:", error);
     });
 
     return () => unsubscribe();
@@ -44,23 +52,33 @@ export default function NotificationBell() {
   const handleAccept = async (req: FriendRequest) => {
     if (!user) return;
     setActionLoading(req.id);
-    await acceptFriendRequest(req.id, req.senderId, user.uid);
-    setActionLoading(null);
+    try {
+        await acceptFriendRequest(req.id, req.senderId, user.uid);
+    } catch (e) {
+        console.error("Failed to accept request:", e);
+    } finally {
+        setActionLoading(null);
+    }
   };
 
   const handleDecline = async (req: FriendRequest) => {
     setActionLoading(req.id);
-    await declineFriendRequest(req.id);
-    setActionLoading(null);
+    try {
+        await declineFriendRequest(req.id);
+    } catch (e) {
+        console.error("Failed to decline request:", e);
+    } finally {
+        setActionLoading(null);
+    }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full hover:bg-secondary">
-          <Bell className="h-5 w-5 text-foreground" />
+        <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full hover:bg-secondary flex items-center justify-center">
+          <Bell className="h-6 w-6 text-foreground" />
           {requests.length > 0 && (
-            <span className="absolute top-2 right-2 flex h-3 w-3">
+            <span className="absolute top-2.5 right-2.5 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-background"></span>
             </span>

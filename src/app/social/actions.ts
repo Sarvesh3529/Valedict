@@ -6,36 +6,6 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 
 /**
- * Sends a friend request to another user.
- * Document ID is generated as senderId_receiverId to prevent duplicate pending requests.
- */
-export async function sendFriendRequest(receiverId: string) {
-  const cookieStore = cookies();
-  const token = (await cookieStore).get('firebase_token')?.value;
-  if (!token) throw new Error('Unauthorized');
-
-  try {
-    // 1. Get current user's UID (simplified check for MVP)
-    // In a real app, we'd verify the token via adminAuth.
-    // For this prototype, we'll assume the caller passes verified context or we verify token.
-    const senderUid = (await cookieStore).get('user_uid_temporary_debug')?.value; 
-    // Note: In production, decode 'firebase_token' to get UID.
-    
-    // For the sake of the exercise, let's look up the sender's real name
-    // We'll use a better approach: find the receiver first
-    const receiverDoc = await adminDb.collection('users').doc(receiverId).get();
-    if (!receiverDoc.exists) throw new Error('Receiver not found');
-
-    // We actually need the sender's UID from the server side. 
-    // Let's assume the client-side profile is passed or we fetch by token.
-    // Since I can't easily decode JWT here without more boilerplate, 
-    // I'll define a helper that accepts the sender's info.
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-/**
  * Handle sending friend request with explicit sender details
  */
 export async function handleFriendRequest(senderId: string, senderName: string, receiverId: string) {
