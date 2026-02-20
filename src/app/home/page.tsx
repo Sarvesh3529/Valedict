@@ -70,13 +70,23 @@ export default async function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8 max-w-5xl">
-      {/* Row 1: Hero Unit (Lesson) */}
-      <div className="w-full">
-        <ContinueLearning chapter={lastPracticedChapter} />
+      {/* Row 1: Welcome & Hero Unit */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div className="space-y-2 text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+            Welcome back, <span className="text-primary">{profile.username}</span>!
+          </h1>
+          <p className="text-muted-foreground font-bold text-sm md:text-lg uppercase tracking-wide">
+            Ready to conquer your goals today?
+          </p>
+        </div>
+        <div className="w-full">
+          <ContinueLearning chapter={lastPracticedChapter} />
+        </div>
       </div>
 
       {/* Row 2: Main Stats Grid */}
-      {/* Mobile grid is 2 cols (Streak/XP), Row below is Leaderboard. Desktop is 3 cols. */}
+      {/* Logic for 2-col vs 3-col based on footer handled via CSS classes */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
@@ -89,7 +99,7 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Full width on mobile footer devices (md:hidden), 1/3 on desktop */}
+        {/* Leaderboard Link - Full width on footer devices, 1/3 on desktop */}
         <Link href="/leaderboard" className="group h-full col-span-2 md:col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
@@ -99,32 +109,6 @@ export default async function HomePage() {
                     </div>
                     <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-yellow-400/20 flex items-center justify-center flex-shrink-0">
                         <Medal className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
-                    </div>
-                </div>
-
-                {/* Content hidden on mobile/landscape where footer is visible */}
-                <div className="hidden md:block space-y-4">
-                    <div className="flex items-center gap-4 py-2 border-t border-white/5">
-                        <div className="flex-1">
-                            <p className="text-xs font-black uppercase text-muted-foreground">Competetion</p>
-                            <p className="text-sm font-bold">Join the race!</p>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-sm font-black text-foreground">{profile.totalxp} XP</p>
-                        </div>
-                    </div>
-
-                    <div className="flex -space-x-3">
-                        {topUsers.map((user) => (
-                            <Avatar key={user.uid} className="h-8 w-8 border-2 border-background shadow-lg">
-                                <AvatarFallback style={{backgroundColor: generateAvatarColor(user.uid)}} className="text-[10px] font-black text-white">
-                                    {user.username.charAt(0).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                        ))}
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black border-2 border-background">
-                            +47
-                        </div>
                     </div>
                 </div>
 
@@ -162,19 +146,19 @@ export default async function HomePage() {
               
               return (
               <Card key={subject.id} className="glass-card border-2 border-border glow-border bouncy-hover overflow-hidden group">
-                  <div className="p-3 md:p-6 flex items-center gap-3 md:gap-4">
-                      <div className="flex h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-xl md:rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
-                          <Icon className="h-5 w-5 md:h-8 md:w-8 text-primary" />
+                  <div className="p-2 md:p-4 flex items-center gap-3 md:gap-4">
+                      <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl md:rounded-xl bg-secondary group-hover:bg-primary/10 transition-colors">
+                          <Icon className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                       </div>
                       <div className="flex-1 overflow-hidden">
-                        <CardTitle className="font-black text-base md:text-xl mb-0.5 md:mb-1 uppercase tracking-tight text-foreground truncate">{subject.name}</CardTitle>
+                        <CardTitle className="font-black text-sm md:text-lg mb-0.5 uppercase tracking-tight text-foreground truncate">{subject.name}</CardTitle>
                         <p className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase tracking-wider">
                             {count} Chapters
                         </p>
                       </div>
                   </div>
-                  <div className="px-3 pb-3 md:px-6 md:pb-6">
-                    <Button asChild variant="outline" className="w-full border-2 h-9 md:h-12 text-[10px] md:text-sm">
+                  <div className="px-2 pb-2 md:px-4 md:pb-4">
+                    <Button asChild variant="outline" className="w-full border-2 h-8 md:h-10 text-[10px] md:text-xs">
                         <Link href={`/quiz?subject=${subject.id}`}>Practice</Link>
                     </Button>
                   </div>
