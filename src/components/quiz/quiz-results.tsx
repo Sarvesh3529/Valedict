@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -77,59 +78,33 @@ export default function QuizResults({
   const totalQuestions = results.length;
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
   
-  const incorrectAnswers = totalQuestions - correctAnswers;
-
-  let baseXP = 0;
-  if (totalQuestions === 5) {
-      baseXP = 10;
-  } else if (totalQuestions === 7) { // For revision quiz
-      baseXP = fixedXpGained ?? 20; 
-  } else if (totalQuestions === 10) {
-      baseXP = 20;
-  } else if (totalQuestions === 15) {
-      baseXP = 30;
-  }
-
-
-  let deduction = 0;
-  if (incorrectAnswers >= 1 && incorrectAnswers <= 2) {
-      deduction = 1;
-  } else if (incorrectAnswers >= 3 && incorrectAnswers <= 4) {
-      deduction = 2;
-  } else if (incorrectAnswers >= 5 && incorrectAnswers <= 6) {
-      deduction = 3;
-  } else if (incorrectAnswers >= 7 && incorrectAnswers <= 8) {
-      deduction = 4;
-  } else if (incorrectAnswers >= 9) {
-      deduction = 5;
-  }
-
-  const calculatedXpGained = Math.max(0, baseXP - deduction);
-  const xpGained = fixedXpGained !== undefined ? fixedXpGained : calculatedXpGained;
+  // --- New Sensible XP Logic ---
+  // If fixedXpGained is provided (e.g., from revision session), it acts as the Max XP.
+  // Otherwise, default to 2 XP per correct answer.
+  const maxPossibleXp = fixedXpGained !== undefined ? fixedXpGained : (totalQuestions * 2);
+  const xpGained = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * maxPossibleXp) : 0;
   
   useEffect(() => {
     if (results.length === 0) {
         setIsUpdating(false);
         return;
     };
+    
     // This effect runs once when the component mounts with the results
     const lastChapterId = results[results.length - 1].question.chapterId;
     updateUserStatsAfterQuiz(xpGained, lastChapterId)
       .then(({ streakIncreased, newStreak }) => {
-        // User wants streak animation first
         if (streakIncreased) {
           setAnimationState({ xp: xpGained, streak: newStreak, streakIncreased, stage: 'streak' });
         } else if (xpGained > 0) {
-          // If no streak increase, but XP was gained, show XP animation
           setAnimationState({ xp: xpGained, streak: newStreak, streakIncreased, stage: 'xp' });
         } else {
-          // No animations needed, just finish loading
           setIsUpdating(false);
         }
       })
       .catch(error => {
         console.error("Failed to update stats:", error);
-        setIsUpdating(false); // Stop loading if server action fails
+        setIsUpdating(false);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results, xpGained]);
@@ -158,7 +133,7 @@ export default function QuizResults({
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-muted-foreground">Calculating your results and updating stats...</p>
+          <p className="text-muted-foreground font-bold">Calculating your results and updating stats...</p>
       </div>
     );
   }
@@ -173,11 +148,11 @@ export default function QuizResults({
       )}
 
       <div className={cn("space-y-6 md:space-y-8", isUpdating ? 'opacity-0' : 'opacity-100 transition-opacity duration-500')}>
-        <Card className="text-center">
+        <Card className="text-center border-2 shadow-none">
           <CardHeader>
-            <CardTitle className="text-3xl md:text-4xl font-bold">Your Score</CardTitle>
-            <CardDescription>
-              You answered {correctAnswers} out of {totalQuestions} questions correctly and earned {xpGained} XP!
+            <CardTitle className="text-3xl md:text-4xl font-black uppercase tracking-tight">Your Score</CardTitle>
+            <CardDescription className="font-bold text-base">
+              You answered {correctAnswers} out of {totalQuestions} correctly and earned <span className="text-primary">{xpGained} XP</span>!
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
@@ -202,62 +177,62 @@ export default function QuizResults({
                 </Pie>
               </PieChart>
             </ChartContainer>
-            <p className="text-5xl md:text-6xl font-bold mt-4">{score.toFixed(0)}%</p>
+            <p className="text-5xl md:text-6xl font-black mt-4 tabular-nums">{score.toFixed(0)}%</p>
           </CardContent>
         </Card>
         
         <div>
-          <h3 className="text-xl md:text-2xl font-semibold mb-4 text-center">Review Your Answers</h3>
-          <Accordion type="single" collapsible className="w-full">
+          <h3 className="text-xl font-black uppercase tracking-widest text-muted-foreground mb-4 text-center">Review Your Answers</h3>
+          <Accordion type="single" collapsible className="w-full space-y-2">
             {results.map((result, index) => (
-              <AccordionItem value={`item-${index}`} key={index}>
+              <AccordionItem value={`item-${index}`} key={index} className="border-2 rounded-2xl overflow-hidden">
                 <AccordionTrigger 
                   className={cn(
-                    'flex p-3 hover:no-underline',
+                    'flex p-4 hover:no-underline font-bold text-left',
                     result.isCorrect 
                       ? 'bg-accent/10 hover:bg-accent/20' 
                       : 'bg-destructive/10 hover:bg-destructive/20'
                   )}
                 >
-                  <div className="flex flex-1 items-center space-x-3 text-left">
+                  <div className="flex flex-1 items-center space-x-3">
                     {result.isCorrect ? (
                       <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0" />
                     ) : (
                       <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
                     )}
-                    <span className="flex-1 text-foreground">Question {index + 1}</span>
+                    <span className="flex-1">Question {index + 1}</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="p-4 md:p-6 border-t">
-                  <div className="text-foreground font-semibold mb-3">
+                <AccordionContent className="p-4 md:p-6 border-t-2 bg-card">
+                  <div className="text-foreground font-bold text-lg mb-4 leading-relaxed">
                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                           {result.question.question}
                       </ReactMarkdown>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      Your answer:{' '}
-                      <span className={cn('font-medium', result.isCorrect ? 'text-accent' : 'text-destructive')}>
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-xl bg-secondary/50 border-2">
+                      <span className="text-xs font-black uppercase text-muted-foreground block mb-1">Your answer</span>
+                      <span className={cn('font-bold', result.isCorrect ? 'text-accent' : 'text-destructive')}>
                           {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
                       </span>
                     </div>
                     {!result.isCorrect && (
-                      <div>
-                          Correct answer:{' '}
-                          <span className="font-medium text-muted-foreground">
+                      <div className="p-3 rounded-xl bg-accent/10 border-2 border-accent/20">
+                          <span className="text-xs font-black uppercase text-accent block mb-1">Correct answer</span>
+                          <span className="font-bold text-foreground">
                               {result.question.options[result.question.correctAnswer]}
                           </span>
                       </div>
                     )}
                   </div>
-                  <Alert className="mt-4">
-                    <AlertTitle>Explanation</AlertTitle>
-                    <AlertDescription>
+                  <div className="mt-6 p-4 rounded-2xl bg-primary/5 border-2 border-primary/10">
+                    <h4 className="text-xs font-black uppercase text-primary mb-2">Explanation</h4>
+                    <div className="text-sm font-medium leading-relaxed prose prose-sm max-w-none dark:prose-invert">
                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
                           {result.question.explanation}
                       </ReactMarkdown>
-                    </AlertDescription>
-                  </Alert>
+                    </div>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             ))}
@@ -265,14 +240,14 @@ export default function QuizResults({
         </div>
 
         <div className="text-center mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <Button onClick={onRestart} size="lg">
-              <RestartButtonIcon className="mr-2 h-4 w-4" />
+          <Button onClick={onRestart} size="lg" className="w-full sm:w-auto h-14 rounded-full px-10">
+              <RestartButtonIcon className="mr-2 h-5 w-5" />
               {restartButtonText}
           </Button>
           {RestartButtonIcon !== Home && (
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto h-14 rounded-full px-10">
                 <Link href="/home">
-                    <Home className="mr-2 h-4 w-4" />
+                    <Home className="mr-2 h-5 w-5" />
                     Go to Home
                 </Link>
             </Button>
