@@ -11,6 +11,8 @@ import {
   SheetContent,
   SheetTrigger,
   SheetClose,
+  SheetHeader,
+  SheetTitle,
 } from '@/components/ui/sheet';
 import { useAuth } from '@/context/AuthContext';
 import NotificationBell from './notifications/NotificationBell';
@@ -42,17 +44,21 @@ export default function Header() {
                     <Button variant="ghost" size="icon"><Menu className="h-5 w-5"/></Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-4">
-                    <Link href="/home" className="flex items-center gap-2 font-bold mb-8">
-                        <BrainCircuit className="h-6 w-6 text-primary" />
-                        <span className="font-headline text-lg">Valedict AI</span>
-                    </Link>
+                    <SheetHeader className="text-left mb-8">
+                        <SheetTitle>
+                            <Link href="/home" className="flex items-center gap-2 font-bold">
+                                <BrainCircuit className="h-6 w-6 text-primary" />
+                                <span className="font-headline text-lg">Valedict AI</span>
+                            </Link>
+                        </SheetTitle>
+                    </SheetHeader>
                     <nav className="flex flex-col gap-2">
                         {navLinks.map((link) => (
                            <SheetClose asChild key={link.href}>
                              <Link
                                 href={link.href}
                                 className={cn(
-                                'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
+                                'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary font-bold',
                                 pathname === link.href && 'bg-primary/10 text-primary'
                                 )}
                             >
@@ -80,7 +86,7 @@ export default function Header() {
               variant="ghost"
               asChild
               className={cn(
-                'justify-start',
+                'justify-start h-10 px-4 rounded-xl',
                 pathname === link.href
                   ? 'bg-primary/10 text-primary'
                   : 'text-foreground/80 hover:text-primary'
