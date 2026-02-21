@@ -34,8 +34,9 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
       {users.map((u, index) => {
         const avatarColor = generateAvatarColor(u.uid);
         return (
-          <div key={u.uid} className="flex items-center gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all border border-transparent hover:border-primary/20">
-            <Avatar className="h-10 w-10">
+          <div key={u.uid} className="flex items-center gap-3 sm:gap-4 p-3 rounded-lg bg-card hover:bg-secondary/50 transition-all border border-transparent hover:border-primary/20">
+            {/* Hidden on mobile to save horizontal space */}
+            <Avatar className="hidden md:flex h-10 w-10 flex-shrink-0">
               <AvatarImage src={''} />
               <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white font-bold">
                 {u.username?.charAt(0).toUpperCase() || 'U'}
@@ -46,11 +47,13 @@ function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType
             </div>
             <Link 
                 href={`/profile/${u.uid}`} 
-                className="font-bold flex-1 break-words text-foreground hover:text-primary hover:underline underline-offset-4 decoration-primary transition-colors"
+                className="font-bold flex-1 truncate text-foreground hover:text-primary hover:underline underline-offset-4 decoration-primary transition-colors"
             >
                 {u.username || 'Anonymous User'}
             </Link>
-            <p className="font-black text-foreground tabular-nums">{type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP</p>
+            <p className="font-black text-foreground tabular-nums whitespace-nowrap">
+                {type === 'weeklyxp' ? (u.weeklyxp || 0) : (u.totalxp || 0)} XP
+            </p>
           </div>
         )
       })}
@@ -81,8 +84,9 @@ function CurrentUserBar({ users, type }: { users: UserProfile[], type: Leaderboa
       >
         <Card className="shadow-2xl border-primary bg-background/90 backdrop-blur-md">
           <CardContent className="p-0">
-            <div className="flex items-center gap-4 p-3">
-              <Avatar className="h-10 w-10">
+            <div className="flex items-center gap-3 sm:gap-4 p-3">
+              {/* Hidden on mobile to save horizontal space */}
+              <Avatar className="hidden md:flex h-10 w-10 flex-shrink-0">
                 <AvatarImage src={''} />
                 <AvatarFallback style={{backgroundColor: avatarColor}} className="text-white font-bold">
                     {currentUserData.username?.charAt(0).toUpperCase() || 'U'}
@@ -91,8 +95,10 @@ function CurrentUserBar({ users, type }: { users: UserProfile[], type: Leaderboa
               <div className="w-8 text-center flex-shrink-0 flex items-center justify-center">
                 <span className="font-black text-lg text-primary">{currentUserData.rank + 1}</span>
               </div>
-              <p className="font-black flex-1 break-words text-foreground">You</p>
-              <p className="font-black text-primary tabular-nums">{type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP</p>
+              <p className="font-black flex-1 truncate text-foreground">You</p>
+              <p className="font-black text-primary tabular-nums whitespace-nowrap">
+                {type === 'weeklyxp' ? (currentUserData.weeklyxp || 0) : (currentUserData.totalxp || 0)} XP
+              </p>
             </div>
           </CardContent>
         </Card>
