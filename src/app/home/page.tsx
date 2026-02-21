@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import * as Icons from 'lucide-react';
-import { BrainCircuit, ArrowRight, Medal } from 'lucide-react';
+import { BrainCircuit, ArrowRight, Medal, Compass } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
@@ -57,20 +57,14 @@ export default async function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8 max-w-5xl">
-      {/* Row 1: Welcome & Hero Unit */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight font-sans">
-            Welcome back, <span className="text-primary">{profile.username}</span>!
-          </h1>
-        </div>
-        <div className="w-full">
-          <ContinueLearning chapter={lastPracticedChapter} />
-        </div>
+      {/* Row 1: Welcome message */}
+      <div className="text-center md:text-left mb-2">
+        <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight font-sans">
+          Welcome back, <span className="text-primary">{profile.username}</span>!
+        </h1>
       </div>
 
       {/* Row 2: Main Stats Grid */}
-      {/* 2-col on mobile/landscape footer devices, 3-col on larger screens */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
@@ -83,7 +77,6 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Full width on mobile row 2, 1/3 on desktop row 1 */}
         <Link href="/leaderboard" className="group h-full col-span-2 md:col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
@@ -104,12 +97,29 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* Row 3: Quick Actions (AI Doubt Solver Centered) */}
+      {/* Row 3: Action Row (Continue Learning & AI Doubt Solver) */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 text-center">Power Tools</h2>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
-            <Link href="/doubt-solver" className="group col-span-12 md:col-span-6 md:col-start-4">
-                <Card className="h-full bg-primary text-primary-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4">
+        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 pl-1">Study Tools</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch">
+            {/* Continue Learning Slot */}
+            <div className="h-full">
+                {lastPracticedChapter ? (
+                    <ContinueLearning chapter={lastPracticedChapter} />
+                ) : (
+                    <Link href="/quiz" className="group h-full block">
+                        <Card className="h-full bg-secondary/50 border-4 border-dashed border-muted-foreground/20 p-8 rounded-[2rem] flex flex-col items-center justify-center text-center gap-4 hover:border-primary/20 transition-colors">
+                            <div className="h-16 w-16 bg-muted rounded-2xl flex items-center justify-center">
+                                <Compass className="h-10 w-10 text-muted-foreground" />
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight text-muted-foreground">Pick a Subject</h3>
+                        </Card>
+                    </Link>
+                )}
+            </div>
+
+            {/* AI Doubt Solver */}
+            <Link href="/doubt-solver" className="group h-full">
+                <Card className="h-full bg-primary text-primary-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-[2rem] flex flex-col items-center justify-center text-center gap-4">
                     <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
                         <BrainCircuit className="h-10 w-10 text-white"/>
                     </div>
