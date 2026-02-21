@@ -80,8 +80,8 @@ export default function QuizResults({
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
   
   // --- XP Logic ---
-  // If fixedXpGained is provided (e.g., from revision session), it acts as the Max XP.
-  // Otherwise, default to 2 XP per correct answer.
+  // Earn XP proportional to performance. 
+  // Each question is worth 2 XP by default.
   const maxPossibleXp = fixedXpGained !== undefined ? fixedXpGained : (totalQuestions * 2);
   const xpGained = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * maxPossibleXp) : 0;
   
@@ -215,16 +215,22 @@ export default function QuizResults({
                   <div className="space-y-3">
                     <div className="p-3 rounded-xl bg-secondary/50 border-2">
                       <span className="text-xs font-black uppercase text-muted-foreground block mb-1">Your answer</span>
-                      <span className={cn('font-bold', result.isCorrect ? 'text-accent' : 'text-destructive')}>
-                          {result.userAnswer !== null ? result.question.options[result.userAnswer] : 'Not answered'}
-                      </span>
+                      <div className={cn('font-bold', result.isCorrect ? 'text-accent' : 'text-destructive')}>
+                          {result.userAnswer !== null ? (
+                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
+                              {result.question.options[result.userAnswer]}
+                            </ReactMarkdown>
+                          ) : 'Not answered'}
+                      </div>
                     </div>
                     {!result.isCorrect && (
                       <div className="p-3 rounded-xl bg-accent/10 border-2 border-accent/20">
                           <span className="text-xs font-black uppercase text-accent block mb-1">Correct answer</span>
-                          <span className="font-bold text-foreground">
-                              {result.question.options[result.question.correctAnswer]}
-                          </span>
+                          <div className="font-bold text-foreground">
+                              <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[[rehypeKatex, { output: 'html' }]]}>
+                                {result.question.options[result.question.correctAnswer]}
+                              </ReactMarkdown>
+                          </div>
                       </div>
                     )}
                   </div>
