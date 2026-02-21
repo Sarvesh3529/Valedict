@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { QuizResult } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -73,22 +73,25 @@ export default function QuizResults({
 }: QuizResultsProps) {
   const [isUpdating, setIsUpdating] = useState(true);
   const [animationState, setAnimationState] = useState<AnimationState | null>(null);
+  const updateStarted = useRef(false);
 
   const correctAnswers = results.filter((r) => r.isCorrect).length;
   const totalQuestions = results.length;
   const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
   
-  // --- New Sensible XP Logic ---
+  // --- XP Logic ---
   // If fixedXpGained is provided (e.g., from revision session), it acts as the Max XP.
   // Otherwise, default to 2 XP per correct answer.
   const maxPossibleXp = fixedXpGained !== undefined ? fixedXpGained : (totalQuestions * 2);
   const xpGained = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * maxPossibleXp) : 0;
   
   useEffect(() => {
-    if (results.length === 0) {
-        setIsUpdating(false);
+    if (results.length === 0 || updateStarted.current) {
+        if (results.length === 0) setIsUpdating(false);
         return;
     };
+    
+    updateStarted.current = true;
     
     // This effect runs once when the component mounts with the results
     const lastChapterId = results[results.length - 1].question.chapterId;
