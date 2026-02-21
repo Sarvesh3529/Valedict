@@ -80,7 +80,7 @@ export default function EditUsernameDialog({ isOpen, onOpenChange, currentUserna
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="New username"
                 className="border-2 h-12 font-bold"
-                maxLength={15}
+                maxLength={12}
               />
               {debouncedUsername.toLowerCase() !== currentUsername.toLowerCase() && username.length >= 3 && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">

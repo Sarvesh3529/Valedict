@@ -9,8 +9,8 @@ export async function checkUsernameAvailability(username: string): Promise<{ ava
   if (!trimmedUsername || trimmedUsername.length < 3) {
     return { available: false, message: 'Username must be at least 3 characters.' };
   }
-  if (trimmedUsername.length > 15) {
-      return { available: false, message: 'Username must be 15 characters or less.' };
+  if (trimmedUsername.length > 12) {
+      return { available: false, message: 'Username must be 12 characters or less.' };
   }
   if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
       return { available: false, message: 'Only letters, numbers, and underscores allowed.' };

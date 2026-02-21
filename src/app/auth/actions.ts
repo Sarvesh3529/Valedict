@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 
 const signupSchema = z.object({
-    username: z.string().min(3, "Username must be 3-15 characters.").max(15, "Username must be 3-15 characters.").regex(/^[a-zA-Z0-9_]+$/, "No spaces or special characters."),
+    username: z.string().min(3, "Username must be 3-12 characters.").max(12, "Username must be 3-12 characters.").regex(/^[a-zA-Z0-9_]+$/, "No spaces or special characters."),
     password: z.string().min(8, "Password must be at least 8 characters."),
 });
 
