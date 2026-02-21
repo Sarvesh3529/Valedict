@@ -60,7 +60,7 @@ export default async function HomePage() {
       {/* Row 1: Welcome & Hero Unit */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight">
+          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight font-sans">
             Welcome back, <span className="text-primary">{profile.username}</span>!
           </h1>
         </div>
