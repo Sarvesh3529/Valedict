@@ -7,16 +7,14 @@ import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
 
 // UI components
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { Card, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import * as Icons from 'lucide-react';
-import { BrainCircuit, NotebookText, ArrowRight, Medal } from 'lucide-react';
+import { BrainCircuit, ArrowRight, Medal } from 'lucide-react';
 import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
 import ContinueLearning from '@/components/home/ContinueLearning';
-import { generateAvatarColor } from '@/lib/utils';
 
 const iconComponents: { [key: string]: React.ElementType } = {
   Calculator: Icons.Calculator,
@@ -54,17 +52,6 @@ export default async function HomePage() {
     redirect('/onboarding/start');
   }
   
-  // Fetch top 3 for the leaderboard card preview
-  const topUsersSnapshot = await adminDb.collection('users')
-    .orderBy('weeklyxp', 'desc')
-    .limit(3)
-    .get();
-  
-  const topUsers = topUsersSnapshot.docs.map(doc => ({
-    uid: doc.id,
-    username: doc.data().username,
-  }));
-
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
   const lastPracticedChapter = chapters.find(c => c.id === profile.lastPracticedChapterId);
 
@@ -72,13 +59,10 @@ export default async function HomePage() {
     <div className="container mx-auto px-4 py-8 md:py-12 space-y-8 max-w-5xl">
       {/* Row 1: Welcome & Hero Unit */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        <div className="space-y-2 text-center md:text-left">
-          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+        <div className="text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight">
             Welcome back, <span className="text-primary">{profile.username}</span>!
           </h1>
-          <p className="text-muted-foreground font-bold text-sm md:text-lg uppercase tracking-wide">
-            Ready to conquer your goals today?
-          </p>
         </div>
         <div className="w-full">
           <ContinueLearning chapter={lastPracticedChapter} />
@@ -86,7 +70,7 @@ export default async function HomePage() {
       </div>
 
       {/* Row 2: Main Stats Grid */}
-      {/* Logic for 2-col vs 3-col based on footer handled via CSS classes */}
+      {/* 2-col on mobile/landscape footer devices, 3-col on larger screens */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div className="col-span-1 h-full">
           <StreakDisplay 
@@ -99,7 +83,7 @@ export default async function HomePage() {
           <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
         </div>
         
-        {/* Leaderboard Link - Full width on footer devices, 1/3 on desktop */}
+        {/* Leaderboard Link - Full width on mobile row 2, 1/3 on desktop row 1 */}
         <Link href="/leaderboard" className="group h-full col-span-2 md:col-span-1">
             <Card className="h-full w-full glass-card glow-border border-2 bouncy-hover flex flex-col justify-between p-4 md:p-6">
                 <div className="flex items-start justify-between">
