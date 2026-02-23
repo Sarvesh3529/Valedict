@@ -31,8 +31,8 @@ const RANKS = [
   { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
   { xp: 4250, title: 'Champion', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/50' },
   { xp: 5000, title: 'Titan', icon: Zap, color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50' },
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50' },
-  { xp: 10000, title: 'Mythic', icon: Sparkles, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
+  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
+  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50' },
 ];
 
 export default function RankProgressPage() {
@@ -76,46 +76,48 @@ export default function RankProgressPage() {
 
       <div className="relative z-10 flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 gap-8 pb-12">
         
-        {/* HERO RANK CARD */}
-        <Card className="w-full bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
-          <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
-            <div className="relative flex-shrink-0">
-              <div className={cn(
-                "w-24 h-24 md:w-32 md:h-32 rounded-[2rem] flex items-center justify-center bg-primary/20 border-4 border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.3)]",
-                "current-rank"
-              )}>
-                <currentRankData.icon className="w-12 h-12 md:w-16 md:h-16 text-primary" />
-              </div>
-            </div>
-
-            <div className="flex-1 space-y-6 text-center md:text-left w-full">
-              <div className="space-y-2">
-                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">
-                  {currentRankData.title}
-                </h2>
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                    <p className="text-xs font-black text-primary uppercase tracking-widest">
-                        {totalXp} Total XP Collected
-                    </p>
-                    <span className="hidden md:block text-white/20">|</span>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                        Mastery Level {currentRankIndex + 2}
-                    </p>
+        {/* HERO RANK CARD - Now at the Top */}
+        <div className="w-full flex justify-center">
+          <Card className="w-full max-w-4xl bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
+            <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
+              <div className="relative flex-shrink-0">
+                <div className={cn(
+                  "w-24 h-24 md:w-32 md:h-32 rounded-[2rem] flex items-center justify-center bg-primary/20 border-4 border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.3)]",
+                  "current-rank"
+                )}>
+                  <currentRankData.icon className="w-12 h-12 md:w-16 md:h-16 text-primary" />
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                  <span>Current Progress</span>
-                  {nextRank && <span>{totalXp} / {nextRank.xp} XP to {nextRank.title}</span>}
+              <div className="flex-1 space-y-6 text-center md:text-left w-full">
+                <div className="space-y-2">
+                  <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">
+                    {currentRankData.title}
+                  </h2>
+                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                      <p className="text-xs font-black text-primary uppercase tracking-widest">
+                          {totalXp} Total XP Collected
+                      </p>
+                      <span className="hidden md:block text-white/20">|</span>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                          Mastery Level {currentRankIndex + 2}
+                      </p>
+                  </div>
                 </div>
-                <Progress value={progressToNext} className="h-4 bg-white/5 border border-white/5 rounded-full" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* EXPEDITION PATH */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <span>Current Progress</span>
+                    {nextRank && <span>{totalXp} / {nextRank.xp} XP to {nextRank.title}</span>}
+                  </div>
+                  <Progress value={progressToNext} className="h-4 bg-white/5 border border-white/5 rounded-full" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* HORIZONTAL EXPEDITION PATH */}
         <div className="w-full space-y-6 pt-4">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Expedition Path</h3>
