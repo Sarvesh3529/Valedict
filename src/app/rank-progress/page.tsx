@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
@@ -66,7 +65,7 @@ export default function RankProgressPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white overflow-hidden flex flex-col">
-      {/* Background Starry Effect (Simple CSS fallback) */}
+      {/* Background Starry Effect */}
       <div className="fixed inset-0 pointer-events-none opacity-30">
         <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse"></div>
         <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-white rounded-full animate-pulse delay-700"></div>
@@ -87,11 +86,11 @@ export default function RankProgressPage() {
       </header>
 
       <div className="flex-1 relative overflow-y-auto pb-40 pt-10 px-4">
-        {/* SVG Path Connector */}
+        {/* SVG Path Connector (Adjusted for tighter spacing) */}
         <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
-          <svg className="w-full max-w-md h-[1800px]" viewBox="0 0 100 1800" fill="none">
+          <svg className="w-full max-w-md h-[1200px]" viewBox="0 0 100 1200" fill="none">
             <motion.path
-              d="M 50 1700 Q 20 1600 20 1500 T 50 1300 T 80 1100 T 50 900 T 20 700 T 50 500 T 80 300 T 50 100"
+              d="M 50 1100 Q 20 1000 20 950 T 50 800 T 80 650 T 50 500 T 20 350 T 50 200 T 80 100 T 50 50"
               stroke="rgba(59, 130, 246, 0.3)"
               strokeWidth="2"
               strokeDasharray="10 10"
@@ -102,7 +101,7 @@ export default function RankProgressPage() {
           </svg>
         </div>
 
-        <div className="max-w-md mx-auto space-y-24 relative z-10 flex flex-col-reverse items-center">
+        <div className="max-w-md mx-auto space-y-16 relative z-10 flex flex-col-reverse items-center">
           {RANKS.map((rank, index) => {
             const isReached = totalXp >= rank.xp;
             const isCurrent = index === currentRankIndex;
@@ -114,18 +113,18 @@ export default function RankProgressPage() {
                 key={rank.xp}
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "-50px" }}
                 className="flex flex-col items-center relative w-full"
                 style={{ 
-                    left: rank.x === '50%' ? '0' : rank.x === '20%' ? '-30%' : '30%',
-                    marginBottom: '4rem'
+                    left: rank.x === '50%' ? '0' : rank.x === '20%' ? '-25%' : '25%',
+                    marginBottom: '2rem'
                 }}
               >
                 {/* Hexagon Node */}
                 <div 
                   onClick={() => handleLockedClick(rank)}
                   className={cn(
-                    "w-24 h-28 flex items-center justify-center cursor-pointer transition-all duration-500 relative group",
+                    "w-20 h-24 flex items-center justify-center cursor-pointer transition-all duration-500 relative group",
                     isReached ? "bg-gradient-to-br from-blue-500/40 to-indigo-600/40 border-2 border-blue-400/50 backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.3)]" : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
                     isCurrent && "current-rank scale-110 shadow-[0_0_40px_rgba(251,191,36,0.4)]"
                   )}
@@ -134,15 +133,11 @@ export default function RankProgressPage() {
                   }}
                 >
                   <div className="flex flex-col items-center gap-1">
-                    {isLocked ? (
-                      <Lock className="h-8 w-8 text-slate-400" />
-                    ) : (
-                      <Icon className={cn("h-10 w-10", isReached ? "text-white" : "text-slate-400")} />
-                    )}
+                    <Icon className={cn("h-8 w-8", isReached ? "text-white" : "text-slate-400/50")} />
                   </div>
 
                   {/* Corner Status Icon */}
-                  <div className="absolute bottom-4 right-4">
+                  <div className="absolute bottom-3 right-3">
                     {isReached && !isCurrent ? (
                       <CheckCircle2 className="h-4 w-4 text-green-400 fill-green-400/20" />
                     ) : isLocked ? (
@@ -152,17 +147,17 @@ export default function RankProgressPage() {
                 </div>
 
                 {/* Text Labels */}
-                <div className="mt-4 text-center">
+                <div className="mt-3 text-center">
                   <h3 className={cn(
-                    "text-xs font-black uppercase tracking-widest",
+                    "text-[10px] font-black uppercase tracking-widest",
                     isReached ? "text-white" : "text-slate-500"
                   )}>
                     {rank.title}
                   </h3>
                   {isCurrent && (
-                    <p className="text-[8px] font-black text-primary uppercase animate-pulse mt-1">You Are Here</p>
+                    <p className="text-[7px] font-black text-primary uppercase animate-pulse mt-0.5">You Are Here</p>
                   )}
-                  <p className="text-[10px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
+                  <p className="text-[9px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
                 </div>
               </motion.div>
             );
@@ -172,7 +167,7 @@ export default function RankProgressPage() {
 
       {/* Floating Bottom Progress Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0e1a] to-transparent pointer-events-none">
-        <div className="max-w-md mx-auto bg-slate-900/80 backdrop-blur-md border-2 border-white/5 p-4 rounded-2xl pointer-events-auto">
+        <div className="max-w-md mx-auto bg-slate-900/80 backdrop-blur-md border-2 border-white/5 p-4 rounded-2xl pointer-events-auto shadow-2xl">
           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest mb-2">
             <span className="text-slate-400">{totalXp} XP Collected</span>
             <span className="text-primary">{nextRank ? `${Math.round(progressToNext)}% to ${nextRank.title}` : 'Max Rank Reached'}</span>
