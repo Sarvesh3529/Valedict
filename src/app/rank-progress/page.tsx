@@ -25,15 +25,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useRef } from 'react';
 
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },   // Center Start
-  { xp: 500, title: 'Scout', icon: Zap, x: '30%' },         // Left Peak
-  { xp: 1200, title: 'Guardian', icon: Shield, x: '70%' },  // Right Peak
-  { xp: 2500, title: 'Vanguard', icon: Sword, x: '30%' },   // Left Peak
-  { xp: 3500, title: 'Elite', icon: Crown, x: '70%' },      // Right Peak
-  { xp: 4250, title: 'Champion', icon: Trophy, x: '30%' },  // Left Peak
-  { xp: 5000, title: 'Titan', icon: Hand, x: '70%' },       // Right Peak
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '30%' }, // Left Peak
-  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },  // Center Finish
+  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },   // Center
+  { xp: 500, title: 'Scout', icon: Zap, x: '25%' },         // Left
+  { xp: 1200, title: 'Guardian', icon: Shield, x: '75%' },  // Right
+  { xp: 2500, title: 'Vanguard', icon: Sword, x: '25%' },   // Left
+  { xp: 3500, title: 'Elite', icon: Crown, x: '75%' },      // Right
+  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%' },  // Left
+  { xp: 5000, title: 'Titan', icon: Hand, x: '75%' },       // Right
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '25%' }, // Left
+  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },  // Center
 ];
 
 export default function RankProgressPage() {
@@ -79,9 +79,9 @@ export default function RankProgressPage() {
       </div>
 
       <div className="relative z-10 flex flex-col lg:flex-row min-h-screen">
-        {/* LEFT PANEL: Hero Battle Card */}
-        <aside className="w-full lg:w-[350px] lg:fixed lg:left-0 lg:top-0 lg:h-screen p-6 flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent border-r border-white/5 backdrop-blur-sm overflow-y-auto items-center">
-          <div className="w-full mb-6">
+        {/* LEFT PANEL: Centered Hero Battle Card */}
+        <aside className="w-full lg:w-[400px] lg:fixed lg:left-0 lg:top-0 lg:h-screen p-6 flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent border-r border-white/5 backdrop-blur-sm items-center justify-center">
+          <div className="absolute top-6 left-6">
             <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full h-10 px-4">
               <Link href="/home">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -90,7 +90,7 @@ export default function RankProgressPage() {
             </Button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center space-y-6 w-full py-4">
+          <div className="flex flex-col items-center space-y-6 w-full py-4 max-w-sm">
             <div className="text-center space-y-1">
               <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">Active Ranking</p>
               <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight drop-shadow-2xl">
@@ -106,13 +106,11 @@ export default function RankProgressPage() {
             >
               <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/stars/400/600')] opacity-10 mix-blend-overlay"></div>
               <CurrentIcon className="w-24 h-24 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] z-10" />
-              
-              {/* Inner Gloss */}
               <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
             </motion.div>
 
             {/* XP Stats */}
-            <div className="w-full max-w-[240px] space-y-4">
+            <div className="w-full space-y-4">
               <div className="flex justify-between items-end">
                 <div className="space-y-0.5">
                   <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Total XP</p>
@@ -136,25 +134,25 @@ export default function RankProgressPage() {
 
             <Button 
               onClick={scrollToRoadmap}
-              className="w-full max-w-[240px] h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-2 shadow-xl bg-primary hover:bg-primary/90"
+              className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-2 shadow-xl bg-primary hover:bg-primary/90"
             >
-              View Roadmap
+              View All Ranks
               <ChevronDown className="ml-2 h-3 w-3 animate-bounce" />
             </Button>
           </div>
         </aside>
 
         {/* RIGHT PANEL: Roadmap Section */}
-        <main ref={roadmapRef} className="flex-1 lg:ml-[350px] relative pb-40 pt-10 px-6 md:px-16 overflow-x-hidden">
-          <div className="max-w-2xl mx-auto relative">
-            {/* SVG Path Connector (Adjusted for narrower amplitude) */}
+        <main ref={roadmapRef} className="flex-1 lg:ml-[400px] relative pb-40 pt-10 px-6 md:px-16">
+          <div className="max-w-xl mx-auto relative min-h-screen">
+            {/* SVG Path Connector (Passes directly through node centers) */}
             <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
-              <svg className="w-full max-w-md h-full min-h-[1000px]" viewBox="0 0 100 1000" fill="none" preserveAspectRatio="none">
+              <svg className="w-full h-full" viewBox="0 0 100 1000" fill="none" preserveAspectRatio="none">
                 <motion.path
-                  d="M 50 950 Q 30 900 30 850 T 70 750 T 30 650 T 70 550 T 30 450 T 70 350 T 30 250 T 50 150"
-                  stroke="rgba(251, 191, 36, 0.2)"
-                  strokeWidth="3"
-                  strokeDasharray="8 8"
+                  d="M 50 950 L 25 850 L 75 750 L 25 650 L 75 550 L 25 450 L 75 350 L 25 250 L 50 150"
+                  stroke="rgba(251, 191, 36, 0.3)"
+                  strokeWidth="4"
+                  strokeDasharray="10 10"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 2, ease: "easeInOut" }}
@@ -170,16 +168,19 @@ export default function RankProgressPage() {
                 const isLocked = !isReached;
                 const Icon = rank.icon;
 
+                // Map 'x' percentage to horizontal position
+                const horizontalClass = rank.x === '50%' ? 'translate-x-0' : rank.x === '25%' ? '-translate-x-[25%]' : 'translate-x-[25%]';
+
                 return (
                   <motion.div
                     key={rank.xp}
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    className="flex flex-col items-center relative w-full"
-                    style={{ 
-                        left: rank.x === '50%' ? '0' : rank.x === '30%' ? '-20%' : '20%'
-                    }}
+                    className={cn(
+                        "flex flex-col items-center relative w-full transition-transform duration-500",
+                        horizontalClass
+                    )}
                   >
                     {/* Hexagon Node */}
                     <div 
@@ -216,7 +217,7 @@ export default function RankProgressPage() {
                         {rank.title}
                       </h3>
                       {isCurrent && (
-                        <p className="text-[7px] font-black text-yellow-400 uppercase animate-pulse mt-0.5">You Are Here</p>
+                        <p className="text-[7px] font-black text-yellow-400 uppercase animate-pulse mt-0.5">Active Title</p>
                       )}
                       <p className="text-[9px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
                     </div>
