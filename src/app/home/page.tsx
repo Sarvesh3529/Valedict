@@ -74,7 +74,9 @@ export default async function HomePage() {
           />
         </div>
         <div className="col-span-1 h-full">
-          <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+          <Link href="/milestones" className="block h-full">
+            <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
+          </Link>
         </div>
         
         <Link href="/leaderboard" className="group h-full col-span-2 md:col-span-1">
