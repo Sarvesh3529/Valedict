@@ -15,25 +15,29 @@ import {
   Zap,
   Infinity as InfinityIcon,
   Sparkles,
-  Binoculars,
+  Compass,
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-// Custom SVG Icon for Wanderer (Hiking Boot style)
-const WandererIcon = ({ className }: { className?: string }) => (
+// Custom SVG Icon for Scout (Shoe with wings at the back)
+const WingedShoeIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M4 16v-2a2 2 0 0 1 2-2h2l3 3h3a2 2 0 0 1 2 2v3a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-1H6a2 2 0 0 0-2 2" />
-    <path d="M9 12V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3" />
-    <path d="M12 16h.01" />
+    {/* Shoe body */}
+    <path d="M8 17v-2a2 2 0 0 1 2-2h2l3 3h3a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1h-6a2 2 0 0 1-2-2z" />
+    <path d="M13 13V10a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3" />
+    {/* Wings at the back (heel) */}
+    <path d="M7 14c-2-1-4-1-6 1" />
+    <path d="M6 12c-2-1-4-1-6 1" />
+    <path d="M5 10c-2-1-4-1-6 1" />
   </svg>
 );
 
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: WandererIcon, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/50' },
-  { xp: 500, title: 'Scout', icon: Binoculars, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50' },
+  { xp: 100, title: 'Wanderer', icon: Compass, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/50' },
+  { xp: 500, title: 'Scout', icon: WingedShoeIcon, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50' },
   { xp: 1200, title: 'Guardian', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/50' },
   { xp: 2500, title: 'Vanguard', icon: Sword, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50' },
   { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
