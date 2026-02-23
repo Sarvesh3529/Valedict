@@ -72,6 +72,17 @@
   }
 }
 
+@keyframes pulse-aura {
+  0% { box-shadow: 0 0 0 0px rgba(255, 165, 0, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(255, 165, 0, 0); }
+  100% { box-shadow: 0 0 0 0px rgba(255, 165, 0, 0); }
+}
+
+.current-rank { 
+  animation: pulse-aura 2s infinite; 
+  border: 2px solid #fbbf24 !important; 
+}
+
 .segmented-progress-item {
   @apply h-8 w-full rounded-md transition-all duration-500;
 }

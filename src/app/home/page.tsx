@@ -74,7 +74,7 @@ export default async function HomePage() {
           />
         </div>
         <div className="col-span-1 h-full">
-          <Link href="/milestones" className="block h-full">
+          <Link href="/rank-progress" className="block h-full">
             <WeeklyProgressChart weeklyXp={profile.weeklyxp || 0} />
           </Link>
         </div>
