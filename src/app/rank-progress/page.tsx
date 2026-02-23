@@ -3,51 +3,45 @@
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { 
-  ArrowLeft, 
-  Lock, 
-  CheckCircle2, 
-  Compass, 
-  Zap, 
-  Shield, 
-  Sword, 
-  Crown, 
-  Trophy, 
-  Hand, 
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  ArrowLeft,
+  Lock,
+  CheckCircle2,
+  Compass,
+  Zap,
+  Shield,
+  Sword,
+  Crown,
+  Trophy,
+  Hand,
   Infinity as InfinityIcon,
   Sparkles,
-  ChevronDown
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { useRef } from 'react';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-// Coordinates are in % relative to the roadmap container
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%', y: '92%' },   // Start (Center)
-  { xp: 500, title: 'Scout', icon: Zap, x: '25%', y: '82%' },         // Left Peak
-  { xp: 1200, title: 'Guardian', icon: Shield, x: '75%', y: '72%' },  // Right Peak
-  { xp: 2500, title: 'Vanguard', icon: Sword, x: '25%', y: '62%' },   // Left Peak
-  { xp: 3500, title: 'Elite', icon: Crown, x: '75%', y: '52%' },      // Right Peak
-  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%', y: '42%' },  // Left Peak
-  { xp: 5000, title: 'Titan', icon: Hand, x: '75%', y: '32%' },       // Right Peak
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '25%', y: '22%' }, // Left Peak
-  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%', y: '12%' },  // Finish (Center)
+  { xp: 100, title: 'Wanderer', icon: Compass },
+  { xp: 500, title: 'Scout', icon: Zap },
+  { xp: 1200, title: 'Guardian', icon: Shield },
+  { xp: 2500, title: 'Vanguard', icon: Sword },
+  { xp: 3500, title: 'Elite', icon: Crown },
+  { xp: 4250, title: 'Champion', icon: Trophy },
+  { xp: 5000, title: 'Titan', icon: Hand },
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon },
+  { xp: 10000, title: 'Mythic', icon: Sparkles },
 ];
 
 export default function RankProgressPage() {
   const { profile } = useAuth();
-  const { toast } = useToast();
-  const roadmapRef = useRef<HTMLDivElement>(null);
   const totalXp = profile?.totalxp || 0;
 
   const currentRankIndex = RANKS.findLastIndex((r) => totalXp >= r.xp);
-
-  const nextRank = RANKS[currentRankIndex + 1] || null;
   const currentRankData = currentRankIndex === -1 ? { title: 'Beginner', xp: 0, icon: Compass } : RANKS[currentRankIndex];
-  const CurrentIcon = currentRankData.icon;
+  const nextRank = RANKS[currentRankIndex + 1] || null;
 
   let progressToNext = 0;
   if (nextRank) {
@@ -57,186 +51,159 @@ export default function RankProgressPage() {
     progressToNext = Math.min((progress / range) * 100, 100);
   }
 
-  const handleLockedClick = (rank: typeof RANKS[0]) => {
-    if (totalXp < rank.xp) {
-      toast({
-        title: "Rank Locked",
-        description: `Earn ${rank.xp - totalXp} more XP to unlock the ${rank.title} title!`,
-      });
-    }
-  };
-
-  const scrollToRoadmap = () => {
-    roadmapRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0e1a] text-white flex flex-col">
       {/* Starry Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-30 z-0">
+      <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
         <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse"></div>
         <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-white rounded-full animate-pulse delay-700"></div>
         <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-white rounded-full animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative z-10 flex flex-col lg:flex-row min-h-screen">
-        {/* LEFT PANEL: Hero Battle Card Section */}
-        <aside className="w-full lg:w-[400px] lg:fixed lg:left-0 lg:top-0 lg:h-screen p-6 flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent border-r border-white/5 backdrop-blur-sm items-center justify-center">
-          <div className="absolute top-6 left-6">
-            <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full h-10 px-4">
-              <Link href="/home">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Exit Journey
-              </Link>
-            </Button>
-          </div>
+      {/* Header Area */}
+      <div className="relative z-10 p-4 md:p-6 flex items-center justify-between">
+        <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full h-10 px-4">
+          <Link href="/home">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
+        <div className="text-right">
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Academic Journey</p>
+          <h1 className="text-lg md:text-xl font-black uppercase tracking-tight">Rank Progress</h1>
+        </div>
+      </div>
 
-          <div className="flex flex-col items-center space-y-6 w-full py-4 max-w-sm">
-            <div className="text-center space-y-1">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">Active Ranking</p>
-              <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight drop-shadow-2xl">
-                {currentRankData.title}
-              </h1>
+      <div className="relative z-10 flex-1 flex flex-col items-center px-4 max-w-6xl mx-auto w-full space-y-8 pb-12">
+        {/* HERO RANK CARD: Prominent top section */}
+        <Card className="w-full bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
+          <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
+            <div className="relative flex-shrink-0">
+              <div className={cn(
+                "w-24 h-24 md:w-32 md:h-32 rounded-[2rem] flex items-center justify-center bg-primary/20 border-2 border-primary/30",
+                "shadow-[0_0_40px_rgba(59,130,246,0.3)] relative group"
+              )}>
+                <currentRankData.icon className="w-12 h-12 md:w-16 md:h-16 text-primary drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                <div className="absolute inset-0 rounded-[inherit] border border-white/10 group-hover:border-primary/50 transition-colors"></div>
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-yellow-500 text-black text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-lg">
+                Active
+              </div>
             </div>
 
-            {/* Battle Card Graphic */}
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="relative w-52 h-64 flex items-center justify-center rounded-[2rem] border-4 border-yellow-500/30 bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl shadow-[0_0_40px_rgba(251,191,36,0.15)] group overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/stars/400/600')] opacity-10 mix-blend-overlay"></div>
-              <CurrentIcon className="w-24 h-24 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] z-10" />
-              <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-            </motion.div>
+            <div className="flex-1 space-y-4 text-center md:text-left w-full">
+              <div className="space-y-1">
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">
+                  {currentRankData.title}
+                </h2>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                  <span className="text-[10px] font-black bg-white/10 px-3 py-1 rounded-full uppercase tracking-widest text-white/70">
+                    Tier {currentRankIndex + 2}
+                  </span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">
+                    {totalXp} Total XP
+                  </span>
+                </div>
+              </div>
 
-            {/* XP Stats */}
-            <div className="w-full space-y-4">
-              <div className="flex justify-between items-end">
-                <div className="space-y-0.5">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Total XP</p>
-                  <p className="text-2xl font-black tabular-nums">{totalXp}</p>
+              <div className="space-y-3">
+                <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  <span>Current Progress</span>
+                  {nextRank && <span>Goal: {nextRank.xp} XP</span>}
+                </div>
+                <div className="relative">
+                  <Progress value={progressToNext} className="h-4 bg-white/5 border border-white/5 rounded-full" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse rounded-full pointer-events-none"></div>
                 </div>
                 {nextRank && (
-                  <div className="text-right space-y-0.5">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-primary">Next Rank</p>
-                    <p className="text-[10px] font-bold text-slate-400">{nextRank.title}</p>
-                  </div>
+                  <p className="text-[10px] font-bold text-primary uppercase tracking-tighter text-center md:text-left">
+                    Earn {nextRank.xp - totalXp} more XP to reach the next milestone!
+                  </p>
                 )}
               </div>
-              
-              <div className="space-y-2">
-                <Progress value={progressToNext} className="h-2 bg-slate-800" />
-                <p className="text-center text-[8px] font-bold text-slate-500 uppercase tracking-tighter">
-                  {nextRank ? `${nextRank.xp - totalXp} XP until ${nextRank.title}` : 'Peak level achieved'}
-                </p>
-              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <Button 
-              onClick={scrollToRoadmap}
-              className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-2 shadow-xl bg-primary hover:bg-primary/90"
-            >
-              View Expedition Map
-              <ChevronDown className="ml-2 h-3 w-3 animate-bounce" />
-            </Button>
+        {/* HORIZONTAL ROADMAP */}
+        <div className="w-full space-y-6">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Expedition Path</h3>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Scroll to explore &rarr;</span>
           </div>
-        </aside>
-
-        {/* RIGHT PANEL: Vertical Roadmap Section */}
-        <main ref={roadmapRef} className="flex-1 lg:ml-[400px] relative">
-          <div className="max-w-2xl mx-auto relative min-h-[1200px] py-20 px-6 md:px-16">
-            
-            {/* SVG Path Connector - Adjusted with translateX for perfect vertex centering */}
-            <div className="absolute inset-0 z-0 pointer-events-none py-20">
-              <svg 
-                className="w-full h-full overflow-visible" 
-                viewBox="0 0 100 100" 
-                fill="none" 
-                preserveAspectRatio="none"
-                style={{ transform: 'translateX(0.2%)' }} // Sub-pixel shift for absolute centering
-              >
-                <motion.path
-                  d="M 50 92 L 25 82 L 75 72 L 25 62 L 75 52 L 25 42 L 75 32 L 25 22 L 50 12"
-                  stroke="rgba(251, 191, 36, 0.25)"
-                  strokeWidth="0.5"
-                  strokeDasharray="1 1"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 2, ease: "easeInOut" }}
-                />
-              </svg>
-            </div>
-
-            {/* Expedition Path Nodes */}
-            <div className="relative w-full h-full z-10 min-h-[1000px]">
+          
+          <ScrollArea className="w-full whitespace-nowrap rounded-[2.5rem] border-2 border-white/5 bg-white/5 backdrop-blur-md">
+            <div className="flex items-center space-x-16 md:space-x-24 min-w-max p-10 md:p-16">
               {RANKS.map((rank, index) => {
                 const isReached = totalXp >= rank.xp;
                 const isCurrent = index === currentRankIndex;
-                const isLocked = !isReached;
                 const Icon = rank.icon;
 
                 return (
-                  <motion.div
-                    key={rank.xp}
-                    style={{
-                        position: 'absolute',
-                        left: rank.x,
-                        top: rank.y,
-                        transform: 'translate(-50%, -50%)',
-                    }}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center group"
-                  >
-                    {/* Hexagon Node */}
-                    <div 
-                      onClick={() => handleLockedClick(rank)}
+                  <div key={rank.xp} className="flex flex-col items-center space-y-6 relative group">
+                    {/* Connecting Line */}
+                    {index < RANKS.length - 1 && (
+                      <div className={cn(
+                        "absolute top-10 left-1/2 w-full h-[2px] z-0 pointer-events-none",
+                        isReached && totalXp >= RANKS[index+1].xp 
+                          ? "bg-primary" 
+                          : "bg-white/10 border-t-2 border-dashed border-white/20"
+                      )} style={{ width: 'calc(100% + 4rem)' }}></div>
+                    )}
+
+                    {/* Milestone Node */}
+                    <motion.div
+                      whileHover={{ scale: 1.1, y: -5 }}
                       className={cn(
-                        "w-20 h-24 flex items-center justify-center cursor-pointer transition-all duration-500 relative",
+                        "w-20 h-20 md:w-24 md:h-24 rounded-3xl flex items-center justify-center relative z-10 transition-all duration-500",
                         isReached 
-                            ? "bg-gradient-to-br from-yellow-500/40 to-orange-600/40 border-2 border-yellow-400/50 backdrop-blur-xl shadow-[0_0_25px_rgba(251,191,36,0.3)]" 
-                            : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
-                        isCurrent && "current-rank scale-110 shadow-[0_0_40px_rgba(251,191,36,0.6)]"
+                          ? "bg-primary text-primary-foreground shadow-[0_0_30px_rgba(var(--primary),0.4)]" 
+                          : "bg-slate-800 text-muted-foreground border-2 border-white/5 grayscale"
                       )}
-                      style={{
-                        clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
-                      }}
                     >
-                      <div className="flex flex-col items-center gap-1">
-                        <Icon className={cn("h-8 w-8", isReached ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "text-slate-400/50")} />
-                      </div>
+                      <Icon className={cn("w-10 h-10 md:w-12 md:h-12", !isReached && "opacity-20")} />
+                      
+                      {/* Status Indicators */}
+                      {!isReached && (
+                        <div className="absolute -top-3 -right-3 bg-slate-900 p-2 rounded-xl border-2 border-white/10 shadow-xl">
+                          <Lock className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      )}
+                      
+                      {isReached && !isCurrent && (
+                        <div className="absolute -bottom-3 -right-3 bg-green-500 p-2 rounded-xl shadow-xl">
+                          <CheckCircle2 className="w-4 h-4 text-white" />
+                        </div>
+                      )}
 
-                      {/* Corner Status Icon */}
-                      <div className="absolute bottom-3 right-3">
-                        {isReached && !isCurrent ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-400 fill-green-400/20" />
-                        ) : isLocked ? (
-                          <Lock className="h-3 w-3 text-slate-500" />
-                        ) : null}
-                      </div>
-                    </div>
+                      {/* Pulsing Aura for Current Rank */}
+                      {isCurrent && (
+                        <div className="absolute -inset-3 border-2 border-yellow-500/50 rounded-[2rem] animate-pulse"></div>
+                      )}
+                    </motion.div>
 
-                    {/* Text Labels - Positioned below the node center */}
-                    <div className="absolute top-24 text-center whitespace-nowrap">
-                      <h3 className={cn(
-                        "text-[10px] font-black uppercase tracking-widest",
-                        isReached ? "text-white" : "text-slate-500"
+                    {/* Label Section */}
+                    <div className="text-center space-y-1">
+                      <h4 className={cn(
+                        "text-[11px] font-black uppercase tracking-widest",
+                        isReached ? "text-white" : "text-muted-foreground"
                       )}>
                         {rank.title}
-                      </h3>
-                      {isCurrent && (
-                        <p className="text-[7px] font-black text-yellow-400 uppercase animate-pulse mt-0.5">Active</p>
-                      )}
-                      <p className="text-[9px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
+                      </h4>
+                      <p className={cn(
+                        "text-[10px] font-bold uppercase",
+                        isReached ? "text-primary" : "text-slate-600"
+                      )}>
+                        {rank.xp} XP
+                      </p>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
-          </div>
-        </main>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </div>
     </div>
   );
