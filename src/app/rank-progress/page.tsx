@@ -26,13 +26,13 @@ import { useRef } from 'react';
 
 const RANKS = [
   { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },   // Center Start
-  { xp: 500, title: 'Scout', icon: Zap, x: '25%' },         // Left Peak
-  { xp: 1200, title: 'Guardian', icon: Shield, x: '75%' },  // Right Peak
-  { xp: 2500, title: 'Vanguard', icon: Sword, x: '25%' },   // Left Peak
-  { xp: 3500, title: 'Elite', icon: Crown, x: '75%' },      // Right Peak
-  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%' },  // Left Peak
-  { xp: 5000, title: 'Titan', icon: Hand, x: '75%' },       // Right Peak
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '25%' }, // Left Peak
+  { xp: 500, title: 'Scout', icon: Zap, x: '30%' },         // Left Peak
+  { xp: 1200, title: 'Guardian', icon: Shield, x: '70%' },  // Right Peak
+  { xp: 2500, title: 'Vanguard', icon: Sword, x: '30%' },   // Left Peak
+  { xp: 3500, title: 'Elite', icon: Crown, x: '70%' },      // Right Peak
+  { xp: 4250, title: 'Champion', icon: Trophy, x: '30%' },  // Left Peak
+  { xp: 5000, title: 'Titan', icon: Hand, x: '70%' },       // Right Peak
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '30%' }, // Left Peak
   { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },  // Center Finish
 ];
 
@@ -145,13 +145,13 @@ export default function RankProgressPage() {
         </aside>
 
         {/* RIGHT PANEL: Roadmap Section */}
-        <main ref={roadmapRef} className="flex-1 lg:ml-[350px] relative pb-40 pt-10 px-4 md:px-10">
+        <main ref={roadmapRef} className="flex-1 lg:ml-[350px] relative pb-40 pt-10 px-6 md:px-16 overflow-x-hidden">
           <div className="max-w-2xl mx-auto relative">
-            {/* SVG Path Connector (Smoothed to hit peaks precisely) */}
+            {/* SVG Path Connector (Adjusted for narrower amplitude) */}
             <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
               <svg className="w-full max-w-md h-full min-h-[1000px]" viewBox="0 0 100 1000" fill="none" preserveAspectRatio="none">
                 <motion.path
-                  d="M 50 950 Q 25 900 25 850 T 75 750 T 25 650 T 75 550 T 25 450 T 75 350 T 25 250 T 50 150"
+                  d="M 50 950 Q 30 900 30 850 T 70 750 T 30 650 T 70 550 T 30 450 T 70 350 T 30 250 T 50 150"
                   stroke="rgba(251, 191, 36, 0.2)"
                   strokeWidth="3"
                   strokeDasharray="8 8"
@@ -178,7 +178,7 @@ export default function RankProgressPage() {
                     viewport={{ once: true, margin: "-50px" }}
                     className="flex flex-col items-center relative w-full"
                     style={{ 
-                        left: rank.x === '50%' ? '0' : rank.x === '25%' ? '-25%' : '25%'
+                        left: rank.x === '50%' ? '0' : rank.x === '30%' ? '-20%' : '20%'
                     }}
                   >
                     {/* Hexagon Node */}
