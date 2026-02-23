@@ -25,15 +25,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useRef } from 'react';
 
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },   // Center
-  { xp: 500, title: 'Scout', icon: Zap, x: '25%' },         // Left
-  { xp: 1200, title: 'Guardian', icon: Shield, x: '50%' },  // Center
-  { xp: 2500, title: 'Vanguard', icon: Sword, x: '75%' },   // Right
-  { xp: 3500, title: 'Elite', icon: Crown, x: '50%' },      // Center
-  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%' },  // Left
-  { xp: 5000, title: 'Titan', icon: Hand, x: '50%' },       // Center
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '75%' }, // Right
-  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },  // Center
+  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },   // Center Start
+  { xp: 500, title: 'Scout', icon: Zap, x: '25%' },         // Left Peak
+  { xp: 1200, title: 'Guardian', icon: Shield, x: '75%' },  // Right Peak
+  { xp: 2500, title: 'Vanguard', icon: Sword, x: '25%' },   // Left Peak
+  { xp: 3500, title: 'Elite', icon: Crown, x: '75%' },      // Right Peak
+  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%' },  // Left Peak
+  { xp: 5000, title: 'Titan', icon: Hand, x: '75%' },       // Right Peak
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '25%' }, // Left Peak
+  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },  // Center Finish
 ];
 
 export default function RankProgressPage() {
@@ -147,11 +147,11 @@ export default function RankProgressPage() {
         {/* RIGHT PANEL: Roadmap Section */}
         <main ref={roadmapRef} className="flex-1 lg:ml-[350px] relative pb-40 pt-10 px-4 md:px-10">
           <div className="max-w-2xl mx-auto relative">
-            {/* SVG Path Connector (Compressed Sine Wave) */}
+            {/* SVG Path Connector (Smoothed to hit peaks precisely) */}
             <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
               <svg className="w-full max-w-md h-full min-h-[1000px]" viewBox="0 0 100 1000" fill="none" preserveAspectRatio="none">
                 <motion.path
-                  d="M 50 950 Q 25 900 25 850 T 50 750 T 75 650 T 50 550 T 25 450 T 50 350 T 75 250 T 50 150"
+                  d="M 50 950 Q 25 900 25 850 T 75 750 T 25 650 T 75 550 T 25 450 T 75 350 T 25 250 T 50 150"
                   stroke="rgba(251, 191, 36, 0.2)"
                   strokeWidth="3"
                   strokeDasharray="8 8"
@@ -162,7 +162,7 @@ export default function RankProgressPage() {
               </svg>
             </div>
 
-            {/* Reduced vertical distance with space-y-12 */}
+            {/* Expedition Path Nodes */}
             <div className="space-y-12 relative z-10 flex flex-col-reverse items-center pt-10">
               {RANKS.map((rank, index) => {
                 const isReached = totalXp >= rank.xp;
