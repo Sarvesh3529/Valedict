@@ -31,8 +31,8 @@ const RANKS = [
   { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
   { xp: 4250, title: 'Champion', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/50' },
   { xp: 5000, title: 'Titan', icon: Zap, color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50' },
-  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
-  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50' },
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50' },
+  { xp: 10000, title: 'Mythic', icon: Sparkles, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
 ];
 
 export default function RankProgressPage() {
@@ -65,20 +65,20 @@ export default function RankProgressPage() {
         <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full h-10 px-4">
           <Link href="/home">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
+            Back
           </Link>
         </Button>
         <div className="text-right">
-          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Academic Journey</p>
-          <h1 className="text-lg md:text-xl font-black uppercase tracking-tight">Rank Progress</h1>
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Academy</p>
+          <h1 className="text-lg md:text-xl font-black uppercase tracking-tight">Rank Journey</h1>
         </div>
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 gap-8 pb-12">
         
-        {/* HERO RANK CARD - Now at the Top */}
-        <div className="w-full flex justify-center">
-          <Card className="w-full max-w-4xl bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
+        {/* HERO RANK CARD - Centered with 1/4 spacing on sides (w-1/2 on desktop) */}
+        <div className="w-full flex justify-center mt-4">
+          <Card className="w-full md:w-1/2 bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
             <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
               <div className="relative flex-shrink-0">
                 <div className={cn(
@@ -96,7 +96,7 @@ export default function RankProgressPage() {
                   </h2>
                   <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                       <p className="text-xs font-black text-primary uppercase tracking-widest">
-                          {totalXp} Total XP Collected
+                          {totalXp} XP
                       </p>
                       <span className="hidden md:block text-white/20">|</span>
                       <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -107,8 +107,8 @@ export default function RankProgressPage() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                    <span>Current Progress</span>
-                    {nextRank && <span>{totalXp} / {nextRank.xp} XP to {nextRank.title}</span>}
+                    <span>Progress</span>
+                    {nextRank && <span>{totalXp} / {nextRank.xp} XP</span>}
                   </div>
                   <Progress value={progressToNext} className="h-4 bg-white/5 border border-white/5 rounded-full" />
                 </div>
@@ -120,9 +120,9 @@ export default function RankProgressPage() {
         {/* HORIZONTAL EXPEDITION PATH */}
         <div className="w-full space-y-6 pt-4">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Expedition Path</h3>
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Expedition Map</h3>
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                Scroll to explore <span className="animate-bounce-x">&rarr;</span>
+                Scroll &rarr;
             </span>
           </div>
           
@@ -186,7 +186,7 @@ export default function RankProgressPage() {
                         "text-[10px] md:text-xs font-bold uppercase",
                         isReached ? rank.color : "text-slate-600"
                       )}>
-                        {isReached ? 'Reached' : `${rank.xp} XP Required`}
+                        {isReached ? 'Reached' : `${rank.xp} XP`}
                       </p>
                     </div>
                   </div>
