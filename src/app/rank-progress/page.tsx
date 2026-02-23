@@ -1,25 +1,38 @@
+
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Lock, CheckCircle2, Star, Map, Binoculars, ShieldCheck, Sword, Gem, Trophy, Mountain, Infinity, Zap } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Lock, 
+  CheckCircle2, 
+  Compass, 
+  Zap, 
+  Shield, 
+  Sword, 
+  Crown, 
+  Trophy, 
+  Hand, 
+  Infinity as InfinityIcon,
+  Sparkles
+} from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Map },
-  { xp: 500, title: 'Scout', icon: Binoculars },
-  { xp: 1200, title: 'Guardian', icon: ShieldCheck },
-  { xp: 2500, title: 'Vanguard', icon: Sword },
-  { xp: 3500, title: 'Elite', icon: Gem },
-  { xp: 4250, title: 'Champion', icon: Trophy },
-  { xp: 5000, title: 'Titan', icon: Mountain },
-  { xp: 7500, title: 'Immortal', icon: Infinity },
-  { xp: 10000, title: 'Mythic', icon: Zap },
+  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },
+  { xp: 500, title: 'Scout', icon: Zap, x: '20%' },
+  { xp: 1200, title: 'Guardian', icon: Shield, x: '20%' },
+  { xp: 2500, title: 'Vanguard', icon: Sword, x: '50%' },
+  { xp: 3500, title: 'Elite', icon: Crown, x: '80%' },
+  { xp: 4250, title: 'Champion', icon: Trophy, x: '50%' },
+  { xp: 5000, title: 'Titan', icon: Hand, x: '80%' },
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '20%' },
+  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },
 ];
 
 export default function RankProgressPage() {
@@ -27,16 +40,14 @@ export default function RankProgressPage() {
   const { toast } = useToast();
   const totalXp = profile?.totalxp || 0;
 
-  // Find current rank index
   const currentRankIndex = RANKS.findIndex((r, i) => {
     const nextRank = RANKS[i + 1];
     return totalXp >= r.xp && (!nextRank || totalXp < nextRank.xp);
   });
 
-  const currentRank = currentRankIndex === -1 ? { title: 'Beginner', xp: 0 } : RANKS[currentRankIndex];
   const nextRank = RANKS[currentRankIndex + 1] || null;
+  const currentRankData = currentRankIndex === -1 ? { title: 'Beginner', xp: 0 } : RANKS[currentRankIndex];
 
-  // Calculate progress to next rank
   let progressToNext = 0;
   if (nextRank) {
     const range = nextRank.xp - (currentRankIndex === -1 ? 0 : RANKS[currentRankIndex].xp);
@@ -54,52 +65,44 @@ export default function RankProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Dynamic Header / Hero Card */}
-      <div className="container max-w-4xl mx-auto px-4 pt-8 md:pt-12 space-y-6">
-        <Button asChild variant="ghost" size="sm" className="rounded-full">
-          <Link href="/home">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </Button>
-
-        <Card className="border-4 border-primary/20 bg-secondary/10 overflow-hidden rounded-[2.5rem] relative">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <Star className="h-32 w-32" />
-          </div>
-          <CardContent className="p-8 md:p-12">
-            <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
-              <div className="h-24 w-24 rounded-full bg-primary/20 flex items-center justify-center border-4 border-primary/30">
-                <Star className="h-12 w-12 text-primary" />
-              </div>
-              <div className="text-center md:text-left space-y-2">
-                <h1 className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground">
-                  Expedition Hero
-                </h1>
-                <h2 className="text-4xl md:text-5xl font-black tracking-tight uppercase">
-                  {profile?.username}
-                </h2>
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                  <span className="px-4 py-1 rounded-full bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest">
-                    {currentRank.title}
-                  </span>
-                  <span className="text-lg font-bold text-muted-foreground">
-                    {totalXp} Total XP
-                  </span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-[#0a0e1a] text-white overflow-hidden flex flex-col">
+      {/* Background Starry Effect (Simple CSS fallback) */}
+      <div className="fixed inset-0 pointer-events-none opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse"></div>
+        <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-white rounded-full animate-pulse delay-700"></div>
+        <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-white rounded-full animate-pulse delay-1000"></div>
       </div>
 
-      {/* Vertical Expedition Roadmap */}
-      <div className="relative mt-16 max-w-lg mx-auto px-4">
-        {/* The Curved Path (Simplified centered line) */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 border-l-4 border-dashed border-muted/30 pointer-events-none" />
+      <header className="relative z-20 p-4 md:p-8 flex items-center justify-between">
+        <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full">
+          <Link href="/home">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Link>
+        </Button>
+        <div className="text-right">
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary/80">Current Title</p>
+          <h2 className="text-xl font-black uppercase tracking-tight text-white">{currentRankData.title}</h2>
+        </div>
+      </header>
 
-        <div className="space-y-24 relative pb-20">
+      <div className="flex-1 relative overflow-y-auto pb-40 pt-10 px-4">
+        {/* SVG Path Connector */}
+        <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
+          <svg className="w-full max-w-md h-[1800px]" viewBox="0 0 100 1800" fill="none">
+            <motion.path
+              d="M 50 1700 Q 20 1600 20 1500 T 50 1300 T 80 1100 T 50 900 T 20 700 T 50 500 T 80 300 T 50 100"
+              stroke="rgba(59, 130, 246, 0.3)"
+              strokeWidth="2"
+              strokeDasharray="10 10"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 2, ease: "easeInOut" }}
+            />
+          </svg>
+        </div>
+
+        <div className="max-w-md mx-auto space-y-24 relative z-10 flex flex-col-reverse items-center">
           {RANKS.map((rank, index) => {
             const isReached = totalXp >= rank.xp;
             const isCurrent = index === currentRankIndex;
@@ -109,57 +112,75 @@ export default function RankProgressPage() {
             return (
               <motion.div
                 key={rank.xp}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="flex flex-col items-center"
+                className="flex flex-col items-center relative w-full"
+                style={{ 
+                    left: rank.x === '50%' ? '0' : rank.x === '20%' ? '-30%' : '30%',
+                    marginBottom: '4rem'
+                }}
               >
+                {/* Hexagon Node */}
                 <div 
                   onClick={() => handleLockedClick(rank)}
                   className={cn(
-                    "relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center cursor-pointer transition-all duration-500",
-                    isReached ? "glass-card bg-gradient-to-br from-yellow-400/40 to-orange-500/40 border-2" : "bg-slate-200 dark:bg-slate-800 grayscale border-2 border-slate-300 dark:border-slate-700",
-                    isCurrent && "current-rank scale-110"
+                    "w-24 h-28 flex items-center justify-center cursor-pointer transition-all duration-500 relative group",
+                    isReached ? "bg-gradient-to-br from-blue-500/40 to-indigo-600/40 border-2 border-blue-400/50 backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.3)]" : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
+                    isCurrent && "current-rank scale-110 shadow-[0_0_40px_rgba(251,191,36,0.4)]"
                   )}
+                  style={{
+                    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
+                  }}
                 >
-                  {isLocked ? (
-                    <Lock className="h-8 w-8 text-muted-foreground" />
-                  ) : (
-                    <Icon className={cn("h-10 w-10", isReached ? "text-yellow-500" : "text-muted-foreground")} />
-                  )}
-                  
-                  {isReached && !isCurrent && (
-                    <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1 border-2 border-background">
-                      <CheckCircle2 className="h-4 w-4 text-white" />
-                    </div>
-                  )}
+                  <div className="flex flex-col items-center gap-1">
+                    {isLocked ? (
+                      <Lock className="h-8 w-8 text-slate-400" />
+                    ) : (
+                      <Icon className={cn("h-10 w-10", isReached ? "text-white" : "text-slate-400")} />
+                    )}
+                  </div>
+
+                  {/* Corner Status Icon */}
+                  <div className="absolute bottom-4 right-4">
+                    {isReached && !isCurrent ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-400 fill-green-400/20" />
+                    ) : isLocked ? (
+                      <Lock className="h-3 w-3 text-slate-500" />
+                    ) : null}
+                  </div>
                 </div>
 
+                {/* Text Labels */}
                 <div className="mt-4 text-center">
                   <h3 className={cn(
-                    "text-xl font-black uppercase tracking-tight",
-                    isReached ? "text-foreground" : "text-muted-foreground"
+                    "text-xs font-black uppercase tracking-widest",
+                    isReached ? "text-white" : "text-slate-500"
                   )}>
                     {rank.title}
                   </h3>
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                    {rank.xp} XP
-                  </p>
+                  {isCurrent && (
+                    <p className="text-[8px] font-black text-primary uppercase animate-pulse mt-1">You Are Here</p>
+                  )}
+                  <p className="text-[10px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
                 </div>
-
-                {/* Progress Bar under Current Rank */}
-                {isCurrent && nextRank && (
-                  <div className="w-64 mt-6 space-y-2 animate-in fade-in slide-in-from-top-4 duration-700">
-                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                      <span className="text-primary">Next: {nextRank.title}</span>
-                      <span>{Math.round(progressToNext)}%</span>
-                    </div>
-                    <Progress value={progressToNext} className="h-3 border-2 border-primary/10 shadow-sm" />
-                  </div>
-                )}
               </motion.div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Floating Bottom Progress Bar */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0e1a] to-transparent pointer-events-none">
+        <div className="max-w-md mx-auto bg-slate-900/80 backdrop-blur-md border-2 border-white/5 p-4 rounded-2xl pointer-events-auto">
+          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest mb-2">
+            <span className="text-slate-400">{totalXp} XP Collected</span>
+            <span className="text-primary">{nextRank ? `${Math.round(progressToNext)}% to ${nextRank.title}` : 'Max Rank Reached'}</span>
+          </div>
+          <Progress value={progressToNext} className="h-2 bg-slate-800" />
+          <p className="text-center text-[8px] text-slate-500 mt-2 font-bold uppercase tracking-tighter">
+            {nextRank ? `${nextRank.xp - totalXp} XP until next milestone` : 'You have reached the ultimate peak!'}
+          </p>
         </div>
       </div>
     </div>
