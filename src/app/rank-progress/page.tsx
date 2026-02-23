@@ -24,16 +24,17 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useRef } from 'react';
 
+// Coordinates are in % relative to the roadmap container
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%' },   // Center
-  { xp: 500, title: 'Scout', icon: Zap, x: '25%' },         // Left
-  { xp: 1200, title: 'Guardian', icon: Shield, x: '75%' },  // Right
-  { xp: 2500, title: 'Vanguard', icon: Sword, x: '25%' },   // Left
-  { xp: 3500, title: 'Elite', icon: Crown, x: '75%' },      // Right
-  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%' },  // Left
-  { xp: 5000, title: 'Titan', icon: Hand, x: '75%' },       // Right
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '25%' }, // Left
-  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%' },  // Center
+  { xp: 100, title: 'Wanderer', icon: Compass, x: '50%', y: '92%' },   // Start (Center)
+  { xp: 500, title: 'Scout', icon: Zap, x: '25%', y: '82%' },         // Left Peak
+  { xp: 1200, title: 'Guardian', icon: Shield, x: '75%', y: '72%' },  // Right Peak
+  { xp: 2500, title: 'Vanguard', icon: Sword, x: '25%', y: '62%' },   // Left Peak
+  { xp: 3500, title: 'Elite', icon: Crown, x: '75%', y: '52%' },      // Right Peak
+  { xp: 4250, title: 'Champion', icon: Trophy, x: '25%', y: '42%' },  // Left Peak
+  { xp: 5000, title: 'Titan', icon: Hand, x: '75%', y: '32%' },       // Right Peak
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, x: '25%', y: '22%' }, // Left Peak
+  { xp: 10000, title: 'Mythic', icon: Sparkles, x: '50%', y: '12%' },  // Finish (Center)
 ];
 
 export default function RankProgressPage() {
@@ -79,7 +80,7 @@ export default function RankProgressPage() {
       </div>
 
       <div className="relative z-10 flex flex-col lg:flex-row min-h-screen">
-        {/* LEFT PANEL: Centered Hero Battle Card */}
+        {/* LEFT PANEL: Hero Battle Card Section */}
         <aside className="w-full lg:w-[400px] lg:fixed lg:left-0 lg:top-0 lg:h-screen p-6 flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent border-r border-white/5 backdrop-blur-sm items-center justify-center">
           <div className="absolute top-6 left-6">
             <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full h-10 px-4">
@@ -136,23 +137,24 @@ export default function RankProgressPage() {
               onClick={scrollToRoadmap}
               className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-2 shadow-xl bg-primary hover:bg-primary/90"
             >
-              View All Ranks
+              View Expedition Map
               <ChevronDown className="ml-2 h-3 w-3 animate-bounce" />
             </Button>
           </div>
         </aside>
 
-        {/* RIGHT PANEL: Roadmap Section */}
-        <main ref={roadmapRef} className="flex-1 lg:ml-[400px] relative pb-40 pt-10 px-6 md:px-16">
-          <div className="max-w-xl mx-auto relative min-h-screen">
-            {/* SVG Path Connector (Passes directly through node centers) */}
-            <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
-              <svg className="w-full h-full" viewBox="0 0 100 1000" fill="none" preserveAspectRatio="none">
+        {/* RIGHT PANEL: Vertical Roadmap Section */}
+        <main ref={roadmapRef} className="flex-1 lg:ml-[400px] relative">
+          <div className="max-w-2xl mx-auto relative min-h-[1200px] py-20 px-6 md:px-16">
+            
+            {/* SVG Path Connector - Anchored perfectly to node vertices */}
+            <div className="absolute inset-0 z-0 pointer-events-none py-20">
+              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" preserveAspectRatio="none">
                 <motion.path
-                  d="M 50 950 L 25 850 L 75 750 L 25 650 L 75 550 L 25 450 L 75 350 L 25 250 L 50 150"
-                  stroke="rgba(251, 191, 36, 0.3)"
-                  strokeWidth="4"
-                  strokeDasharray="10 10"
+                  d="M 50 92 L 25 82 L 75 72 L 25 62 L 75 52 L 25 42 L 75 32 L 25 22 L 50 12"
+                  stroke="rgba(251, 191, 36, 0.25)"
+                  strokeWidth="0.5"
+                  strokeDasharray="1 1"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 2, ease: "easeInOut" }}
@@ -161,41 +163,43 @@ export default function RankProgressPage() {
             </div>
 
             {/* Expedition Path Nodes */}
-            <div className="space-y-12 relative z-10 flex flex-col-reverse items-center pt-10">
+            <div className="relative w-full h-full z-10 min-h-[1000px]">
               {RANKS.map((rank, index) => {
                 const isReached = totalXp >= rank.xp;
                 const isCurrent = index === currentRankIndex;
                 const isLocked = !isReached;
                 const Icon = rank.icon;
 
-                // Map 'x' percentage to horizontal position
-                const horizontalClass = rank.x === '50%' ? 'translate-x-0' : rank.x === '25%' ? '-translate-x-[25%]' : 'translate-x-[25%]';
-
                 return (
                   <motion.div
                     key={rank.xp}
+                    style={{
+                        position: 'absolute',
+                        left: rank.x,
+                        top: rank.y,
+                        transform: 'translate(-50%, -50%)',
+                    }}
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    className={cn(
-                        "flex flex-col items-center relative w-full transition-transform duration-500",
-                        horizontalClass
-                    )}
+                    viewport={{ once: true }}
+                    className="flex flex-col items-center group"
                   >
                     {/* Hexagon Node */}
                     <div 
                       onClick={() => handleLockedClick(rank)}
                       className={cn(
-                        "w-20 h-24 flex items-center justify-center cursor-pointer transition-all duration-500 relative group",
-                        isReached ? "bg-gradient-to-br from-yellow-500/40 to-orange-600/40 border-2 border-yellow-400/50 backdrop-blur-xl shadow-[0_0_20px_rgba(251,191,36,0.3)]" : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
-                        isCurrent && "current-rank scale-110 shadow-[0_0_30px_rgba(251,191,36,0.5)]"
+                        "w-20 h-24 flex items-center justify-center cursor-pointer transition-all duration-500 relative",
+                        isReached 
+                            ? "bg-gradient-to-br from-yellow-500/40 to-orange-600/40 border-2 border-yellow-400/50 backdrop-blur-xl shadow-[0_0_25px_rgba(251,191,36,0.3)]" 
+                            : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
+                        isCurrent && "current-rank scale-110 shadow-[0_0_40px_rgba(251,191,36,0.6)]"
                       )}
                       style={{
                         clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
                       }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <Icon className={cn("h-8 w-8", isReached ? "text-white" : "text-slate-400/50")} />
+                        <Icon className={cn("h-8 w-8", isReached ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "text-slate-400/50")} />
                       </div>
 
                       {/* Corner Status Icon */}
@@ -208,8 +212,8 @@ export default function RankProgressPage() {
                       </div>
                     </div>
 
-                    {/* Text Labels */}
-                    <div className="mt-3 text-center">
+                    {/* Text Labels - Positioned below the node center */}
+                    <div className="absolute top-24 text-center whitespace-nowrap">
                       <h3 className={cn(
                         "text-[10px] font-black uppercase tracking-widest",
                         isReached ? "text-white" : "text-slate-500"
@@ -217,7 +221,7 @@ export default function RankProgressPage() {
                         {rank.title}
                       </h3>
                       {isCurrent && (
-                        <p className="text-[7px] font-black text-yellow-400 uppercase animate-pulse mt-0.5">Active Title</p>
+                        <p className="text-[7px] font-black text-yellow-400 uppercase animate-pulse mt-0.5">Active</p>
                       )}
                       <p className="text-[9px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
                     </div>
