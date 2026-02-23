@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,15 +73,15 @@
 }
 
 @keyframes pulse-aura {
-  0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.7); }
-  70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
-  100% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0); }
+  0% { box-shadow: 0 0 0 0px rgba(255, 165, 0, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(255, 165, 0, 0); }
+  100% { box-shadow: 0 0 0 0px rgba(255, 165, 0, 0); }
 }
 
 .current-rank { 
   animation: pulse-aura 2s infinite; 
-  border: 2px solid #60a5fa !important; 
-  background: rgba(59, 130, 246, 0.4) !important;
+  border: 2px solid #fbbf24 !important; 
+  background: rgba(251, 191, 36, 0.2) !important;
 }
 
 .segmented-progress-item {

@@ -42,10 +42,7 @@ export default function RankProgressPage() {
   const roadmapRef = useRef<HTMLDivElement>(null);
   const totalXp = profile?.totalxp || 0;
 
-  const currentRankIndex = RANKS.findIndex((r, i) => {
-    const nextRank = RANKS[i + 1];
-    return totalXp >= r.xp && (!nextRank || totalXp < nextRank.xp);
-  });
+  const currentRankIndex = RANKS.findLastIndex((r) => totalXp >= r.xp);
 
   const nextRank = RANKS[currentRankIndex + 1] || null;
   const currentRankData = currentRankIndex === -1 ? { title: 'Beginner', xp: 0, icon: Compass } : RANKS[currentRankIndex];
@@ -53,8 +50,9 @@ export default function RankProgressPage() {
 
   let progressToNext = 0;
   if (nextRank) {
-    const range = nextRank.xp - (currentRankIndex === -1 ? 0 : RANKS[currentRankIndex].xp);
-    const progress = totalXp - (currentRankIndex === -1 ? 0 : RANKS[currentRankIndex].xp);
+    const floor = currentRankIndex === -1 ? 0 : RANKS[currentRankIndex].xp;
+    const range = nextRank.xp - floor;
+    const progress = totalXp - floor;
     progressToNext = Math.min((progress / range) * 100, 100);
   }
 
@@ -82,8 +80,8 @@ export default function RankProgressPage() {
 
       <div className="relative z-10 flex flex-col lg:flex-row min-h-screen">
         {/* LEFT PANEL: Hero Battle Card */}
-        <aside className="w-full lg:w-[400px] lg:fixed lg:left-0 lg:top-0 lg:h-screen p-6 flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent border-r border-white/5 backdrop-blur-sm overflow-y-auto">
-          <div className="mb-8">
+        <aside className="w-full lg:w-[350px] lg:fixed lg:left-0 lg:top-0 lg:h-screen p-6 flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent border-r border-white/5 backdrop-blur-sm overflow-y-auto items-center">
+          <div className="w-full mb-6">
             <Button asChild variant="ghost" className="text-white hover:bg-white/10 rounded-full h-10 px-4">
               <Link href="/home">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -92,45 +90,45 @@ export default function RankProgressPage() {
             </Button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-10">
-            <div className="text-center space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Active Ranking</p>
-              <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight drop-shadow-2xl">
+          <div className="flex-1 flex flex-col items-center justify-center space-y-6 w-full py-4">
+            <div className="text-center space-y-1">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">Active Ranking</p>
+              <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight drop-shadow-2xl">
                 {currentRankData.title}
               </h1>
             </div>
 
-            {/* Large Card Graphic */}
+            {/* Battle Card Graphic (Smaller & Centered) */}
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="relative w-64 h-80 flex items-center justify-center rounded-[2.5rem] border-4 border-primary/30 bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl shadow-[0_0_50px_rgba(59,130,246,0.2)] group overflow-hidden"
+              className="relative w-52 h-64 flex items-center justify-center rounded-[2rem] border-4 border-yellow-500/30 bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl shadow-[0_0_40px_rgba(251,191,36,0.15)] group overflow-hidden"
             >
               <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/stars/400/600')] opacity-10 mix-blend-overlay"></div>
-              <CurrentIcon className="w-32 h-32 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] z-10" />
+              <CurrentIcon className="w-24 h-24 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] z-10" />
               
               {/* Inner Gloss */}
               <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
             </motion.div>
 
             {/* XP Stats */}
-            <div className="w-full max-w-xs space-y-4">
+            <div className="w-full max-w-[240px] space-y-4">
               <div className="flex justify-between items-end">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total XP</p>
-                  <p className="text-3xl font-black tabular-nums">{totalXp}</p>
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Total XP</p>
+                  <p className="text-2xl font-black tabular-nums">{totalXp}</p>
                 </div>
                 {nextRank && (
-                  <div className="text-right space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Next Rank</p>
-                    <p className="text-xs font-bold text-slate-400">{nextRank.title}</p>
+                  <div className="text-right space-y-0.5">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-primary">Next Rank</p>
+                    <p className="text-[10px] font-bold text-slate-400">{nextRank.title}</p>
                   </div>
                 )}
               </div>
               
               <div className="space-y-2">
                 <Progress value={progressToNext} className="h-2 bg-slate-800" />
-                <p className="text-center text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
+                <p className="text-center text-[8px] font-bold text-slate-500 uppercase tracking-tighter">
                   {nextRank ? `${nextRank.xp - totalXp} XP until ${nextRank.title}` : 'Peak level achieved'}
                 </p>
               </div>
@@ -138,25 +136,25 @@ export default function RankProgressPage() {
 
             <Button 
               onClick={scrollToRoadmap}
-              className="w-full h-14 rounded-2xl text-xs font-black uppercase tracking-widest mt-4 shadow-xl"
+              className="w-full max-w-[240px] h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest mt-2 shadow-xl bg-primary hover:bg-primary/90"
             >
               View Roadmap
-              <ChevronDown className="ml-2 h-4 w-4 animate-bounce" />
+              <ChevronDown className="ml-2 h-3 w-3 animate-bounce" />
             </Button>
           </div>
         </aside>
 
         {/* RIGHT PANEL: Roadmap Section */}
-        <main ref={roadmapRef} className="flex-1 lg:ml-[400px] relative pb-40 pt-10 px-4 md:px-10">
+        <main ref={roadmapRef} className="flex-1 lg:ml-[350px] relative pb-40 pt-10 px-4 md:px-10">
           <div className="max-w-2xl mx-auto relative">
             {/* SVG Path Connector */}
             <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
-              <svg className="w-full max-w-md h-full min-h-[1200px]" viewBox="0 0 100 1200" fill="none">
+              <svg className="w-full max-w-md h-full min-h-[1000px]" viewBox="0 0 100 1000" fill="none" preserveAspectRatio="none">
                 <motion.path
-                  d="M 50 1150 Q 20 1050 20 1000 T 50 850 T 80 700 T 50 550 T 20 400 T 50 250 T 80 150 T 50 50"
-                  stroke="rgba(59, 130, 246, 0.2)"
+                  d="M 50 950 Q 20 850 20 800 T 50 700 T 80 600 T 50 500 T 20 400 T 50 300 T 80 200 T 50 100"
+                  stroke="rgba(251, 191, 36, 0.2)"
                   strokeWidth="3"
-                  strokeDasharray="12 12"
+                  strokeDasharray="8 8"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 2, ease: "easeInOut" }}
@@ -164,7 +162,7 @@ export default function RankProgressPage() {
               </svg>
             </div>
 
-            <div className="space-y-24 relative z-10 flex flex-col-reverse items-center pt-10">
+            <div className="space-y-16 relative z-10 flex flex-col-reverse items-center pt-10">
               {RANKS.map((rank, index) => {
                 const isReached = totalXp >= rank.xp;
                 const isCurrent = index === currentRankIndex;
@@ -179,47 +177,47 @@ export default function RankProgressPage() {
                     viewport={{ once: true, margin: "-50px" }}
                     className="flex flex-col items-center relative w-full"
                     style={{ 
-                        left: rank.x === '50%' ? '0' : rank.x === '20%' ? '-25%' : '25%'
+                        left: rank.x === '50%' ? '0' : rank.x === '20%' ? '-20%' : '20%'
                     }}
                   >
                     {/* Hexagon Node */}
                     <div 
                       onClick={() => handleLockedClick(rank)}
                       className={cn(
-                        "w-24 h-28 flex items-center justify-center cursor-pointer transition-all duration-500 relative group",
-                        isReached ? "bg-gradient-to-br from-blue-500/40 to-indigo-600/40 border-2 border-blue-400/50 backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.3)]" : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
-                        isCurrent && "current-rank scale-110 shadow-[0_0_40px_rgba(59,130,246,0.5)]"
+                        "w-20 h-24 flex items-center justify-center cursor-pointer transition-all duration-500 relative group",
+                        isReached ? "bg-gradient-to-br from-yellow-500/40 to-orange-600/40 border-2 border-yellow-400/50 backdrop-blur-xl shadow-[0_0_20px_rgba(251,191,36,0.3)]" : "bg-slate-800/50 border-2 border-slate-700/50 grayscale opacity-60",
+                        isCurrent && "current-rank scale-110 shadow-[0_0_30px_rgba(251,191,36,0.5)]"
                       )}
                       style={{
                         clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
                       }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <Icon className={cn("h-10 w-10", isReached ? "text-white" : "text-slate-400/50")} />
+                        <Icon className={cn("h-8 w-8", isReached ? "text-white" : "text-slate-400/50")} />
                       </div>
 
                       {/* Corner Status Icon */}
-                      <div className="absolute bottom-4 right-4">
+                      <div className="absolute bottom-3 right-3">
                         {isReached && !isCurrent ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-400 fill-green-400/20" />
+                          <CheckCircle2 className="h-4 w-4 text-green-400 fill-green-400/20" />
                         ) : isLocked ? (
-                          <Lock className="h-4 w-4 text-slate-500" />
+                          <Lock className="h-3 w-3 text-slate-500" />
                         ) : null}
                       </div>
                     </div>
 
                     {/* Text Labels */}
-                    <div className="mt-4 text-center">
+                    <div className="mt-3 text-center">
                       <h3 className={cn(
-                        "text-xs font-black uppercase tracking-widest",
+                        "text-[10px] font-black uppercase tracking-widest",
                         isReached ? "text-white" : "text-slate-500"
                       )}>
                         {rank.title}
                       </h3>
                       {isCurrent && (
-                        <p className="text-[8px] font-black text-primary uppercase animate-pulse mt-1">You Are Here</p>
+                        <p className="text-[7px] font-black text-yellow-400 uppercase animate-pulse mt-0.5">You Are Here</p>
                       )}
-                      <p className="text-[10px] font-bold text-slate-400 mt-1">{rank.xp} XP</p>
+                      <p className="text-[9px] font-bold text-slate-400 mt-0.5">{rank.xp} XP</p>
                     </div>
                   </motion.div>
                 );
