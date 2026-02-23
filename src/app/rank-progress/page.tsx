@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Shield,
   Sword,
+  Swords,
   Crown,
   Trophy,
   Zap,
@@ -22,24 +23,11 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-// Custom SVG Icon for Scout (Shoe with wings at the back)
-const WingedShoeIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    {/* Shoe body */}
-    <path d="M8 17v-2a2 2 0 0 1 2-2h2l3 3h3a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1h-6a2 2 0 0 1-2-2z" />
-    <path d="M13 13V10a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3" />
-    {/* Wings at the back (heel) */}
-    <path d="M7 14c-2-1-4-1-6 1" />
-    <path d="M6 12c-2-1-4-1-6 1" />
-    <path d="M5 10c-2-1-4-1-6 1" />
-  </svg>
-);
-
 const RANKS = [
   { xp: 100, title: 'Wanderer', icon: Compass, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/50' },
-  { xp: 500, title: 'Scout', icon: WingedShoeIcon, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50' },
+  { xp: 500, title: 'Scout', icon: Sword, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50' },
   { xp: 1200, title: 'Guardian', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/50' },
-  { xp: 2500, title: 'Vanguard', icon: Sword, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50' },
+  { xp: 2500, title: 'Vanguard', icon: Swords, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50' },
   { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
   { xp: 4250, title: 'Champion', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/50' },
   { xp: 5000, title: 'Titan', icon: Zap, color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50' },
@@ -88,7 +76,7 @@ export default function RankProgressPage() {
 
       <div className="relative z-10 flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 gap-8 pb-12">
         
-        {/* HERO RANK CARD: Top centered section */}
+        {/* HERO RANK CARD */}
         <Card className="w-full bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
           <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
             <div className="relative flex-shrink-0">
@@ -127,7 +115,7 @@ export default function RankProgressPage() {
           </CardContent>
         </Card>
 
-        {/* HORIZONTAL ROADMAP */}
+        {/* EXPEDITION PATH */}
         <div className="w-full space-y-6 pt-4">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Expedition Path</h3>
@@ -167,7 +155,6 @@ export default function RankProgressPage() {
                     >
                       <Icon className={cn("w-12 h-12 md:w-14 md:h-14", isReached ? rank.color : "text-muted-foreground/40")} />
                       
-                      {/* Status Indicators */}
                       {!isReached && (
                         <div className="absolute -top-3 -right-3 bg-slate-900 p-2 rounded-xl border border-white/10 shadow-2xl">
                           <Lock className="w-4 h-4 text-muted-foreground" />
@@ -180,7 +167,6 @@ export default function RankProgressPage() {
                         </div>
                       )}
 
-                      {/* Current Rank Aura */}
                       {isCurrent && (
                         <div className="absolute -inset-4 border-2 border-yellow-500/50 rounded-[3rem] animate-pulse current-rank"></div>
                       )}
