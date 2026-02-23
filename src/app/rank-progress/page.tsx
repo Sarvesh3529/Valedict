@@ -117,11 +117,15 @@ export default function RankProgressPage() {
             <svg width="400" height="100%" className="opacity-20" preserveAspectRatio="none">
               <path
                 d={`M 200,0 ${RANKS.map((_, i) => {
-                  const x = i % 2 === 0 ? 100 : 300;
+                  const isLast = i === RANKS.length - 1;
+                  const x = isLast ? 200 : (i % 2 === 0 ? 100 : 300);
                   const y = (i + 1) * 200;
-                  const prevX = i === 0 ? 200 : (i % 2 !== 0 ? 100 : 300);
+                  
+                  // Start point for this segment is the end of the previous one
+                  const prevX = i === 0 ? 200 : ( (i - 1) === RANKS.length - 1 ? 200 : ((i - 1) % 2 === 0 ? 100 : 300) );
                   const prevY = i * 200;
                   const cpY = (prevY + y) / 2;
+                  
                   return `C ${prevX},${cpY} ${x},${cpY} ${x},${y}`;
                 }).join(' ')}`}
                 fill="none"
@@ -136,8 +140,9 @@ export default function RankProgressPage() {
             {RANKS.map((rank, index) => {
               const isAchieved = totalXp >= rank.xp;
               const isCurrent = index === currentRankIndex;
+              const isLast = index === RANKS.length - 1;
               const Icon = rank.icon;
-              const side = index % 2 === 0 ? 'left' : 'right';
+              const side = isLast ? 'center' : (index % 2 === 0 ? 'left' : 'right');
 
               return (
                 <motion.div
@@ -148,12 +153,12 @@ export default function RankProgressPage() {
                   transition={{ delay: index * 0.1 }}
                   className={cn(
                     "flex items-center w-full",
-                    side === 'left' ? 'justify-start' : 'justify-end'
+                    side === 'left' ? 'justify-start' : (side === 'right' ? 'justify-end' : 'justify-center')
                   )}
                 >
                   <div className={cn(
                     "flex flex-col items-center gap-4 group",
-                    side === 'left' ? 'mr-[20%]' : 'ml-[20%]'
+                    side === 'left' ? 'mr-[20%]' : (side === 'right' ? 'ml-[20%]' : 'mx-0')
                   )}>
                     {/* Rank Node */}
                     <div className="relative">
@@ -198,7 +203,7 @@ export default function RankProgressPage() {
                       {/* Label Section */}
                       <div className={cn(
                         "absolute top-1/2 -translate-y-1/2 w-32",
-                        side === 'left' ? 'left-full ml-6 text-left' : 'right-full mr-6 text-right'
+                        side === 'left' ? 'left-full ml-6 text-left' : (side === 'right' ? 'right-full mr-6 text-right' : 'left-full ml-6 text-left')
                       )}>
                         <h4 className={cn(
                           "text-sm font-black uppercase tracking-widest",
