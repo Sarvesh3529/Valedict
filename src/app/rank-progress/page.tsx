@@ -147,9 +147,15 @@ export default function RankProgressPage() {
         <main ref={roadmapRef} className="flex-1 lg:ml-[400px] relative">
           <div className="max-w-2xl mx-auto relative min-h-[1200px] py-20 px-6 md:px-16">
             
-            {/* SVG Path Connector - Anchored perfectly to node vertices */}
+            {/* SVG Path Connector - Adjusted with translateX for perfect vertex centering */}
             <div className="absolute inset-0 z-0 pointer-events-none py-20">
-              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" preserveAspectRatio="none">
+              <svg 
+                className="w-full h-full overflow-visible" 
+                viewBox="0 0 100 100" 
+                fill="none" 
+                preserveAspectRatio="none"
+                style={{ transform: 'translateX(0.2%)' }} // Sub-pixel shift for absolute centering
+              >
                 <motion.path
                   d="M 50 92 L 25 82 L 75 72 L 25 62 L 75 52 L 25 42 L 75 32 L 25 22 L 50 12"
                   stroke="rgba(251, 191, 36, 0.25)"
