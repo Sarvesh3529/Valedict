@@ -24,15 +24,15 @@ import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Compass, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/50' },
-  { xp: 500, title: 'Scout', icon: Sword, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50' },
-  { xp: 1200, title: 'Guardian', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/50' },
-  { xp: 2500, title: 'Vanguard', icon: Swords, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50' },
-  { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
-  { xp: 4250, title: 'Champion', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/50' },
-  { xp: 5000, title: 'Titan', icon: Zap, color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50' },
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50' },
-  { xp: 10000, title: 'Mythic', icon: Sparkles, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50' },
+  { xp: 100, title: 'Wanderer', icon: Compass, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/50', gradient: 'from-purple-600/40 to-purple-900/60' },
+  { xp: 500, title: 'Scout', icon: Sword, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50', gradient: 'from-green-600/40 to-green-900/60' },
+  { xp: 1200, title: 'Guardian', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/50', gradient: 'from-blue-600/40 to-blue-900/60' },
+  { xp: 2500, title: 'Vanguard', icon: Swords, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50', gradient: 'from-red-600/40 to-red-900/60' },
+  { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', gradient: 'from-yellow-600/40 to-yellow-900/60' },
+  { xp: 4250, title: 'Champion', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/50', gradient: 'from-orange-600/40 to-orange-900/60' },
+  { xp: 5000, title: 'Titan', icon: Zap, color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50', gradient: 'from-indigo-600/40 to-indigo-900/60' },
+  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50', gradient: 'from-pink-600/40 to-pink-900/60' },
+  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', gradient: 'from-yellow-500/40 to-yellow-800/60' },
 ];
 
 export default function RankProgressPage() {
@@ -135,10 +135,10 @@ export default function RankProgressPage() {
 
                 return (
                   <div key={rank.xp} className="flex flex-col items-center space-y-8 relative group">
-                    {/* Connecting Line */}
+                    {/* Connecting Line - Positioned to pass through center */}
                     {index < RANKS.length - 1 && (
                       <div className={cn(
-                        "absolute top-12 left-1/2 w-full h-[4px] z-0 pointer-events-none",
+                        "absolute top-12 md:top-14 left-1/2 w-full h-[4px] z-0 pointer-events-none",
                         isReached && totalXp >= RANKS[index+1].xp 
                           ? "bg-primary shadow-[0_0_10px_rgba(59,130,246,0.5)]" 
                           : "bg-white/10 border-t-2 border-dashed border-white/20"
@@ -147,11 +147,10 @@ export default function RankProgressPage() {
 
                     {/* Milestone Node */}
                     <motion.div
-                      whileHover={{ scale: 1.1, y: -5 }}
                       className={cn(
                         "w-24 h-24 md:w-28 md:h-28 rounded-[2.5rem] flex items-center justify-center relative z-10 transition-all duration-500",
                         isReached 
-                          ? cn("shadow-2xl", rank.bg, rank.border) 
+                          ? cn("shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-gradient-to-br border-2", rank.gradient, rank.border) 
                           : "bg-slate-800/50 text-muted-foreground border-2 border-white/5 grayscale opacity-60"
                       )}
                     >
