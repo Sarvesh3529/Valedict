@@ -61,6 +61,7 @@ export async function updateUserStatsAfterQuiz(
     
     // --- Strict Streak Logic ---
     const now = new Date();
+    // Today at 00:00:00 local time
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const lastActiveDate = profile.lastactive?.toDate();

@@ -32,15 +32,15 @@ export default function StreakDisplay({ currentStreak, highestStreak, lastActivi
       const diff = today.getTime() - last.getTime();
       const diffDays = Math.round(diff / ONE_DAY_IN_MS);
 
+      // If today is more than 1 calendar day after lastactive, streak is dead.
       if (diffDays > 1) {
-        // Today is more than 1 calendar day after lastactive
         resetBrokenStreak();
       }
     }
   }, [last, currentStreak, today]);
 
   // 2. The 'Grey Flame' Logic (Visual Only)
-  // Glow only if lesson completed on the current calendar day
+  // Glow only if a lesson was completed on the current calendar day
   const isGlowing = last ? last.getTime() === today.getTime() : false;
   
   const progress = Math.min((currentStreak / goal) * 100, 100);
