@@ -21,18 +21,17 @@ import {
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const RANKS = [
-  { xp: 100, title: 'Wanderer', icon: Compass, color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/50', gradient: 'from-purple-600/40 to-purple-900/60' },
-  { xp: 500, title: 'Scout', icon: Sword, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/50', gradient: 'from-green-600/40 to-green-900/60' },
-  { xp: 1200, title: 'Guardian', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/50', gradient: 'from-blue-600/40 to-blue-900/60' },
-  { xp: 2500, title: 'Vanguard', icon: Swords, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50', gradient: 'from-red-600/40 to-red-900/60' },
-  { xp: 3500, title: 'Elite', icon: Crown, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', gradient: 'from-yellow-600/40 to-yellow-900/60' },
-  { xp: 4250, title: 'Champion', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-500/20', border: 'border-orange-500/50', gradient: 'from-orange-600/40 to-orange-900/60' },
-  { xp: 5000, title: 'Titan', icon: Zap, color: 'text-indigo-400', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50', gradient: 'from-indigo-600/40 to-indigo-900/60' },
-  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'text-pink-400', bg: 'bg-pink-500/20', border: 'border-pink-500/50', gradient: 'from-pink-600/40 to-pink-900/60' },
-  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'text-yellow-500', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', gradient: 'from-yellow-500/40 to-yellow-800/60' },
+  { xp: 100, title: 'Wanderer', icon: Compass, color: 'from-emerald-400 to-teal-500', glow: '#10b981' },
+  { xp: 500, title: 'Scout', icon: Sword, color: 'from-cyan-400 to-sky-500', glow: '#06b6d4' },
+  { xp: 1200, title: 'Guardian', icon: Shield, color: 'from-blue-400 to-indigo-500', glow: '#3b82f6' },
+  { xp: 2500, title: 'Vanguard', icon: Swords, color: 'from-violet-400 to-purple-500', glow: '#8b5cf6' },
+  { xp: 3500, title: 'Elite', icon: Crown, color: 'from-fuchsia-400 to-pink-500', glow: '#d946ef' },
+  { xp: 4250, title: 'Champion', icon: Trophy, color: 'from-rose-400 to-red-500', glow: '#f43f5e' },
+  { xp: 5000, title: 'Titan', icon: Zap, color: 'from-amber-400 to-yellow-500', glow: '#f59e0b' },
+  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'from-orange-400 to-red-600', glow: '#f97316' },
+  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'from-slate-200 to-white', glow: '#ffffff' },
 ];
 
 export default function RankProgressPage() {
@@ -40,7 +39,7 @@ export default function RankProgressPage() {
   const totalXp = profile?.totalxp || 0;
 
   const currentRankIndex = RANKS.findLastIndex((r) => totalXp >= r.xp);
-  const currentRankData = currentRankIndex === -1 ? { title: 'Beginner', xp: 0, icon: Sparkles, color: 'text-primary' } : RANKS[currentRankIndex];
+  const currentRankData = currentRankIndex === -1 ? { title: 'Beginner', xp: 0, icon: Sparkles, color: 'from-primary to-blue-600', glow: '#3b82f6' } : RANKS[currentRankIndex];
   const nextRank = RANKS[currentRankIndex + 1] || null;
 
   let progressToNext = 0;
@@ -52,9 +51,9 @@ export default function RankProgressPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-white flex flex-col">
+    <div className="min-h-screen bg-[#0a0e1a] text-white flex flex-col pb-24">
       {/* Starry Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
+      <div className="fixed inset-0 pointer-events-none opacity-30 z-0">
         <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse"></div>
         <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-white rounded-full animate-pulse delay-700"></div>
         <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-white rounded-full animate-pulse delay-1000"></div>
@@ -74,7 +73,7 @@ export default function RankProgressPage() {
         </div>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 gap-8 pb-12">
+      <div className="relative z-10 flex-1 flex flex-col w-full max-w-5xl mx-auto px-4 gap-12">
         
         {/* HERO RANK CARD - Centered with 1/4 spacing on sides (w-1/2 on desktop) */}
         <div className="w-full flex justify-center mt-4">
@@ -82,118 +81,159 @@ export default function RankProgressPage() {
             <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
               <div className="relative flex-shrink-0">
                 <div className={cn(
-                  "w-24 h-24 md:w-32 md:h-32 rounded-[2rem] flex items-center justify-center bg-primary/20 border-4 border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.3)]",
+                  "w-24 h-24 md:w-28 md:h-28 rounded-[2rem] flex items-center justify-center bg-primary/20 border-4 border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.3)]",
                   "current-rank"
                 )}>
-                  <currentRankData.icon className="w-12 h-12 md:w-16 md:h-16 text-primary" />
+                  <currentRankData.icon className="w-12 h-12 md:w-14 md:h-14 text-primary" />
                 </div>
               </div>
 
-              <div className="flex-1 space-y-6 text-center md:text-left w-full">
-                <div className="space-y-2">
-                  <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">
+              <div className="flex-1 space-y-4 text-center md:text-left w-full">
+                <div className="space-y-1">
+                  <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter leading-none">
                     {currentRankData.title}
                   </h2>
-                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                      <p className="text-xs font-black text-primary uppercase tracking-widest">
-                          {totalXp} XP
-                      </p>
-                      <span className="hidden md:block text-white/20">|</span>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                          Mastery Level {currentRankIndex + 2}
-                      </p>
-                  </div>
+                  <p className="text-xs font-black text-primary uppercase tracking-widest">
+                      {totalXp} Total XP
+                  </p>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     <span>Progress</span>
                     {nextRank && <span>{totalXp} / {nextRank.xp} XP</span>}
                   </div>
-                  <Progress value={progressToNext} className="h-4 bg-white/5 border border-white/5 rounded-full" />
+                  <Progress value={progressToNext} className="h-3 bg-white/5 border border-white/5 rounded-full" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* HORIZONTAL EXPEDITION PATH */}
-        <div className="w-full space-y-6 pt-4">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Expedition Map</h3>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                Scroll &rarr;
-            </span>
+        {/* VERTICAL EXPEDITION ROADMAP */}
+        <div className="flex flex-col items-center relative py-12">
+          {/* Connecting Curved Line */}
+          <div className="absolute inset-0 z-0 flex justify-center">
+            <svg width="400" height="100%" className="opacity-20" preserveAspectRatio="none">
+              <path
+                d={`M 200,0 ${RANKS.map((_, i) => {
+                  const x = i % 2 === 0 ? 100 : 300;
+                  const y = (i + 1) * 200;
+                  const prevX = i === 0 ? 200 : (i % 2 !== 0 ? 100 : 300);
+                  const prevY = i * 200;
+                  const cpY = (prevY + y) / 2;
+                  return `C ${prevX},${cpY} ${x},${cpY} ${x},${y}`;
+                }).join(' ')}`}
+                fill="none"
+                stroke="white"
+                strokeWidth="4"
+                strokeDasharray="12 12"
+              />
+            </svg>
           </div>
-          
-          <ScrollArea className="w-full whitespace-nowrap rounded-[2.5rem] border-2 border-white/5 bg-white/5 backdrop-blur-md">
-            <div className="flex items-center space-x-12 md:space-x-24 min-w-max p-12 md:p-20">
-              {RANKS.map((rank, index) => {
-                const isReached = totalXp >= rank.xp;
-                const isCurrent = index === currentRankIndex;
-                const Icon = rank.icon;
 
-                return (
-                  <div key={rank.xp} className="flex flex-col items-center space-y-8 relative group">
-                    {/* Connecting Line - Positioned to pass through center */}
-                    {index < RANKS.length - 1 && (
+          <div className="space-y-[150px] w-full max-w-md relative z-10">
+            {RANKS.map((rank, index) => {
+              const isAchieved = totalXp >= rank.xp;
+              const isCurrent = index === currentRankIndex;
+              const Icon = rank.icon;
+              const side = index % 2 === 0 ? 'left' : 'right';
+
+              return (
+                <motion.div
+                  key={rank.xp}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className={cn(
+                    "flex items-center w-full",
+                    side === 'left' ? 'justify-start' : 'justify-end'
+                  )}
+                >
+                  <div className={cn(
+                    "flex flex-col items-center gap-4 group",
+                    side === 'left' ? 'mr-[20%]' : 'ml-[20%]'
+                  )}>
+                    {/* Rank Node */}
+                    <div className="relative">
+                      <motion.div
+                        className={cn(
+                          "w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] flex items-center justify-center relative z-10 transition-all duration-500 border",
+                          isAchieved 
+                            ? cn("bg-slate-900 shadow-xl border-white/20", isCurrent && "current-rank") 
+                            : "bg-slate-800/50 border-white/5 grayscale opacity-30"
+                        )}
+                        style={isAchieved ? {
+                          borderColor: isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.1)',
+                          boxShadow: isAchieved ? `0 0 20px ${rank.glow}33` : 'none'
+                        } : {}}
+                      >
+                        <div className={cn(
+                          "absolute inset-0 rounded-[inherit] opacity-10",
+                          isAchieved ? `bg-gradient-to-br ${rank.color}` : "bg-transparent"
+                        )} />
+                        
+                        <Icon 
+                          className={cn(
+                            "w-10 h-10 md:w-12 md:h-12 relative z-20",
+                            isAchieved ? "text-white" : "text-muted-foreground"
+                          )} 
+                          style={isAchieved ? { filter: `drop-shadow(0 0 8px ${rank.glow})` } : {}}
+                        />
+
+                        {!isAchieved && (
+                          <div className="absolute -bottom-1 -right-1 bg-slate-900 p-1.5 rounded-lg border border-white/10 shadow-2xl z-30">
+                            <Lock className="w-3 h-3 text-muted-foreground" />
+                          </div>
+                        )}
+                        
+                        {isAchieved && !isCurrent && (
+                          <div className="absolute -bottom-1 -right-1 bg-green-500 p-1.5 rounded-lg shadow-2xl border-2 border-slate-950 z-30">
+                            <CheckCircle2 className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </motion.div>
+
+                      {/* Label Section */}
                       <div className={cn(
-                        "absolute top-12 md:top-14 left-1/2 w-full h-[4px] z-0 pointer-events-none",
-                        isReached && totalXp >= RANKS[index+1].xp 
-                          ? "bg-primary shadow-[0_0_10px_rgba(59,130,246,0.5)]" 
-                          : "bg-white/10 border-t-2 border-dashed border-white/20"
-                      )} style={{ width: 'calc(100% + 3rem)' }}></div>
-                    )}
-
-                    {/* Milestone Node */}
-                    <motion.div
-                      className={cn(
-                        "w-24 h-24 md:w-28 md:h-28 rounded-[2.5rem] flex items-center justify-center relative z-10 transition-all duration-500",
-                        isReached 
-                          ? cn("shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-gradient-to-br border-2", rank.gradient, rank.border) 
-                          : "bg-slate-800/50 text-muted-foreground border-2 border-white/5 grayscale opacity-60"
-                      )}
-                    >
-                      <Icon className={cn("w-12 h-12 md:w-14 md:h-14", isReached ? rank.color : "text-muted-foreground/40")} />
-                      
-                      {!isReached && (
-                        <div className="absolute -top-3 -right-3 bg-slate-900 p-2 rounded-xl border border-white/10 shadow-2xl">
-                          <Lock className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      )}
-                      
-                      {isReached && !isCurrent && (
-                        <div className="absolute -bottom-3 -right-3 bg-green-500 p-2 rounded-xl shadow-2xl border-2 border-slate-950">
-                          <CheckCircle2 className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-
-                      {isCurrent && (
-                        <div className="absolute -inset-4 border-2 border-yellow-500/50 rounded-[3rem] animate-pulse current-rank"></div>
-                      )}
-                    </motion.div>
-
-                    {/* Label Section */}
-                    <div className="text-center space-y-2">
-                      <h4 className={cn(
-                        "text-xs md:text-sm font-black uppercase tracking-widest",
-                        isReached ? "text-white" : "text-muted-foreground"
+                        "absolute top-1/2 -translate-y-1/2 w-32",
+                        side === 'left' ? 'left-full ml-6 text-left' : 'right-full mr-6 text-right'
                       )}>
-                        {rank.title}
-                      </h4>
-                      <p className={cn(
-                        "text-[10px] md:text-xs font-bold uppercase",
-                        isReached ? rank.color : "text-slate-600"
-                      )}>
-                        {isReached ? 'Reached' : `${rank.xp} XP`}
-                      </p>
+                        <h4 className={cn(
+                          "text-sm font-black uppercase tracking-widest",
+                          isAchieved ? "text-white" : "text-slate-600"
+                        )}>
+                          {rank.title}
+                        </h4>
+                        <p className={cn(
+                          "text-[10px] font-bold uppercase",
+                          isAchieved ? "text-primary" : "text-slate-700"
+                        )}>
+                          {isAchieved ? 'Mastered' : `${rank.xp} XP`}
+                        </p>
+                      </div>
                     </div>
+
+                    {/* Progress Bar under current node */}
+                    {isCurrent && nextRank && (
+                      <motion.div 
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        className="w-32 space-y-1.5 pt-2"
+                      >
+                        <div className="flex justify-between text-[8px] font-black uppercase text-primary/80">
+                          <span>{totalXp} XP</span>
+                          <span>{nextRank.xp} XP</span>
+                        </div>
+                        <Progress value={progressToNext} className="h-1.5 bg-white/5" />
+                      </motion.div>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
