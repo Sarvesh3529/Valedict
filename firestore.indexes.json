@@ -1,3 +1,4 @@
+
 {
   "indexes": [
     {
@@ -11,6 +12,14 @@
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "weeklyxp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lastWeeklyReset", "order": "ASCENDING" },
         { "fieldPath": "weeklyxp", "order": "DESCENDING" }
       ]
     }

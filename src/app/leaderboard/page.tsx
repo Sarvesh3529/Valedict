@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -123,15 +123,18 @@ export default function LeaderboardPage() {
       setLoading(true);
       setError(null);
       
-      // Fix serialization error: pass only uid
-      await ensureWeeklyXPReset(user.uid);
+      // Ensure the current user's XP is reset JIT before querying the fair leaderboard
+      const mondayTime = await ensureWeeklyXPReset(user.uid);
+      const mondayDate = new Date(mondayTime);
 
       const usersRef = collection(db, 'users');
       let q;
       
       if (leaderboardType === 'weeklyxp') {
+          // FAIR LEADERBOARD: Only users reset this week with > 0 XP
           q = query(
             usersRef, 
+            where('lastWeeklyReset', '>=', Timestamp.fromDate(mondayDate)),
             where('weeklyxp', '>', 0),
             orderBy('weeklyxp', 'desc'), 
             limit(50)
@@ -153,7 +156,7 @@ export default function LeaderboardPage() {
         setUsers(leaderboardUsers);
       } catch (e: any) {
         console.error("Leaderboard Error:", e);
-        setError("An error occurred while fetching rankings.");
+        setError("An error occurred while fetching rankings. A composite index may be required.");
       } finally {
         setLoading(false);
       }
@@ -194,6 +197,7 @@ export default function LeaderboardPage() {
       )
   }
 
+  // A user is only visible if they have earned XP in the CURRENT week
   const userHasWeeklyXp = (profile?.weeklyxp || 0) > 0;
 
   return (

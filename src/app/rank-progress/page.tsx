@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-// Mythic Hero Ranks Mapping
+// Final Mythic Hero Rank Mapping
 const RANKS = [
   { xp: 100, title: 'Wanderer', icon: Compass, color: 'from-emerald-400 to-teal-500', glow: '#10b981' },
   { xp: 500, title: 'Scout', icon: Sword, color: 'from-cyan-400 to-sky-500', glow: '#06b6d4' },
@@ -32,8 +32,8 @@ const RANKS = [
   { xp: 3500, title: 'Elite', icon: Crown, color: 'from-fuchsia-400 to-pink-500', glow: '#d946ef' },
   { xp: 4250, title: 'Champion', icon: Trophy, color: 'from-rose-400 to-red-500', glow: '#f43f5e' },
   { xp: 5000, title: 'Titan', icon: Zap, color: 'from-amber-400 to-yellow-500', glow: '#f59e0b' },
-  { xp: 7500, title: 'Immortal', icon: InfinityIcon, color: 'from-slate-200 to-white', glow: '#ffffff' },
-  { xp: 10000, title: 'Mythic', icon: Sparkles, color: 'from-orange-400 to-red-600', glow: '#f97316' },
+  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'from-orange-400 to-red-600', glow: '#f97316' },
+  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'from-slate-200 to-white', glow: '#ffffff' },
 ];
 
 export default function RankProgressPage() {

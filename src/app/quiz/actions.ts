@@ -13,7 +13,6 @@ type StreakUpdateResult = {
 
 /**
  * Resets a broken streak to 0 in the database.
- * Triggered when the app detects a missed day.
  */
 export async function resetBrokenStreak() {
   const cookieStore = cookies();
@@ -34,48 +33,47 @@ export async function resetBrokenStreak() {
 }
 
 /**
- * Checks if the weekly XP should be reset (if it's a new Monday since the last reset).
- * Returns true if reset was performed.
+ * Checks if the weekly XP should be reset.
+ * Returns the timestamp of the current Monday 0:00.
  */
-export async function ensureWeeklyXPReset(uid: string): Promise<boolean> {
+export async function ensureWeeklyXPReset(uid: string): Promise<number> {
+  const now = new Date();
+  
+  // Start of current week (Monday 0:00)
+  const currentMonday = new Date(now);
+  const day = currentMonday.getDay();
+  const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
+  currentMonday.setDate(diff);
+  currentMonday.setHours(0, 0, 0, 0);
+
   try {
     const userRef = adminDb.collection('users').doc(uid);
     const userDoc = await userRef.get();
-    if (!userDoc.exists) return false;
-
-    const profile = userDoc.data() as UserProfile;
-    const now = new Date();
     
-    // Start of current week (Monday 0:00)
-    const currentMonday = new Date(now);
-    const day = currentMonday.getDay();
-    // Adjust to previous Monday. getDay(): 0=Sun, 1=Mon, ..., 6=Sat
-    const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
-    currentMonday.setDate(diff);
-    currentMonday.setHours(0, 0, 0, 0);
+    if (userDoc.exists) {
+      const profile = userDoc.data() as UserProfile;
+      
+      const getSafeDate = (ts: any) => {
+        if (!ts) return new Date(0);
+        if (typeof ts.toDate === 'function') return ts.toDate();
+        if (ts.seconds) return new Date(ts.seconds * 1000);
+        return new Date(ts);
+      };
 
-    // Helper to safely get Date from Timestamp (handles server-side Timestamp objects)
-    const getSafeDate = (ts: any) => {
-      if (!ts) return new Date(0);
-      if (typeof ts.toDate === 'function') return ts.toDate();
-      if (ts.seconds) return new Date(ts.seconds * 1000);
-      return new Date(ts);
-    };
+      const lastResetDate = getSafeDate(profile.lastWeeklyReset || profile.joinedat);
 
-    const lastResetDate = getSafeDate(profile.lastWeeklyReset || profile.joinedat);
-
-    if (lastResetDate < currentMonday) {
-      await userRef.update({
-        weeklyxp: 0,
-        lastWeeklyReset: FieldValue.serverTimestamp(),
-      });
-      return true;
+      if (lastResetDate < currentMonday) {
+        await userRef.update({
+          weeklyxp: 0,
+          lastWeeklyReset: FieldValue.serverTimestamp(),
+        });
+      }
     }
   } catch (error) {
     console.error("Error in ensureWeeklyXPReset:", error);
   }
 
-  return false;
+  return currentMonday.getTime();
 }
 
 /**
