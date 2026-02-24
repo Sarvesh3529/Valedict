@@ -22,14 +22,6 @@
         { "fieldPath": "weeklyxp", "order": "DESCENDING" },
         { "fieldPath": "lastWeeklyReset", "order": "DESCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "lastWeeklyReset", "order": "ASCENDING" },
-        { "fieldPath": "weeklyxp", "order": "DESCENDING" }
-      ]
     }
   ],
   "fieldOverrides": []
