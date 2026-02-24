@@ -1,9 +1,10 @@
+
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Crown, Loader2, ShieldX, Home, Trophy, Zap, Lock, ArrowRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -94,7 +95,7 @@ function WeeklyLockMessage() {
             <div className="space-y-2">
                 <h3 className="text-xl font-black uppercase tracking-tight">Leaderboard Locked</h3>
                 <p className="text-muted-foreground text-sm font-bold leading-relaxed max-w-xs mx-auto">
-                    You need to complete at least <span className="text-primary">one lesson</span> this week to unlock the rankings and see how you stack up against your classmates!
+                    You need to complete at least <span className="text-primary">one lesson</span> this week to unlock the rankings and see how you stack up!
                 </p>
             </div>
 
@@ -116,24 +117,19 @@ export default function LeaderboardPage() {
   const { user, profile, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user || !profile) {
-      setLoading(false);
-      return;
-    }
+    if (authLoading || !user) return;
 
     const fetchLeaderboard = async () => {
       setLoading(true);
       setError(null);
       
-      // JIT Reset Check for the current user
-      await ensureWeeklyXPReset(user.uid, profile);
+      // Fix serialization error: pass only uid
+      await ensureWeeklyXPReset(user.uid);
 
       const usersRef = collection(db, 'users');
       let q;
       
       if (leaderboardType === 'weeklyxp') {
-          // Rule: Only users with > 0 weekly XP are visible
           q = query(
             usersRef, 
             where('weeklyxp', '>', 0),
@@ -157,7 +153,6 @@ export default function LeaderboardPage() {
         setUsers(leaderboardUsers);
       } catch (e: any) {
         console.error("Leaderboard Error:", e);
-        // Fallback for missing indexes or permission issues
         setError("An error occurred while fetching rankings.");
       } finally {
         setLoading(false);
@@ -165,7 +160,7 @@ export default function LeaderboardPage() {
     };
     
     fetchLeaderboard();
-  }, [leaderboardType, user, authLoading, profile]);
+  }, [leaderboardType, user, authLoading]);
   
   if (authLoading) {
     return (
@@ -249,7 +244,6 @@ export default function LeaderboardPage() {
         </CardFooter>
       </Card>
 
-      {/* Persistent Current User Bar if participating */}
       {!loading && !error && (leaderboardType === 'totalxp' || userHasWeeklyXp) && (
           <AnimatePresence>
             <motion.div 

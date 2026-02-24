@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
@@ -22,6 +23,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
+// Mythic Hero Ranks Mapping
 const RANKS = [
   { xp: 100, title: 'Wanderer', icon: Compass, color: 'from-emerald-400 to-teal-500', glow: '#10b981' },
   { xp: 500, title: 'Scout', icon: Sword, color: 'from-cyan-400 to-sky-500', glow: '#06b6d4' },
@@ -30,8 +32,8 @@ const RANKS = [
   { xp: 3500, title: 'Elite', icon: Crown, color: 'from-fuchsia-400 to-pink-500', glow: '#d946ef' },
   { xp: 4250, title: 'Champion', icon: Trophy, color: 'from-rose-400 to-red-500', glow: '#f43f5e' },
   { xp: 5000, title: 'Titan', icon: Zap, color: 'from-amber-400 to-yellow-500', glow: '#f59e0b' },
-  { xp: 7500, title: 'Mythic', icon: Sparkles, color: 'from-orange-400 to-red-600', glow: '#f97316' },
-  { xp: 10000, title: 'Immortal', icon: InfinityIcon, color: 'from-slate-200 to-white', glow: '#ffffff' },
+  { xp: 7500, title: 'Immortal', icon: InfinityIcon, color: 'from-slate-200 to-white', glow: '#ffffff' },
+  { xp: 10000, title: 'Mythic', icon: Sparkles, color: 'from-orange-400 to-red-600', glow: '#f97316' },
 ];
 
 export default function RankProgressPage() {
@@ -75,9 +77,9 @@ export default function RankProgressPage() {
 
       <div className="relative z-10 flex-1 flex flex-col w-full max-w-5xl mx-auto px-4 gap-12">
         
-        {/* HERO RANK CARD - Centered with 1/4 spacing on sides (w-1/2 on desktop) */}
+        {/* Centered Hero Rank Card (50% Width) */}
         <div className="w-full flex justify-center mt-4">
-          <Card className="w-full md:w-1/2 bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2rem] shadow-2xl">
+          <Card className="w-full md:w-1/2 bg-gradient-to-br from-blue-600/20 to-indigo-900/40 backdrop-blur-xl border-2 border-white/10 overflow-hidden rounded-[2.5rem] shadow-2xl">
             <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-8">
               <div className="relative flex-shrink-0">
                 <div className={cn(
@@ -110,9 +112,9 @@ export default function RankProgressPage() {
           </Card>
         </div>
 
-        {/* VERTICAL EXPEDITION ROADMAP */}
+        {/* Vertical Expedition Roadmap */}
         <div className="flex flex-col items-center relative py-12">
-          {/* Connecting Curved Line */}
+          {/* Connecting Curved Line through center */}
           <div className="absolute inset-0 z-0 flex justify-center">
             <svg width="400" height="100%" className="opacity-20" preserveAspectRatio="none">
               <path
@@ -121,7 +123,6 @@ export default function RankProgressPage() {
                   const x = isLast ? 200 : (i % 2 === 0 ? 100 : 300);
                   const y = (i + 1) * 200;
                   
-                  // Start point for this segment is the end of the previous one
                   const prevX = i === 0 ? 200 : ( (i - 1) === RANKS.length - 1 ? 200 : ((i - 1) % 2 === 0 ? 100 : 300) );
                   const prevY = i * 200;
                   const cpY = (prevY + y) / 2;
@@ -164,14 +165,14 @@ export default function RankProgressPage() {
                     <div className="relative">
                       <motion.div
                         className={cn(
-                          "w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] flex items-center justify-center relative z-10 transition-all duration-500 border",
+                          "w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] flex items-center justify-center relative z-10 transition-all duration-500 border-2",
                           isAchieved 
-                            ? cn("bg-slate-900 shadow-xl border-white/20", isCurrent && "current-rank") 
+                            ? "bg-slate-900 shadow-2xl border-white/20" 
                             : "bg-slate-800/50 border-white/5 grayscale opacity-30"
                         )}
                         style={isAchieved ? {
                           borderColor: isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.1)',
-                          boxShadow: isAchieved ? `0 0 20px ${rank.glow}33` : 'none'
+                          boxShadow: `0 0 20px ${rank.glow}33`
                         } : {}}
                       >
                         <div className={cn(
@@ -186,6 +187,14 @@ export default function RankProgressPage() {
                           )} 
                           style={isAchieved ? { filter: `drop-shadow(0 0 8px ${rank.glow})` } : {}}
                         />
+
+                        {isCurrent && (
+                            <motion.div 
+                                className="absolute -inset-2 border-2 border-primary rounded-[1.8rem] z-0"
+                                animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.2, 0.5] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                            />
+                        )}
 
                         {!isAchieved && (
                           <div className="absolute -bottom-1 -right-1 bg-slate-900 p-1.5 rounded-lg border border-white/10 shadow-2xl z-30">

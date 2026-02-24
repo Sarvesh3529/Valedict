@@ -37,27 +37,42 @@ export async function resetBrokenStreak() {
  * Checks if the weekly XP should be reset (if it's a new Monday since the last reset).
  * Returns true if reset was performed.
  */
-export async function ensureWeeklyXPReset(uid: string, profile: UserProfile): Promise<boolean> {
-  const now = new Date();
-  
-  // Start of current week (Monday 0:00)
-  const currentMonday = new Date(now);
-  const day = currentMonday.getDay();
-  // Adjust to previous Monday. getDay(): 0=Sun, 1=Mon, ..., 6=Sat
-  // If today is Sunday (0), we go back 6 days. If Mon (1), we stay.
-  const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
-  currentMonday.setDate(diff);
-  currentMonday.setHours(0, 0, 0, 0);
-
-  const lastResetDate = profile.lastWeeklyReset?.toDate() || profile.joinedat?.toDate() || new Date(0);
-
-  if (lastResetDate < currentMonday) {
+export async function ensureWeeklyXPReset(uid: string): Promise<boolean> {
+  try {
     const userRef = adminDb.collection('users').doc(uid);
-    await userRef.update({
-      weeklyxp: 0,
-      lastWeeklyReset: FieldValue.serverTimestamp(),
-    });
-    return true;
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return false;
+
+    const profile = userDoc.data() as UserProfile;
+    const now = new Date();
+    
+    // Start of current week (Monday 0:00)
+    const currentMonday = new Date(now);
+    const day = currentMonday.getDay();
+    // Adjust to previous Monday. getDay(): 0=Sun, 1=Mon, ..., 6=Sat
+    const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
+    currentMonday.setDate(diff);
+    currentMonday.setHours(0, 0, 0, 0);
+
+    // Helper to safely get Date from Timestamp (handles server-side Timestamp objects)
+    const getSafeDate = (ts: any) => {
+      if (!ts) return new Date(0);
+      if (typeof ts.toDate === 'function') return ts.toDate();
+      if (ts.seconds) return new Date(ts.seconds * 1000);
+      return new Date(ts);
+    };
+
+    const lastResetDate = getSafeDate(profile.lastWeeklyReset || profile.joinedat);
+
+    if (lastResetDate < currentMonday) {
+      await userRef.update({
+        weeklyxp: 0,
+        lastWeeklyReset: FieldValue.serverTimestamp(),
+      });
+      return true;
+    }
+  } catch (error) {
+    console.error("Error in ensureWeeklyXPReset:", error);
   }
 
   return false;
@@ -82,23 +97,19 @@ export async function updateUserStatsAfterQuiz(
     const uid = decodedToken.uid;
 
     const userRef = adminDb.collection('users').doc(uid);
+    
+    // 1. Weekly Reset JIT Check
+    await ensureWeeklyXPReset(uid);
+    
     const userDoc = await userRef.get();
-
     if (!userDoc.exists) {
       throw new Error('User profile not found.');
     }
 
     let profile = userDoc.data() as UserProfile;
     
-    // 1. Weekly Reset JIT Check
-    const wasReset = await ensureWeeklyXPReset(uid, profile);
-    if (wasReset) {
-        profile.weeklyxp = 0;
-    }
-    
     // 2. Strict Streak Logic
     const now = new Date();
-    // Today at 00:00:00 local time
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const lastActiveDate = profile.lastactive?.toDate();
@@ -112,7 +123,6 @@ export async function updateUserStatsAfterQuiz(
     let streakIncreased = false;
 
     if (!lastActiveDayStart || currentStreak === 0) {
-        // 1. If streak is 0 or no previous record: Set to 1
         newStreak = 1;
         streakIncreased = true;
     } else {
@@ -121,15 +131,12 @@ export async function updateUserStatsAfterQuiz(
         const differenceInDays = Math.round(differenceInMs / ONE_DAY_IN_MS);
 
         if (differenceInDays === 1) {
-            // 2. If lastactive was Yesterday: Increment
             newStreak = currentStreak + 1;
             streakIncreased = true;
         } else if (differenceInDays > 1) {
-            // 3. If missed a day: Reset to 1 (starting fresh today)
             newStreak = 1;
             streakIncreased = true;
         } 
-        // 4. If differenceInDays is 0 (Today): Do nothing (streak stays same)
     }
     
     const newHighestStreak = Math.max(profile.highestStreak || 0, newStreak);

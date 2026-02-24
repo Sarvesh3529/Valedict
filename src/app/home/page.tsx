@@ -41,6 +41,9 @@ export default async function HomePage() {
     redirect('/');
   }
 
+  // Check and Reset Weekly XP if a new Monday has passed
+  await ensureWeeklyXPReset(decodedToken.uid);
+
   const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
 
   if (!userDoc.exists) {
@@ -52,12 +55,6 @@ export default async function HomePage() {
 
   if (profile.onboardingComplete === false) {
     redirect('/onboarding/start');
-  }
-
-  // Check and Reset Weekly XP if a new Monday has passed
-  const wasReset = await ensureWeeklyXPReset(decodedToken.uid, profile);
-  if (wasReset) {
-    profile.weeklyxp = 0;
   }
   
   const lastActiveDate = profile.lastactive?.toDate().toISOString();
@@ -107,11 +104,10 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* Row 3: Action Row (Continue Learning & AI Doubt Solver) */}
+      {/* Row 3: Action Row */}
       <section>
         <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 pl-1">Study Tools</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch">
-            {/* Continue Learning Slot */}
             <div className="h-full">
                 {lastPracticedChapter ? (
                     <ContinueLearning chapter={lastPracticedChapter} />
@@ -119,7 +115,7 @@ export default async function HomePage() {
                     <Link href="/quiz" className="group h-full block">
                         <Card className="h-full bg-secondary/50 border-4 border-dashed border-muted-foreground/20 p-8 rounded-[2rem] flex flex-col items-center justify-center text-center gap-4 hover:border-primary/20 transition-colors">
                             <div className="h-16 w-16 bg-muted rounded-2xl flex items-center justify-center">
-                                <Compass className="h-10 w-10 text-muted-foreground" />
+                                <Icons.Compass className="h-10 w-10 text-muted-foreground" />
                             </div>
                             <h3 className="text-xl font-black uppercase tracking-tight text-muted-foreground">Pick a Subject</h3>
                         </Card>
@@ -127,11 +123,10 @@ export default async function HomePage() {
                 )}
             </div>
 
-            {/* AI Doubt Solver */}
             <Link href="/doubt-solver" className="group h-full">
                 <Card className="h-full bg-primary text-primary-foreground border-b-8 border-black/20 hover:border-b-4 hover:translate-y-[4px] active:border-b-0 active:translate-y-[8px] transition-all p-8 rounded-[2rem] flex flex-col items-center justify-center text-center gap-4">
                     <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                        <BrainCircuit className="h-10 w-10 text-white"/>
+                        <Icons.BrainCircuit className="h-10 w-10 text-white"/>
                     </div>
                     <h3 className="text-xl font-black uppercase tracking-tight">AI Doubt Solver</h3>
                 </Card>
