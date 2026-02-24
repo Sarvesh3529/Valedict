@@ -34,14 +34,16 @@ export async function resetBrokenStreak() {
 
 /**
  * Checks if the weekly XP should be reset.
- * Returns the timestamp of the current Monday 0:00.
+ * Returns the timestamp of the current Monday 0:00 (Server Time).
+ * This ensures fairness as it calculates the same window for all users.
  */
 export async function ensureWeeklyXPReset(uid: string): Promise<number> {
   const now = new Date();
   
-  // Start of current week (Monday 0:00)
+  // Start of current week (Monday 0:00) calculated on the server
   const currentMonday = new Date(now);
   const day = currentMonday.getDay();
+  // Get distance to previous Monday (1)
   const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
   currentMonday.setDate(diff);
   currentMonday.setHours(0, 0, 0, 0);
@@ -53,6 +55,7 @@ export async function ensureWeeklyXPReset(uid: string): Promise<number> {
     if (userDoc.exists) {
       const profile = userDoc.data() as UserProfile;
       
+      // Robust date parsing for various timestamp formats
       const getSafeDate = (ts: any) => {
         if (!ts) return new Date(0);
         if (typeof ts.toDate === 'function') return ts.toDate();
@@ -62,6 +65,7 @@ export async function ensureWeeklyXPReset(uid: string): Promise<number> {
 
       const lastResetDate = getSafeDate(profile.lastWeeklyReset || profile.joinedat);
 
+      // If the last recorded reset was BEFORE the start of the current week, reset the XP
       if (lastResetDate < currentMonday) {
         await userRef.update({
           weeklyxp: 0,
@@ -96,7 +100,7 @@ export async function updateUserStatsAfterQuiz(
 
     const userRef = adminDb.collection('users').doc(uid);
     
-    // 1. Weekly Reset JIT Check
+    // 1. Weekly Reset JIT Check (Server-side calculation)
     await ensureWeeklyXPReset(uid);
     
     const userDoc = await userRef.get();
