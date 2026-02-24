@@ -1,3 +1,4 @@
+
 'use server';
 
 import { cookies } from 'next/headers';
@@ -33,6 +34,36 @@ export async function resetBrokenStreak() {
 }
 
 /**
+ * Checks if the weekly XP should be reset (if it's a new Monday since the last reset).
+ * Returns true if reset was performed.
+ */
+export async function ensureWeeklyXPReset(uid: string, profile: UserProfile): Promise<boolean> {
+  const now = new Date();
+  
+  // Start of current week (Monday 0:00)
+  const currentMonday = new Date(now);
+  const day = currentMonday.getDay();
+  // Adjust to previous Monday. getDay(): 0=Sun, 1=Mon, ..., 6=Sat
+  // If today is Sunday (0), we go back 6 days. If Mon (1), we stay.
+  const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
+  currentMonday.setDate(diff);
+  currentMonday.setHours(0, 0, 0, 0);
+
+  const lastResetDate = profile.lastWeeklyReset?.toDate() || profile.joinedat?.toDate() || new Date(0);
+
+  if (lastResetDate < currentMonday) {
+    const userRef = adminDb.collection('users').doc(uid);
+    await userRef.update({
+      weeklyxp: 0,
+      lastWeeklyReset: FieldValue.serverTimestamp(),
+    });
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Updates user stats after a quiz following strict streak rules.
  */
 export async function updateUserStatsAfterQuiz(
@@ -57,9 +88,15 @@ export async function updateUserStatsAfterQuiz(
       throw new Error('User profile not found.');
     }
 
-    const profile = userDoc.data() as UserProfile;
+    let profile = userDoc.data() as UserProfile;
     
-    // --- Strict Streak Logic ---
+    // 1. Weekly Reset JIT Check
+    const wasReset = await ensureWeeklyXPReset(uid, profile);
+    if (wasReset) {
+        profile.weeklyxp = 0;
+    }
+    
+    // 2. Strict Streak Logic
     const now = new Date();
     // Today at 00:00:00 local time
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

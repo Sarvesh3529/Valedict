@@ -1,3 +1,4 @@
+
 'use server';
 
 import { cookies } from 'next/headers';
@@ -15,6 +16,7 @@ import StreakDisplay from '@/components/StreakDisplay';
 import { subjects, chapters } from '@/lib/data';
 import WeeklyProgressChart from '@/components/home/WeeklyProgressChart';
 import ContinueLearning from '@/components/home/ContinueLearning';
+import { ensureWeeklyXPReset } from '@/app/quiz/actions';
 
 const iconComponents: { [key: string]: React.ElementType } = {
   Calculator: Icons.Calculator,
@@ -50,6 +52,12 @@ export default async function HomePage() {
 
   if (profile.onboardingComplete === false) {
     redirect('/onboarding/start');
+  }
+
+  // Check and Reset Weekly XP if a new Monday has passed
+  const wasReset = await ensureWeeklyXPReset(decodedToken.uid, profile);
+  if (wasReset) {
+    profile.weeklyxp = 0;
   }
   
   const lastActiveDate = profile.lastactive?.toDate().toISOString();

@@ -8,6 +8,7 @@ export type UserProfile = {
   highestStreak: number;
   joinedat: any; // Firestore Timestamp
   lastactive: any; // Firestore Timestamp
+  lastWeeklyReset?: any; // Firestore Timestamp
   onboardingComplete: boolean;
   lastPracticedChapterId?: string;
   friends?: string[];

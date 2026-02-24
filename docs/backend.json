@@ -13,6 +13,7 @@
         "highestStreak": { "type": "number", "description": "User's all-time highest daily study streak." },
         "joinedat": { "type": "string", "format": "date-time", "description": "Timestamp when the user joined." },
         "lastactive": { "type": "string", "format": "date-time", "description": "Timestamp of the user's last activity." },
+        "lastWeeklyReset": { "type": "string", "format": "date-time", "description": "Timestamp of the last time weekly XP was reset." },
         "onboardingComplete": { "type": "boolean", "description": "Flag indicating if the user has completed the onboarding flow." },
         "grade": { "type": "string" },
         "friends": { "type": "array", "items": { "type": "string" }, "description": "List of friend UIDs." }

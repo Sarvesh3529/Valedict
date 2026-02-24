@@ -1,3 +1,4 @@
+
 'use server';
 
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
@@ -60,8 +61,9 @@ export async function signupWithUsername(prevState: any, formData: FormData): Pr
       streak: 0,
       highestStreak: 0,
       joinedat: FieldValue.serverTimestamp(),
+      lastactive: FieldValue.serverTimestamp(),
+      lastWeeklyReset: FieldValue.serverTimestamp(),
       onboardingComplete: false,
-      lastactive: null,
     });
 
     const usernameRef = adminDb.collection('usernames').doc(usernameLower);
