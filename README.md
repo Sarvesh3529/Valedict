@@ -1,7 +1,4 @@
-# Valedict AI
-
-Valedict AI is a gamified, AI-powered learning platform designed to make studying engaging, effective, and fun. It combines the addictive progression systems of modern language-learning apps with rigorous academic content and cutting-edge generative AI.
-
+# Valedict A
 ## 🚀 Features
 
 - **AI Doubt Solver**: Instant, detailed explanations for text or image-based academic questions using Google Gemini.
