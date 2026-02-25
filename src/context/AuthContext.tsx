@@ -31,9 +31,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   const logout = async () => {
-    await auth.signOut(); // This will trigger onIdTokenChanged
-    await serverLogout(); // Also clear the server-side session cookie
-    router.push('/');
+    try {
+        await auth.signOut();
+        await serverLogout();
+    } catch (e) {
+        console.error("Logout error:", e);
+    } finally {
+        setUser(null);
+        setProfile(null);
+        router.push('/');
+    }
   };
 
   useEffect(() => {
@@ -48,11 +55,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
           if (doc.exists()) {
             setProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+            setLoading(false);
           } else {
-            console.error("Profile not found for user:", authUser.uid);
-            setProfile(null);
+            // CRITICAL: If profile is not found, it's a stale session or deleted account.
+            // Force logout to prevent app breakage.
+            console.warn("Profile not found for UID:", authUser.uid, ". Logging out.");
+            logout();
           }
-          setLoading(false);
         }, (error) => {
             console.error("Error fetching profile:", error);
             setProfile(null);

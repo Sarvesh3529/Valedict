@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
@@ -24,6 +23,14 @@ const renderRank = (rank: number) => {
   if (rank === 1) return <Crown className={cn(size, "text-gray-400 fill-gray-400")} />;
   if (rank === 2) return <Crown className={cn(size, "text-orange-400 fill-orange-400")} />;
   return <span className="font-bold text-lg text-foreground">{rank + 1}</span>;
+};
+
+// Helper to get consistent date from various timestamp formats
+const getSafeDate = (ts: any) => {
+    if (!ts) return new Date(0);
+    if (typeof ts.toDate === 'function') return ts.toDate();
+    if (ts.seconds !== undefined) return new Date(ts.seconds * 1000);
+    return new Date(ts);
 };
 
 function UserList({ users, type }: { users: UserProfile[], type: LeaderboardType}) {
@@ -114,6 +121,7 @@ export default function LeaderboardPage() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentMonday, setCurrentMonday] = useState<number>(0);
   const { user, profile, loading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -123,24 +131,37 @@ export default function LeaderboardPage() {
       setLoading(true);
       setError(null);
       
-      // JIT reset for the current user
-      await ensureWeeklyXPReset(user.uid);
-
-      const usersRef = collection(db, 'users');
-      // Simple ordering queries that don't require composite indexes
-      const q = query(
-        usersRef, 
-        orderBy(leaderboardType, 'desc'), 
-        limit(50)
-      );
-      
       try {
+        // 1. Just-In-Time reset for the current user and get current week's start
+        const mondayTime = await ensureWeeklyXPReset(user.uid);
+        setCurrentMonday(mondayTime);
+
+        // 2. Simple ordering query (no complex index required)
+        const usersRef = collection(db, 'users');
+        const q = query(
+          usersRef, 
+          orderBy(leaderboardType, 'desc'), 
+          limit(100) // Fetch top 100 to filter client-side for fairness
+        );
+      
         const querySnapshot = await getDocs(q);
-        const leaderboardUsers: UserProfile[] = [];
+        const fetchedUsers: UserProfile[] = [];
         querySnapshot.forEach((doc) => {
-          leaderboardUsers.push({ uid: doc.id, ...doc.data() } as UserProfile);
+          fetchedUsers.push({ uid: doc.id, ...doc.data() } as UserProfile);
         });
-        setUsers(leaderboardUsers);
+
+        // 3. Client-side fairness filter:
+        // Only show users who have reset their accounts this week (prevents stale week scores)
+        if (leaderboardType === 'weeklyxp') {
+            const filtered = fetchedUsers.filter(u => {
+                const userReset = getSafeDate(u.lastWeeklyReset);
+                return userReset.getTime() >= mondayTime && (u.weeklyxp || 0) > 0;
+            });
+            setUsers(filtered);
+        } else {
+            setUsers(fetchedUsers);
+        }
+
       } catch (e: any) {
         console.error("Leaderboard Error:", e);
         setError("An error occurred while fetching rankings.");
