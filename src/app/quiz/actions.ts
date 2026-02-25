@@ -33,9 +33,8 @@ export async function resetBrokenStreak() {
 }
 
 /**
- * Checks if the weekly XP should be reset.
- * Returns the timestamp of the current Monday 0:00 (Server Time).
- * This ensures fairness as it calculates the same window for all users.
+ * Checks if the weekly XP should be reset based on server time.
+ * Returns the current Monday timestamp.
  */
 export async function ensureWeeklyXPReset(uid: string): Promise<number> {
   const now = new Date();
@@ -43,7 +42,6 @@ export async function ensureWeeklyXPReset(uid: string): Promise<number> {
   // Start of current week (Monday 0:00) calculated on the server
   const currentMonday = new Date(now);
   const day = currentMonday.getDay();
-  // Get distance to previous Monday (1)
   const diff = currentMonday.getDate() - day + (day === 0 ? -6 : 1);
   currentMonday.setDate(diff);
   currentMonday.setHours(0, 0, 0, 0);
@@ -55,17 +53,16 @@ export async function ensureWeeklyXPReset(uid: string): Promise<number> {
     if (userDoc.exists) {
       const profile = userDoc.data() as UserProfile;
       
-      // Robust date parsing for various timestamp formats
+      // Safe date parsing for Firestore Timestamps
       const getSafeDate = (ts: any) => {
         if (!ts) return new Date(0);
         if (typeof ts.toDate === 'function') return ts.toDate();
-        if (ts.seconds) return new Date(ts.seconds * 1000);
+        if (ts.seconds !== undefined) return new Date(ts.seconds * 1000);
         return new Date(ts);
       };
 
       const lastResetDate = getSafeDate(profile.lastWeeklyReset || profile.joinedat);
 
-      // If the last recorded reset was BEFORE the start of the current week, reset the XP
       if (lastResetDate < currentMonday) {
         await userRef.update({
           weeklyxp: 0,
@@ -100,7 +97,7 @@ export async function updateUserStatsAfterQuiz(
 
     const userRef = adminDb.collection('users').doc(uid);
     
-    // 1. Weekly Reset JIT Check (Server-side calculation)
+    // 1. Weekly Reset JIT Check
     await ensureWeeklyXPReset(uid);
     
     const userDoc = await userRef.get();
@@ -114,10 +111,12 @@ export async function updateUserStatsAfterQuiz(
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const lastActiveDate = profile.lastactive?.toDate();
+    const lastActiveTs = profile.lastactive;
     let lastActiveDayStart: Date | null = null;
-    if (lastActiveDate) {
-      lastActiveDayStart = new Date(lastActiveDate.getFullYear(), lastActiveDate.getMonth(), lastActiveDate.getDate());
+    
+    if (lastActiveTs) {
+      const d = lastActiveTs.toDate ? lastActiveTs.toDate() : new Date(lastActiveTs.seconds * 1000);
+      lastActiveDayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     }
 
     let currentStreak = profile.streak || 0;
